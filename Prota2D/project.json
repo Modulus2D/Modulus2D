@@ -1,0 +1,9 @@
+{
+  "supports": {},
+  "dependencies": {},
+  "frameworks": {
+    ".NETStandard1.7": {
+      "imports": "portable-"
+    }
+  }
+}
