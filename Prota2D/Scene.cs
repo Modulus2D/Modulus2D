@@ -5,18 +5,19 @@ using System.Text;
 using System.Threading.Tasks;
 using Prota2D.Entities;
 using SFML.Graphics;
+using Prota2D.Graphics;
 
 namespace Prota2D
 {
     public class Scene
     {
-        private EntitySystem entitySystem = new EntitySystem();
+        public EntityWorld world = new EntityWorld();
+        private SpriteSystem spriteSystem;
 
-        public void Activate(RenderWindow window) {
-            entitySystem.RegisterComponent<Graphics.Sprite>();
-            Entity e1 = entitySystem.Add();
-            entitySystem.AddComponent(e1, new Graphics.Sprite("A"));
-            entitySystem.GetComponent<Graphics.Sprite>(entitySystem.Add());
+        public void Activate(RenderWindow window)
+        {
+            spriteSystem = new SpriteSystem(window);
+            world.AddSystem(spriteSystem);
         }
 
         public void Deactivate()
@@ -25,6 +26,7 @@ namespace Prota2D
 
         public void Update()
         {
+            world.Update();
         }
     }
 }

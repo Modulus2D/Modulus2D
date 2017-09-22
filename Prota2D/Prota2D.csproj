@@ -30,6 +30,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="FarseerPhysics, Version=3.5.0.38023, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\FarseerPhysics.3.5.0\lib\NET40\FarseerPhysics.dll</HintPath>
+    </Reference>
     <Reference Include="sfmlnet-audio-2">
       <HintPath>..\Deps\SFML.Net-2.2\lib\sfmlnet-audio-2.dll</HintPath>
     </Reference>
@@ -52,10 +55,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Entity\ComponentRegister.cs" />
-    <Compile Include="Entity\Entity.cs" />
-    <Compile Include="Entity\EntitySystem.cs" />
-    <Compile Include="Entity\IComponent.cs" />
+    <Compile Include="Application.cs" />
+    <Compile Include="Entities\ComponentRegister.cs" />
+    <Compile Include="Entities\Entity.cs" />
+    <Compile Include="Entities\EntityFilter.cs" />
+    <Compile Include="Entities\EntityIterator.cs" />
+    <Compile Include="Entities\EntitySystem.cs" />
+    <Compile Include="Entities\EntityWorld.cs" />
+    <Compile Include="Entities\IComponent.cs" />
     <Compile Include="Game.cs" />
     <Compile Include="Graphics\Sprite.cs" />
     <Compile Include="Graphics\SpriteSystem.cs" />
@@ -63,6 +70,8 @@
     <Compile Include="Scene.cs" />
     <Compile Include="Transform.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

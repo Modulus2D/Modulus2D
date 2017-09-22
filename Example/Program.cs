@@ -12,15 +12,8 @@ namespace Example
     {
         static void Main(string[] args)
         {
-            Game game = new Game(1336, 768, "Example");
-            Scene scene = new Scene();
-            game.Scene = scene;
-
-            // entity.AddComponent(new Transform());
-            //entity.AddComponent(new Transform());
-            //entity.AddComponent(new Sprite("Textures/Face.png"));
-
-            game.Start();
+            Application application = new Application(new ExampleGame(), 1336, 768, "Example");
+            application.Start();
         }
     }
 }

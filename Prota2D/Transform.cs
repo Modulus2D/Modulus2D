@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Prota2D.Entities;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Prota2D
 {
-    public class Transform
+    public class Transform : IComponent
     {
         public float x = 0f;
         public float y = 0f;

@@ -3,64 +3,45 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using SFML;
+using Prota2D.Graphics;
+using Prota2D.Entities;
 using SFML.Graphics;
-using SFML.Window;
+using SFML.System;
 
 namespace Prota2D
 {
-    public class Game
+    public abstract class Game
     {
+        private Scene currentScene;
         private RenderWindow window;
+        private Clock clock = new Clock();
 
-        private Scene scene;
-        public Scene Scene
+        public abstract void Init();
+
+        public void SetWindow(RenderWindow renderWindow)
         {
-            get
-            {
-                return scene;
-            }
-            set
-            {
-                if(scene != null)
-                {
-                    scene.Deactivate();
-                }
-                scene = value;
-                scene.Activate(window);
-            }
+            window = renderWindow;
         }
 
-        public Game(uint width, uint height, string name)
+        public void SetScene(Scene scene)
         {
-            // SFML
-            window = new RenderWindow(new VideoMode(width, height), name);
-
-            window.SetActive();
-            window.Closed += new EventHandler(OnClosed);  
-        }
-
-        public void Start()
-        {
-            while (window.IsOpen)
+            if (currentScene != null)
             {
-                window.DispatchEvents();
-
-                window.Clear(new Color(0, 0, 0));
-
-                if (scene != null)
-                {
-                    scene.Update();
-                }
-
-                window.Display();
+                currentScene.Deactivate();
             }
+
+            currentScene = scene;
+            currentScene.Activate(window);
         }
 
-        static void OnClosed(object sender, EventArgs e)
+        public void Update()
         {
-            Window window = (Window)sender;
-            window.Close();
+            currentScene.Update();
+
+            float fps = 1f / clock.ElapsedTime.AsSeconds();
+            clock.Restart();
+
+            Console.WriteLine("FPS: " + fps);
         }
     }
 }

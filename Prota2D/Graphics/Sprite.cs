@@ -13,6 +13,8 @@ namespace Prota2D.Graphics
 
         public Sprite(string file)
         {
+            sprite = new SFML.Graphics.Sprite();
+            sprite.Origin = new SFML.System.Vector2f(0.5f, 0.5f);
             sprite.Texture = new SFML.Graphics.Texture(file);
         } 
     }
