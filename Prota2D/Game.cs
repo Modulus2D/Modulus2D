@@ -36,12 +36,9 @@ namespace Prota2D
 
         public void Update()
         {
-            currentScene.Update();
-
-            float fps = 1f / clock.ElapsedTime.AsSeconds();
+            float dt = clock.ElapsedTime.AsSeconds();
             clock.Restart();
-
-            Console.WriteLine("FPS: " + fps);
+            currentScene.Update(dt);
         }
     }
 }

@@ -7,11 +7,11 @@ using Prota2D.Entities;
 
 namespace Prota2D.Graphics
 {
-    public class Sprite : IComponent
+    public class SpriteRenderer : IComponent
     {
         public SFML.Graphics.Sprite sprite;
 
-        public Sprite(string file)
+        public SpriteRenderer(string file)
         {
             sprite = new SFML.Graphics.Sprite();
             sprite.Origin = new SFML.System.Vector2f(0.5f, 0.5f);

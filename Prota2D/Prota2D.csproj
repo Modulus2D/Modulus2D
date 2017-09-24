@@ -56,15 +56,18 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Application.cs" />
-    <Compile Include="Entities\ComponentRegister.cs" />
+    <Compile Include="Entities\ComponentFilter.cs" />
     <Compile Include="Entities\Entity.cs" />
+    <Compile Include="Entities\EntityAllocator.cs" />
     <Compile Include="Entities\EntityFilter.cs" />
     <Compile Include="Entities\EntityIterator.cs" />
-    <Compile Include="Entities\EntitySystem.cs" />
+    <Compile Include="Entities\IComponentFilter.cs" />
+    <Compile Include="Entities\IEntitySystem.cs" />
     <Compile Include="Entities\EntityWorld.cs" />
     <Compile Include="Entities\IComponent.cs" />
+    <Compile Include="FPSCounterSystem.cs" />
     <Compile Include="Game.cs" />
-    <Compile Include="Graphics\Sprite.cs" />
+    <Compile Include="Graphics\SpriteRenderer.cs" />
     <Compile Include="Graphics\SpriteSystem.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Scene.cs" />

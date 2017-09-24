@@ -24,9 +24,9 @@ namespace Prota2D
         {
         }
 
-        public void Update()
+        public void Update(float deltaTime)
         {
-            world.Update();
+            world.Update(deltaTime);
         }
     }
 }

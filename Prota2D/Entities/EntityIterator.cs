@@ -9,26 +9,26 @@ namespace Prota2D.Entities
 {
     public class EntityIterator : System.Collections.IEnumerable
     {
-        private List<Entity> entities;
+        private int last;
         private EntityWorld world;
         private EntityFilter filter;
 
-        public EntityIterator(List<Entity> entityList, EntityWorld entityWorld, EntityFilter entityFilter)
+        public EntityIterator(int lastIndex, EntityWorld entityWorld, EntityFilter entityFilter)
         {
-            entities = entityList;
+            last = lastIndex;
             world = entityWorld;
             filter = entityFilter;
         }
 
         public IEnumerator GetEnumerator()
         {
-            foreach (Entity entity in entities)
+            for (int i = 0; i < last; i++)
             {
                 bool pass = true;
 
-                foreach (Type type in filter.types)
+                foreach (IComponentFilter filter in filter.filters)
                 {
-                    if (!world.HasComponentType(entity, type))
+                    if (!filter.Test(i))
                     {
                         pass = false;
                         break;
@@ -37,7 +37,7 @@ namespace Prota2D.Entities
 
                 if (pass)
                 {
-                    yield return entity;
+                    yield return i;
                 }
             }
 

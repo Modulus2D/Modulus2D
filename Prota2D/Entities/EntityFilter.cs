@@ -8,14 +8,11 @@ namespace Prota2D.Entities
 {
     public class EntityFilter
     {
-        public List<Type> types = new List<Type>();
+        public List<IComponentFilter> filters = new List<IComponentFilter>();
 
-        public EntityFilter(params Type[] componentTypes)
+        public void Add<T>() where T : IComponent
         {
-            foreach (Type type in componentTypes)
-            {
-                types.Add(type);
-            }
+            filters.Add(new ComponentFilter<T>());
         }
     }
 }

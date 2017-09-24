@@ -13,24 +13,30 @@ namespace Prota2D.Graphics
     {
         RenderWindow window;
 
+        private EntityFilter filter;
+
         public SpriteSystem(RenderWindow renderWindow)
         {
             window = renderWindow;
+
+            filter = new EntityFilter();
+            filter.Add<Transform>();
+            //filter.Add<SpriteRenderer>();
         }
-
-        public void Update(EntityWorld world)
+        
+        public void Update(EntityWorld world, float deltaTime)
         {
-            foreach(Entity entity in world.Iterate(new EntityFilter(typeof(Sprite), typeof(Transform))))
+            foreach (int id in world.Iterate(filter))
             {
-               /* Transform transform = world.GetComponent<Transform>(entity);
-                transform.rotation += 0.2f;
+                Console.Write("D");
 
-                SFML.Graphics.Sprite sprite = world.GetComponent<Sprite>(entity).sprite;
+                Transform transform = world.GetComponent<Transform>(id);
+                /*Sprite sprite = world.GetComponent<SpriteRenderer>(id).sprite;
+
                 sprite.Position = new Vector2f(transform.x, transform.y);
                 sprite.Scale = new Vector2f(transform.scaleX, transform.scaleY);
                 sprite.Rotation = transform.rotation;
-
-                //window.Draw(sprite);*/
+                window.Draw(sprite);*/
             }
         }
     }

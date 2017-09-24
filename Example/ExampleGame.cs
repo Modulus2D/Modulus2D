@@ -16,16 +16,16 @@ namespace Example
             Console.WriteLine("Init");
             Scene scene = new Scene();
 
-            for (int i = 0; i < 50000; i++)
+            for (int i = 0; i < 100; i++)
             {
                 Entity entity = scene.world.Add();
                 scene.world.AddComponent(entity, new Transform());
-                scene.world.AddComponent(entity, new Sprite("Textures/Face.png"));
-                scene.world.GetComponent<Transform>(entity).rotation = 180f;
-                scene.world.GetComponent<Transform>(entity).x = 180f;
-                scene.world.GetComponent<Transform>(entity).y = 180f;
+                scene.world.AddComponent(entity, new SpriteRenderer("Textures/Face.png"));
             }
+            
+            Console.WriteLine("Setup complete");
 
+            scene.world.AddSystem(new FPSCounterSystem());
 
             SetScene(scene);
         }

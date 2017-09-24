@@ -9,6 +9,6 @@ namespace Prota2D.Entities
 {
     public interface IEntitySystem
     {
-        void Update(EntityWorld world);
+        void Update(EntityWorld world, float deltaTime);
     }
 }
