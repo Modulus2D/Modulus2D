@@ -14,20 +14,58 @@ namespace Example
         public override void Init()
         {
             Console.WriteLine("Init");
-            Scene scene = new Scene();
 
-            for (int i = 0; i < 100; i++)
-            {
-                Entity entity = scene.world.Add();
-                scene.world.AddComponent(entity, new Transform());
-                scene.world.AddComponent(entity, new SpriteRenderer("Textures/Face.png"));
-            }
+            Texture ed = Textures.Load("Textures/Dota.png");
+            /*Texture disc = Textures.Load("Textures/Dota.png");
+            Texture harold = Textures.Load("Textures/Dota.png");
+            Texture gerald = Textures.Load("Textures/Dota.png");
+            Texture pillar = Textures.Load("Textures/Dota.png");*/
+
             
+            
+            Texture disc = Textures.Load("Textures/Face.png");
+            Texture harold = Textures.Load("Textures/Harold2.png");
+            Texture gerald = Textures.Load("Textures/Gerald2.png");
+            Texture pillar = Textures.Load("Textures/Pillar.png");
+
+    
+
+            for (int i = 0; i < 1280; i++)
+            {
+                Entity entity = World.Add();
+
+                Transform transform = new Transform();
+                transform.x = (i % 40) * 32;
+                transform.y = (i / 40) * 32;
+                transform.rotation = i;
+
+                World.AddComponent(entity, transform);
+
+                if (i % 5 == 0)
+                {
+                    World.AddComponent(entity, new SpriteRenderer(ed));
+                }
+                if (i % 5 == 1)
+                {
+                    World.AddComponent(entity, new SpriteRenderer(disc));
+                }
+                if (i % 5 == 2)
+                {
+                    World.AddComponent(entity, new SpriteRenderer(harold));
+                }
+                if (i % 5 == 3)
+                {
+                    World.AddComponent(entity, new SpriteRenderer(gerald));
+                }
+                if (i % 5 == 4)
+                {
+                    World.AddComponent(entity, new SpriteRenderer(pillar));
+                }
+            }
+
             Console.WriteLine("Setup complete");
 
-            scene.world.AddSystem(new FPSCounterSystem());
-
-            SetScene(scene);
+            World.AddSystem(new FPSCounterSystem());
         }
     }
 }

@@ -22,7 +22,12 @@ namespace Prota2D
             
             averageFps = averageFps * (totalTicks - 1) / totalTicks + 1f / (deltaTime * totalTicks);
             
-            Console.WriteLine("FPS: " + averageFps);
+            if (printTimer > printFrequency)
+            {
+                Console.WriteLine("FPS: " + averageFps);
+
+                printTimer = 0f;
+            }
         }
     }
 }

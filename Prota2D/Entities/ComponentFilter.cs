@@ -12,7 +12,7 @@ namespace Prota2D.Entities
 
         public bool Test(int id)
         {
-            return list[id] != null;
+            return id < list.Count && list[id] != null;
         }
     }
 }

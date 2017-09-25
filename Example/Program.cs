@@ -12,7 +12,7 @@ namespace Example
     {
         static void Main(string[] args)
         {
-            Application application = new Application(new ExampleGame(), 1336, 768, "Example");
+            Application application = new Application(new ExampleGame(), 1280, 768, "Example");
             application.Start();
         }
     }

@@ -9,14 +9,21 @@ namespace Prota2D.Graphics
 {
     public class SpriteRenderer : IComponent
     {
-        public SFML.Graphics.Sprite sprite;
+        internal SFML.Graphics.Sprite sprite;
 
-        public SpriteRenderer(string file)
+        private Texture texture;
+        public Texture Texture { get => texture; set => texture = value; }
+
+        public SpriteRenderer(Texture spriteTexture)
         {
             sprite = new SFML.Graphics.Sprite();
             sprite.Origin = new SFML.System.Vector2f(0.5f, 0.5f);
-            sprite.Texture = new SFML.Graphics.Texture(file);
-        } 
+
+            sprite.Texture = spriteTexture.texture;
+            //sprite.Texture = new SFML.Graphics.Texture("Textures/Face.png");
+            /*Texture = spriteTexture;
+            sprite.Texture = Texture.texture;*/
+        }
     }
 }
 

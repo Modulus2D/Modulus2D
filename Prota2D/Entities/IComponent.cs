@@ -19,12 +19,20 @@ namespace Prota2D.Entities
 
         public static List<T> Get<T>() where T : IComponent
         {
-            return PerType<T>.list;
+            List<T> list = PerType<T>.list;
+
+            if (list == null)
+            {
+                Register<T>();
+                list = PerType<T>.list;
+            }
+
+            return list;
         }
 
-        public static void Set<T>(List<T> newlist) where T : IComponent
+        public static void Register<T>() where T : IComponent
         {
-            PerType<T>.list = newlist;
+            PerType<T>.list = new List<T>();
         }
 
         public static List<T> GetByExample<T>(T ignoredExample) where T : IComponent

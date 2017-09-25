@@ -34,7 +34,7 @@ namespace Prota2D.Entities
 
         public int GetLast()
         {
-            return nextId - 1;
+            return nextId;
         }
     }
 }

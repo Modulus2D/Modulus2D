@@ -14,7 +14,6 @@ namespace Prota2D.Entities
 
         public Entity Add()
         {
-            ComponentLists.Set(new List<SpriteRenderer>());
             return new Entity(allocator.Create());
         }
 
@@ -38,20 +37,17 @@ namespace Prota2D.Entities
             List<T> list = ComponentLists.Get<T>();
             int id = entity.id;
 
-            if (list == null)
-            {
-                ComponentLists.Set(new List<T>());
-                list = ComponentLists.Get<T>();
-            }
-
             if (list.Count < id + 1)
             {
-                for (int i = 0; i < (id - list.Count + 1); i++)
+                
+                for (int i = 0; i < (id - list.Count); i++)
                 {
+                    Console.WriteLine("Spacing...");
                     list.Add(default(T));
                 }
-            }
-            else
+
+                list.Add(component);
+            } else
             {
                 list[id] = component;
             }

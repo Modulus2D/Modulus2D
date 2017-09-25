@@ -12,33 +12,35 @@ namespace Prota2D
 {
     public abstract class Game
     {
-        private Scene currentScene;
-        private RenderWindow window;
+        // World
+        private EntityWorld world = new EntityWorld();
+
+        // Time
         private Clock clock = new Clock();
+
+        // Graphics
+        private RenderWindow window;
+        private SpriteSystem spriteSystem;
+        private TextureLoader textures = new TextureLoader();
+
+        public EntityWorld World { get => world; }
+        public TextureLoader Textures { get => textures; }
 
         public abstract void Init();
 
         public void SetWindow(RenderWindow renderWindow)
         {
             window = renderWindow;
-        }
-
-        public void SetScene(Scene scene)
-        {
-            if (currentScene != null)
-            {
-                currentScene.Deactivate();
-            }
-
-            currentScene = scene;
-            currentScene.Activate(window);
+            
+            spriteSystem = new SpriteSystem(window);
+            world.AddSystem(spriteSystem);
         }
 
         public void Update()
         {
             float dt = clock.ElapsedTime.AsSeconds();
             clock.Restart();
-            currentScene.Update(dt);
+            world.Update(dt);
         }
     }
 }

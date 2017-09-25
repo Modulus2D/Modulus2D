@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Prota2D.Entities
 {
-    public class EntityIterator : System.Collections.IEnumerable
+    public class EntityIterator : IEnumerable
     {
         private int last;
         private EntityWorld world;
