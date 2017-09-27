@@ -8,7 +8,7 @@ using SFML.Graphics;
 using SFML.Window;
 using Prota2D.Graphics;
 
-namespace Prota2D
+namespace Prota2D.Core
 {
     public class Application
     {
@@ -38,6 +38,7 @@ namespace Prota2D
                 window.Clear(new Color(0, 0, 0));
 
                 game.Update();
+                // game.Render();
 
                 window.Display();
             }

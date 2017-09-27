@@ -12,32 +12,46 @@ namespace Prota2D.Entities
         private int last;
         private EntityWorld world;
         private EntityFilter filter;
+        private List<IComponentStorage> storages = new List<IComponentStorage>();
+        private Components components = new Components();
 
         public EntityIterator(int lastIndex, EntityWorld entityWorld, EntityFilter entityFilter)
         {
             last = lastIndex;
             world = entityWorld;
             filter = entityFilter;
+
+            for (int i = 0; i < filter.components.Count; i++)
+            {
+                storages.Add(world.GetGenericStorage(filter.components[i]));
+                components.Allocate();
+            }
         }
 
         public IEnumerator GetEnumerator()
         {
-            for (int i = 0; i < last; i++)
+            for (int id = 0; id < last; id++)
             {
                 bool pass = true;
 
-                foreach (IComponentFilter filter in filter.filters)
+                for (int i = 0; i < storages.Count; i++)
                 {
-                    if (!filter.Test(i))
+                    IComponentStorage storage = storages[i];
+
+                    if(!storage.Has(id))
                     {
                         pass = false;
                         break;
+                    } else
+                    {
+                        components.components[i] = storage.Get(id);
                     }
                 }
 
                 if (pass)
                 {
-                    yield return i;
+                    components.ResetIndex();
+                    yield return components;
                 }
             }
 

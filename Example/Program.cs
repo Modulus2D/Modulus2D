@@ -3,8 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Prota2D;
-using Prota2D.Graphics;
+using Prota2D.Core;
 
 namespace Example
 {

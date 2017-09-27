@@ -11,56 +11,78 @@ namespace Prota2D.Entities
     {
         private EntityAllocator allocator = new EntityAllocator();
         private List<IEntitySystem> systems = new List<IEntitySystem>();
+        private Dictionary<Type, IComponentStorage> storages = new Dictionary<Type, IComponentStorage>();
 
-        public Entity Add()
+        public Entity Create()
         {
-            return new Entity(allocator.Create());
+            return new Entity(allocator.Create(), this);
         }
 
-        public void Remove(Entity entity)
+        public void Destroy(int id)
         {
-            allocator.Remove(entity.id);
-        }
-
-        public T GetComponent<T>(Entity entity) where T : IComponent
-        {
-            return ComponentLists.Get<T>()[entity.id];
+            allocator.Remove(id);
+            foreach (IComponentStorage storage in storages.Values)
+            {
+                storage.Clear(id);
+            }
         }
 
         public T GetComponent<T>(int id) where T : IComponent
         {
-            return ComponentLists.Get<T>()[id];
+            return GetStorage<T>().list[id];
         }
 
-        public void AddComponent<T>(Entity entity, T component) where T : IComponent
+        public void RemoveComponent<T>(int id) where T : IComponent
         {
-            List<T> list = ComponentLists.Get<T>();
-            int id = entity.id;
+            GetStorage<T>().Clear(id);
+        }
 
-            if (list.Count < id + 1)
+        public void AddComponent<T>(int id, T component) where T : IComponent
+        {
+            ComponentStorage<T> storage = GetStorage<T>();
+
+            if (storage.list.Count < id + 1)
             {
-                
-                for (int i = 0; i < (id - list.Count); i++)
+                for (int i = 0; i < (id - storage.list.Count); i++)
                 {
-                    Console.WriteLine("Spacing...");
-                    list.Add(default(T));
+                    storage.list.Add(default(T));
                 }
 
-                list.Add(component);
-            } else
+                storage.list.Add(component);
+            }
+            else
             {
-                list[id] = component;
+                storage.list[id] = component;
             }
         }
 
-        public bool HasComponent<T>(Entity entity) where T : IComponent
+        public ComponentStorage<T> GetStorage<T>() where T : IComponent
         {
-            return ComponentLists.Get<T>()[entity.id] != null;
+            if (storages.TryGetValue(typeof(T), out IComponentStorage storage))
+            {
+                return (ComponentStorage<T>)storage;
+            }
+            else
+            {
+                ComponentStorage<T> newStorage = new ComponentStorage<T>();
+                storages.Add(typeof(T), newStorage);
+                return newStorage;
+            }
         }
 
-        public bool HasComponent<T>(int id) where T : IComponent
+        public IComponentStorage GetGenericStorage(Type type)
         {
-            return ComponentLists.Get<T>()[id] != null;
+            if (storages.TryGetValue(type, out IComponentStorage storage))
+            {
+                return storage;
+            }
+            else
+            {
+                Type args = typeof(ComponentStorage<>).MakeGenericType(type);
+                IComponentStorage newStorage = (IComponentStorage)Activator.CreateInstance(args);
+                storages.Add(type, newStorage);
+                return newStorage;
+            }
         }
 
         public void Update(float deltaTime)

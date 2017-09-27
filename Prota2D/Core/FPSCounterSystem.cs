@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Prota2D
+namespace Prota2D.Core
 {
     public class FPSCounterSystem : IEntitySystem
     {

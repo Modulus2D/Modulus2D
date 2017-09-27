@@ -8,22 +8,20 @@ using Prota2D.Entities;
 using SFML.Graphics;
 using SFML.System;
 
-namespace Prota2D
+namespace Prota2D.Core
 {
     public abstract class Game
     {
-        // World
-        private EntityWorld world = new EntityWorld();
+        // Scenes
+        public List<Scene> scenes = new List<Scene>();
 
         // Time
         private Clock clock = new Clock();
 
         // Graphics
         private RenderWindow window;
-        private SpriteSystem spriteSystem;
         private TextureLoader textures = new TextureLoader();
 
-        public EntityWorld World { get => world; }
         public TextureLoader Textures { get => textures; }
 
         public abstract void Init();
@@ -31,16 +29,38 @@ namespace Prota2D
         public void SetWindow(RenderWindow renderWindow)
         {
             window = renderWindow;
-            
-            spriteSystem = new SpriteSystem(window);
-            world.AddSystem(spriteSystem);
+        }
+
+        public void Load(Scene scene)
+        {
+            scene.Load(window);
+            scenes.Add(scene);
+        }
+
+        public void Unload(Scene scene)
+        {
+            scenes.Remove(scene);
         }
 
         public void Update()
         {
             float dt = clock.ElapsedTime.AsSeconds();
             clock.Restart();
-            world.Update(dt);
+
+            // Update
+            for (int i = 0; i < scenes.Count; i++)
+            {
+                scenes[i].Update(dt);
+            }
+        }
+
+        public void Render()
+        {
+            // Render
+            for (int i = 0; i < scenes.Count; i++)
+            {
+                scenes[i].Render();
+            }
         }
     }
 }

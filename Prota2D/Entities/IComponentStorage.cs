@@ -6,7 +6,10 @@ using System.Threading.Tasks;
 
 namespace Prota2D.Entities
 {
-    public interface IComponent
+    public interface IComponentStorage
     {
+        bool Has(int id);
+        IComponent Get(int id);
+        void Clear(int id);
     }
 }

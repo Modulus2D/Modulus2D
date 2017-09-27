@@ -16,13 +16,11 @@ namespace Prota2D.Graphics
 
         public SpriteRenderer(Texture spriteTexture)
         {
-            sprite = new SFML.Graphics.Sprite();
-            sprite.Origin = new SFML.System.Vector2f(0.5f, 0.5f);
-
-            sprite.Texture = spriteTexture.texture;
-            //sprite.Texture = new SFML.Graphics.Texture("Textures/Face.png");
-            /*Texture = spriteTexture;
-            sprite.Texture = Texture.texture;*/
+            sprite = new SFML.Graphics.Sprite()
+            {
+                Origin = new SFML.System.Vector2f(0.5f, 0.5f),
+                Texture = spriteTexture.texture
+            };
         }
     }
 }

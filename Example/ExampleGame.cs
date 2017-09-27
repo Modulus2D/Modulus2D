@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 using Prota2D;
 using Prota2D.Entities;
 using Prota2D.Graphics;
+using Prota2D.Core;
+using Prota2D.Math;
+using Prota2D.Physics;
 
 namespace Example
 {
@@ -13,59 +16,35 @@ namespace Example
     {
         public override void Init()
         {
-            Console.WriteLine("Init");
-
-            Texture ed = Textures.Load("Textures/Dota.png");
-            /*Texture disc = Textures.Load("Textures/Dota.png");
-            Texture harold = Textures.Load("Textures/Dota.png");
-            Texture gerald = Textures.Load("Textures/Dota.png");
-            Texture pillar = Textures.Load("Textures/Dota.png");*/
-
-            
-            
-            Texture disc = Textures.Load("Textures/Face.png");
-            Texture harold = Textures.Load("Textures/Harold2.png");
-            Texture gerald = Textures.Load("Textures/Gerald2.png");
-            Texture pillar = Textures.Load("Textures/Pillar.png");
-
-    
-
-            for (int i = 0; i < 1280; i++)
+            /*for (int i = 0; i < 1280; i++)
             {
-                Entity entity = World.Add();
+                Entity entity = game.world.Create();
 
-                Transform transform = new Transform();
-                transform.x = (i % 40) * 32;
-                transform.y = (i / 40) * 32;
-                transform.rotation = i;
+                Transform transform = new Transform()
+                {
+                    position = new Vector2((i % 40) * 32 + 16, (i / 40) * 32 + 16),
+                    rotation = 20 * i / 32
+                };
 
-                World.AddComponent(entity, transform);
+                entity.AddComponent(transform);
+                entity.AddComponent(new SpriteRenderer(ed));
+            }*/
 
-                if (i % 5 == 0)
-                {
-                    World.AddComponent(entity, new SpriteRenderer(ed));
-                }
-                if (i % 5 == 1)
-                {
-                    World.AddComponent(entity, new SpriteRenderer(disc));
-                }
-                if (i % 5 == 2)
-                {
-                    World.AddComponent(entity, new SpriteRenderer(harold));
-                }
-                if (i % 5 == 3)
-                {
-                    World.AddComponent(entity, new SpriteRenderer(gerald));
-                }
-                if (i % 5 == 4)
-                {
-                    World.AddComponent(entity, new SpriteRenderer(pillar));
-                }
-            }
+            Texture face = Textures.Load("Textures/Face.png");
+            Scene game = new Scene();
+
+            Entity entity = game.world.Create();
+            entity.AddComponent(new Transform());
+            entity.AddComponent(new SpriteRenderer(face));
+            entity.AddComponent(new Rigidbody());
+
+            //Map map = new Map("Maps/Test.tmx");
+
+            game.world.AddSystem(new FPSCounterSystem());
 
             Console.WriteLine("Setup complete");
 
-            World.AddSystem(new FPSCounterSystem());
+            Load(game);
         }
     }
 }
