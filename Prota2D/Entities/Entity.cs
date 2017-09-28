@@ -27,6 +27,11 @@ namespace Prota2D.Entities
             return world.GetComponent<T>(id);
         }
 
+        public bool HasComponent<T>() where T : IComponent
+        {
+            return world.HasComponent<T>(id);
+        }
+
         public void RemoveComponent<T>() where T : IComponent
         {
             world.RemoveComponent<T>(id);

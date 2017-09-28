@@ -15,36 +15,29 @@ namespace Example
     class ExampleGame : Game
     {
         public override void Init()
-        {
-            /*for (int i = 0; i < 1280; i++)
-            {
-                Entity entity = game.world.Create();
-
-                Transform transform = new Transform()
-                {
-                    position = new Vector2((i % 40) * 32 + 16, (i / 40) * 32 + 16),
-                    rotation = 20 * i / 32
-                };
-
-                entity.AddComponent(transform);
-                entity.AddComponent(new SpriteRenderer(ed));
-            }*/
-
-            Texture face = Textures.Load("Textures/Face.png");
+        {  
             Scene game = new Scene();
+            Load(game);
+
+            Texture face = Textures.Load("Resources/Textures/Face.png");
 
             Entity entity = game.world.Create();
             entity.AddComponent(new Transform());
             entity.AddComponent(new SpriteRenderer(face));
             entity.AddComponent(new Rigidbody());
+            entity.AddComponent(new CircleCollider(1f));
+
+            Entity floor = game.world.Create();
+            floor.AddComponent(new Transform());
+            floor.AddComponent(new Rigidbody());
+            floor.AddComponent(new CircleCollider(1f));
+            floor.GetComponent<Rigidbody>().IsStatic = true;
 
             //Map map = new Map("Maps/Test.tmx");
 
             game.world.AddSystem(new FPSCounterSystem());
 
             Console.WriteLine("Setup complete");
-
-            Load(game);
         }
     }
 }

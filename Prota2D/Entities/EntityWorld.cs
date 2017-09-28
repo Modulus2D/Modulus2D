@@ -7,11 +7,13 @@ using Prota2D.Graphics;
 
 namespace Prota2D.Entities
 {
+
     public class EntityWorld
     {
         private EntityAllocator allocator = new EntityAllocator();
-        private List<IEntitySystem> systems = new List<IEntitySystem>();
+        private List<EntitySystem> systems = new List<EntitySystem>();
         private Dictionary<Type, IComponentStorage> storages = new Dictionary<Type, IComponentStorage>();
+        private Dictionary<Type, List<Action<Entity>>> entityListeners = new Dictionary<Type, List<Action<Entity>>>();
 
         public Entity Create()
         {
@@ -30,6 +32,11 @@ namespace Prota2D.Entities
         public T GetComponent<T>(int id) where T : IComponent
         {
             return GetStorage<T>().list[id];
+        }
+
+        public bool HasComponent<T>(int id) where T : IComponent
+        {
+            return GetStorage<T>().list[id] != null;
         }
 
         public void RemoveComponent<T>(int id) where T : IComponent
@@ -53,6 +60,35 @@ namespace Prota2D.Entities
             else
             {
                 storage.list[id] = component;
+            }
+
+            List<Action<Entity>> listeners = GetListeners<T>();
+            if(listeners.Count > 0)
+            {
+                Entity entity = new Entity(id, this);
+                foreach (Action<Entity> listener in listeners)
+                {
+                    listener(entity);
+                }
+            }
+        }
+
+        public void AddListener<T>(Action<Entity> action) where T : IComponent
+        {
+            GetListeners<T>().Add(action);
+        }
+
+        private List<Action<Entity>> GetListeners<T>() where T : IComponent
+        {
+            if (entityListeners.TryGetValue(typeof(T), out List<Action<Entity>> listeners))
+            {
+                return listeners;
+            }
+            else
+            {
+                List<Action<Entity>> newListeners = new List<Action<Entity>>();
+                entityListeners.Add(typeof(T), newListeners);
+                return newListeners;
             }
         }
 
@@ -87,14 +123,15 @@ namespace Prota2D.Entities
 
         public void Update(float deltaTime)
         {
-            foreach (IEntitySystem system in systems)
+            foreach (EntitySystem system in systems)
             {
                 system.Update(this, deltaTime);
             }
         }
 
-        public void AddSystem(IEntitySystem system)
+        public void AddSystem(EntitySystem system)
         {
+            system.Init(this);
             systems.Add(system);
         }
 

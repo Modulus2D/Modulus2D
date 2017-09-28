@@ -9,7 +9,7 @@ namespace Prota2D.Graphics
 {
     public class SpriteRenderer : IComponent
     {
-        internal SFML.Graphics.Sprite sprite;
+        public SFML.Graphics.Sprite sprite;
 
         private Texture texture;
         public Texture Texture { get => texture; set => texture = value; }

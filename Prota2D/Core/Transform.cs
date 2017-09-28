@@ -10,8 +10,8 @@ namespace Prota2D.Core
 {
     public class Transform : IComponent
     {
-        public Vector2 position = Vector2.Zero;
-        public Vector2 scale = Vector2.Unit;
-        public float rotation = 0f;
+        public Vector2 Position = Vector2.Zero;
+        public Vector2 Scale = Vector2.Unit;
+        public float Rotation = 0f;
     }
 }

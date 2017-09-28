@@ -9,31 +9,30 @@ using Prota2D.Entities;
 
 namespace Prota2D.Graphics
 {
-   public class SpriteSystem : IEntitySystem
+   public class SpriteSystem : EntitySystem
     {
         SFML.Graphics.RenderWindow window;
 
-        private EntityFilter filter;
+        private EntityFilter filter = new EntityFilter();
 
         public SpriteSystem(SFML.Graphics.RenderWindow renderWindow)
         {
             window = renderWindow;
-
-            filter = new EntityFilter();
+            
             filter.Add<Transform>();
             filter.Add<SpriteRenderer>();
         }
         
-        public void Update(EntityWorld world, float deltaTime)
+        public override void Update(EntityWorld world, float deltaTime)
         {
             foreach (Components components in world.Iterate(filter))
             {
                 Transform transform = components.Next<Transform>();
                 SFML.Graphics.Sprite sprite = components.Next<SpriteRenderer>().sprite;
 
-                sprite.Position = new Vector2f(transform.position.X, transform.position.Y);
-                sprite.Scale = new Vector2f(transform.scale.X, transform.scale.Y);
-                sprite.Rotation = transform.rotation;
+                sprite.Position = new Vector2f(transform.Position.X, transform.Position.Y);
+                sprite.Scale = new Vector2f(transform.Scale.X, transform.Scale.Y);
+                sprite.Rotation = transform.Rotation;
                 window.Draw(sprite);
             }
         }

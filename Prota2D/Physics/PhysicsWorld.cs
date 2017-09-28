@@ -10,10 +10,11 @@ namespace Prota2D.Entities
 {
     public class PhysicsWorld
     {
-        private World world = new World(new Microsoft.Xna.Framework.Vector2(0f, 9.8f));
-        private float deltaTime = 1 / 60f;
+        public World world = new World(new Microsoft.Xna.Framework.Vector2(0f, 9.8f));
+        private float stepTime = 1 / 60f;
+        private float accumulator = 0f;
 
-        public float DeltaTime { get => deltaTime; set => deltaTime = value; }
+        public float StepTime { get => stepTime; set => stepTime = value; }
 
         public void SetGravity(Vector2 gravity)
         {
@@ -21,9 +22,15 @@ namespace Prota2D.Entities
             world.Gravity.Y = gravity.Y;
         }
 
-        public void Update()
+        public void Update(float dt)
         {
-            world.Step(deltaTime);
+            accumulator += dt;
+
+            while (accumulator >= stepTime)
+            {
+                world.Step(stepTime);
+                accumulator -= stepTime;
+            }
         }
     }
 }

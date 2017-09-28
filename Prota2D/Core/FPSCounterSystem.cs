@@ -7,15 +7,15 @@ using System.Threading.Tasks;
 
 namespace Prota2D.Core
 {
-    public class FPSCounterSystem : IEntitySystem
+    public class FPSCounterSystem : EntitySystem
     {
         private float averageFps = 0f;
         private float totalTicks = 0f;
         private float printTimer = 0f;
 
         public float printFrequency = 1f;
-
-        public void Update(EntityWorld world, float deltaTime)
+        
+        public override void Update(EntityWorld world, float deltaTime)
         {
             totalTicks += 1f;
             printTimer += deltaTime;

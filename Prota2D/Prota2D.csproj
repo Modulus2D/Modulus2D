@@ -72,11 +72,13 @@
     <Compile Include="Entities\EntityIterator.cs" />
     <Compile Include="Entities\IComponentFilter.cs" />
     <Compile Include="Entities\IComponentStorage.cs" />
-    <Compile Include="Entities\IEntitySystem.cs" />
+    <Compile Include="Entities\EntitySystem.cs" />
     <Compile Include="Entities\EntityWorld.cs" />
     <Compile Include="Entities\IComponent.cs" />
     <Compile Include="Core\FPSCounterSystem.cs" />
     <Compile Include="Core\Game.cs" />
+    <Compile Include="Physics\CircleCollider.cs" />
+    <Compile Include="Physics\PhysicsSystem.cs" />
     <Compile Include="Physics\PhysicsWorld.cs" />
     <Compile Include="Graphics\SpriteRenderer.cs" />
     <Compile Include="Graphics\SpriteSystem.cs" />
