@@ -10,7 +10,7 @@ namespace Prota2D.Entities
 {
     public class PhysicsWorld
     {
-        public World world = new World(new Microsoft.Xna.Framework.Vector2(0f, 9.8f));
+        public World world = new World(new Microsoft.Xna.Framework.Vector2(0f, 1.5f));
         private float stepTime = 1 / 60f;
         private float accumulator = 0f;
 

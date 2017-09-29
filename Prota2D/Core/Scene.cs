@@ -1,14 +1,7 @@
-﻿using FarseerPhysics.Dynamics;
-using Prota2D.Entities;
+﻿using Prota2D.Entities;
 using Prota2D.Graphics;
-using SFML.Graphics;
-using Microsoft.Xna.Framework;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Prota2D.Physics;
+using SFML.Graphics;
 
 namespace Prota2D.Core
 {

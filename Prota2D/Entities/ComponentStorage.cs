@@ -12,7 +12,13 @@ namespace Prota2D.Entities
 
         public bool Has(int id)
         {
-            return list[id] != null;
+            if (list.Count > id)
+            {
+                return list[id] != null;
+            } else
+            {
+                return false;
+            }
         }
 
         public void Clear(int id)

@@ -2,6 +2,7 @@
 using NLog;
 using Prota2D.Core;
 using Prota2D.Entities;
+using Prota2D.Math;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,7 +29,8 @@ namespace Prota2D.Physics
         public override void Init(EntityWorld world)
         {
             world.AddListener<Rigidbody>(Created);
-            world.AddListener<CircleCollider>(BoxColliderAdded);
+            world.AddListener<CircleCollider>(CircleColliderAdded);
+            world.AddListener<BoxCollider>(BoxColliderAdded);
         }
 
         public void Created(Entity entity)
@@ -37,10 +39,10 @@ namespace Prota2D.Physics
             rigidbody.Init(world.world);
         }
 
-        public void BoxColliderAdded(Entity entity)
+        public void CircleColliderAdded(Entity entity)
         {
             Rigidbody rigidbody = entity.GetComponent<Rigidbody>();
-            
+
             if(rigidbody == null)
             {
                 logger.Error("Attempted to add collider before adding rigidbody");
@@ -51,18 +53,31 @@ namespace Prota2D.Physics
             collider.Init(rigidbody.body);
         }
 
+        public void BoxColliderAdded(Entity entity)
+        {
+            Rigidbody rigidbody = entity.GetComponent<Rigidbody>();
+
+            if (rigidbody == null)
+            {
+                logger.Error("Attempted to add collider before adding rigidbody");
+                return;
+            }
+
+            BoxCollider collider = entity.GetComponent<BoxCollider>();
+            collider.Init(rigidbody.body);
+        }
+
         public override void Update(EntityWorld world, float deltaTime)
         {
             foreach(Components components in world.Iterate(filter))
             {
                 Transform transform = components.Next<Transform>();
                 Rigidbody rigidbody = components.Next<Rigidbody>();
-
-                if(rigidbody.body != null)
+                
+                if (rigidbody.body != null)
                 {
-                    transform.Position.X = rigidbody.body.Position.X;
-                    transform.Position.Y = rigidbody.body.Position.Y;
-                    transform.Rotation = rigidbody.body.Rotation;
+                    transform.Position.X = rigidbody.Position.X;
+                    transform.Position.Y = rigidbody.Position.Y;
                 }
             }
         }

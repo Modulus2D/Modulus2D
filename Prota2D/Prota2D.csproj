@@ -61,7 +61,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Core\Application.cs" />
     <Compile Include="Core\Map.cs" />
     <Compile Include="Core\Scene.cs" />
     <Compile Include="Entities\Components.cs" />
@@ -77,6 +76,8 @@
     <Compile Include="Entities\IComponent.cs" />
     <Compile Include="Core\FPSCounterSystem.cs" />
     <Compile Include="Core\Game.cs" />
+    <Compile Include="Graphics\OrthoCamera.cs" />
+    <Compile Include="Physics\BoxCollider.cs" />
     <Compile Include="Physics\CircleCollider.cs" />
     <Compile Include="Physics\PhysicsSystem.cs" />
     <Compile Include="Physics\PhysicsWorld.cs" />

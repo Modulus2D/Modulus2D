@@ -8,15 +8,18 @@ namespace Prota2D.Math
 {
     public class Vector2
     {
-        public float X;
-        public float Y;
+        private float x;
+        private float y;
 
-        public static Vector2 Zero = new Vector2(0f, 0f);
-        public static Vector2 Unit = new Vector2(1f, 1f);
-        public static Vector2 Up = new Vector2(0f, 1f);
-        public static Vector2 Down = new Vector2(0f, -1f);
-        public static Vector2 Right = new Vector2(1f, 0f);
-        public static Vector2 Left = new Vector2(-1f, 0f);
+        public float X { get => x; set => x = value; }
+        public float Y { get => y; set => y = value; }
+
+        public static Vector2 Zero { get => new Vector2(0f, 0f); }
+        public static Vector2 Unit { get => new Vector2(1f, 1f); }
+        public static Vector2 Up { get => new Vector2(0f, 1f); }
+        public static Vector2 Down { get => new Vector2(0f, -1f); }
+        public static Vector2 Right { get => new Vector2(1f, 0f); }
+        public static Vector2 Left { get => new Vector2(-1f, 0f); }
 
         public Vector2(float initX, float initY)
         {

@@ -7,11 +7,15 @@ using Prota2D.Graphics;
 using Prota2D.Entities;
 using SFML.Graphics;
 using SFML.System;
+using SFML.Window;
 
 namespace Prota2D.Core
 {
-    public abstract class Game
+    public class Game
     {
+        // Window
+        private RenderWindow window;
+
         // Scenes
         public List<Scene> scenes = new List<Scene>();
 
@@ -19,16 +23,30 @@ namespace Prota2D.Core
         private Clock clock = new Clock();
 
         // Graphics
-        private RenderWindow window;
         private TextureLoader textures = new TextureLoader();
 
         public TextureLoader Textures { get => textures; }
 
-        public abstract void Init();
-
-        public void SetWindow(RenderWindow renderWindow)
+        public Game(uint width, uint height, string name)
         {
-            window = renderWindow;
+            window = new RenderWindow(new VideoMode(width, height), name);
+        }
+
+        public void Start()
+        {
+            window.SetActive();
+            window.Closed += new EventHandler(OnClosed);
+            
+            while (window.IsOpen)
+            {
+                window.DispatchEvents();
+
+                window.Clear(new Color(0, 0, 0));
+
+                Update();
+
+                window.Display();
+            }
         }
 
         public void Load(Scene scene)
@@ -54,13 +72,20 @@ namespace Prota2D.Core
             }
         }
 
-        public void Render()
+        // TODO: Create separate render loop?
+        /*public void Render()
         {
             // Render
             for (int i = 0; i < scenes.Count; i++)
             {
                 scenes[i].Render();
             }
+        }*/
+
+        static void OnClosed(object sender, EventArgs e)
+        {
+            Window window = (Window)sender;
+            window.Close();
         }
     }
 }

@@ -1,15 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Prota2D.Entities;
+﻿using Prota2D.Entities;
 
 namespace Prota2D.Graphics
 {
     public class SpriteRenderer : IComponent
     {
-        public SFML.Graphics.Sprite sprite;
+        internal SFML.Graphics.Sprite sprite;
 
         private Texture texture;
         public Texture Texture { get => texture; set => texture = value; }

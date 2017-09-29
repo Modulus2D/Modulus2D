@@ -50,15 +50,17 @@ namespace Prota2D.Entities
 
             if (storage.list.Count < id + 1)
             {
-                for (int i = 0; i < (id - storage.list.Count); i++)
+                // Add to end of list
+                while (id + 1 > storage.list.Count)
                 {
                     storage.list.Add(default(T));
                 }
-
-                storage.list.Add(component);
+                
+                storage.list[id] = component;
             }
             else
             {
+                // Add in list
                 storage.list[id] = component;
             }
 
