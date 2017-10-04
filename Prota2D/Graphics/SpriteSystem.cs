@@ -11,11 +11,8 @@ namespace Prota2D.Graphics
         private Window window;
         private EntityFilter filter = new EntityFilter();
         private SpriteBatch batch;
-        private Vector2f pos = new Vector2f(2f, 2f);
-        private float rot = 0f;
 
-        private SFML.Graphics.Texture face = new SFML.Graphics.Texture("Resources/Textures/Face.png");
-        private SFML.Graphics.Texture test = new SFML.Graphics.Texture("Resources/Textures/Test.png");
+        Map map = new Map("Resources/Maps/Test.tmx");
 
         public SpriteSystem(Window window)
         {
@@ -36,6 +33,8 @@ namespace Prota2D.Graphics
                 Transform transform = components.Next<Transform>();
                 batch.Draw(components.Next<SpriteRenderer>().Texture, transform.Position, transform.Rotation);
             }
+
+            map.Draw(batch);
 
             batch.End();
         }

@@ -43,19 +43,19 @@ namespace Prota2D.Graphics
             end = 0;
         }
 
-        public void Draw(Texture texture, Vector2 position, float rotation)
+        private void DrawInit(Texture texture)
         {
             if (lastTexture == null)
             {
                 lastTexture = texture;
             }
 
-           if (texture != lastTexture)
-           {
+            if (texture != lastTexture)
+            {
                 // Render on texture change
                 Flush();
                 lastTexture = texture;
-           }
+            }
 
             if (end >= cutoff)
             {
@@ -63,6 +63,11 @@ namespace Prota2D.Graphics
                 Flush();
                 Begin();
             }
+        }
+
+        public void Draw(Texture texture, Vector2 position, float rotation)
+        {
+            DrawInit(texture);
 
             float halfWidth = texture.Size.X * pixelsToMeters * 0.5f;
             float halfHeight = texture.Size.Y * pixelsToMeters * 0.5f;
@@ -95,6 +100,26 @@ namespace Prota2D.Graphics
 
             end += 4;
         }
+
+        public void DrawRegion(Texture texture, Vector2 position, Vector2 uv1, Vector2 uv2)
+        {
+            DrawInit(texture);
+
+            float halfWidth = (uv2.X - uv1.X) * pixelsToMeters * 0.5f;
+            float halfHeight = (uv2.Y - uv1.Y) * pixelsToMeters * 0.5f;
+            
+            vertices[end + 0] = new Vertex(new Vector2f(position.X - halfWidth,
+                                                        position.Y - halfHeight), new Vector2f(uv1.X, uv1.Y));
+            vertices[end + 1] = new Vertex(new Vector2f(position.X + halfWidth,
+                                                        position.Y - halfHeight), new Vector2f(uv2.X, uv1.Y));
+            vertices[end + 2] = new Vertex(new Vector2f(position.X + halfWidth,
+                                                        position.Y + halfHeight), new Vector2f(uv2.X, uv2.Y));
+            vertices[end + 3] = new Vertex(new Vector2f(position.X - halfWidth,
+                                                        position.Y + halfHeight), new Vector2f(uv1.X, uv2.Y));
+
+            end += 4;
+        }
+
 
         public void End()
         {

@@ -15,7 +15,8 @@ namespace Example
             Scene scene = new Scene();
             game.Load(scene);
 
-            SFML.Graphics.Texture face = new SFML.Graphics.Texture("Resources/Textures/Test.png");
+            SFML.Graphics.Texture face = new SFML.Graphics.Texture("Resources/Textures/Face.png");
+            SFML.Graphics.Texture test = new SFML.Graphics.Texture("Resources/Textures/Test.png");
 
             Entity entity = scene.world.Create();
             entity.AddComponent(new Transform());
@@ -25,7 +26,7 @@ namespace Example
 
             Entity floor = scene.world.Create();
             floor.AddComponent(new Transform());
-            floor.AddComponent(new SpriteRenderer(face));
+            floor.AddComponent(new SpriteRenderer(test));
             floor.AddComponent(new Rigidbody());
             floor.AddComponent(new BoxCollider(1f, 1f));
             floor.GetComponent<Rigidbody>().Body.IsStatic = true;
@@ -37,8 +38,6 @@ namespace Example
             };
 
             game.Window.SetCamera(camera);
-
-            //Map map = new Map("Maps/Test.tmx");
 
             scene.world.AddSystem(new FPSCounterSystem());
 

@@ -74,7 +74,7 @@
     <None Include="App.config" />
     <None Include="packages.config" />
     <None Include="Resources\Maps\Test.tmx">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -120,7 +120,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Maps\Test.tsx">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
