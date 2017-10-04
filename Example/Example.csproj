@@ -78,12 +78,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Prota2D\Prota2D.csproj">
-      <Project>{f176b213-87f0-43ad-b831-3dcb5536eae0}</Project>
-      <Name>Prota2D</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <Content Include="csfml-audio-2.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -122,6 +116,12 @@
     <None Include="Resources\Maps\Test.tsx">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Modulus2D\Modulus2D.csproj">
+      <Project>{9be6f005-8a9a-4bfb-9da1-4d1804098872}</Project>
+      <Name>Modulus2D</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

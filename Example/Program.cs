@@ -1,8 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
-using Prota2D.Core;
-using Prota2D.Entities;
-using Prota2D.Graphics;
-using Prota2D.Physics;
+using Modulus2D.Core;
+using Modulus2D.Entities;
+using Modulus2D.Graphics;
+using Modulus2D.Physics;
 
 namespace Example
 {
