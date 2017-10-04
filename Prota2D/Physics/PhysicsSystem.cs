@@ -2,7 +2,6 @@
 using NLog;
 using Prota2D.Core;
 using Prota2D.Entities;
-using Prota2D.Math;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -50,7 +49,7 @@ namespace Prota2D.Physics
             }
 
             CircleCollider collider = entity.GetComponent<CircleCollider>();
-            collider.Init(rigidbody.body);
+            collider.Init(rigidbody.Body);
         }
 
         public void BoxColliderAdded(Entity entity)
@@ -64,7 +63,7 @@ namespace Prota2D.Physics
             }
 
             BoxCollider collider = entity.GetComponent<BoxCollider>();
-            collider.Init(rigidbody.body);
+            collider.Init(rigidbody.Body);
         }
 
         public override void Update(EntityWorld world, float deltaTime)
@@ -74,10 +73,10 @@ namespace Prota2D.Physics
                 Transform transform = components.Next<Transform>();
                 Rigidbody rigidbody = components.Next<Rigidbody>();
                 
-                if (rigidbody.body != null)
+                if (rigidbody.Body != null)
                 {
-                    transform.Position.X = rigidbody.Position.X;
-                    transform.Position.Y = rigidbody.Position.Y;
+                    transform.Position = rigidbody.Body.Position;
+                    transform.Rotation = rigidbody.Body.Rotation;
                 }
             }
         }

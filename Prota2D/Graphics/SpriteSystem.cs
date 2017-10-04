@@ -1,42 +1,43 @@
 ﻿using SFML.System;
 using Prota2D.Entities;
-using SFML.Graphics;
+using Microsoft.Xna.Framework;
+using System;
+using Prota2D.Core;
 
 namespace Prota2D.Graphics
 {
     public class SpriteSystem : EntitySystem
     {
-        RenderWindow window;
-
+        private Window window;
         private EntityFilter filter = new EntityFilter();
-        private View view;
+        private SpriteBatch batch;
+        private Vector2f pos = new Vector2f(2f, 2f);
+        private float rot = 0f;
 
-        public SpriteSystem(RenderWindow renderWindow)
+        private SFML.Graphics.Texture face = new SFML.Graphics.Texture("Resources/Textures/Face.png");
+        private SFML.Graphics.Texture test = new SFML.Graphics.Texture("Resources/Textures/Test.png");
+
+        public SpriteSystem(Window window)
         {
-            window = renderWindow;
-            
-            filter.Add<Core.Transform>();
-            filter.Add<SpriteRenderer>();
+            this.window = window;
 
-            view = new View(new FloatRect(0f, 0f, 10f, 10f * window.Size.Y / window.Size.X));
+            batch = new SpriteBatch(window);
+
+            filter.Add<Transform>();
+            filter.Add<SpriteRenderer>();
         }
         
         public override void Update(EntityWorld world, float deltaTime)
         {
-            window.SetView(view);
-            //view.Center = new Vector2f(0f, 0f);
+            batch.Begin();
 
             foreach (Components components in world.Iterate(filter))
             {
-                Core.Transform transform = components.Next<Core.Transform>();
-                Sprite sprite = components.Next<SpriteRenderer>().sprite;
-
-                sprite.Position = new Vector2f(transform.Position.X, transform.Position.Y);
-                sprite.Scale = new Vector2f(transform.Scale.X / 32f, transform.Scale.Y / 32f);
-                sprite.Rotation = transform.Rotation;
-
-                window.Draw(sprite);
+                Transform transform = components.Next<Transform>();
+                batch.Draw(components.Next<SpriteRenderer>().Texture, transform.Position, transform.Rotation);
             }
+
+            batch.End();
         }
     }
 }

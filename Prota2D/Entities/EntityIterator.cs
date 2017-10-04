@@ -13,7 +13,7 @@ namespace Prota2D.Entities
         private EntityWorld world;
         private EntityFilter filter;
         private List<IComponentStorage> storages = new List<IComponentStorage>();
-        //private Components components = new Components();
+        private Components components = new Components();
 
         public EntityIterator(int lastIndex, EntityWorld entityWorld, EntityFilter entityFilter)
         {
@@ -24,7 +24,7 @@ namespace Prota2D.Entities
             for (int i = 0; i < filter.components.Count; i++)
             {
                 storages.Add(world.GetGenericStorage(filter.components[i]));
-                //components.Allocate();
+                components.Allocate();
             }
         }
 
@@ -33,11 +33,6 @@ namespace Prota2D.Entities
             for (int i = 0; i < last; i++)
             {
                 bool pass = true;
-
-                Components comp = new Components()
-                {
-                    id = i
-                };
 
                 for (int j = 0; j < storages.Count; j++)
                 {
@@ -49,15 +44,14 @@ namespace Prota2D.Entities
                         break;
                     } else
                     {
-                        comp.Allocate();
-                        comp.components[j] = storage.Get(i);
+                        components.components[j] = storage.Get(i);
                     }
                 }
 
                 if (pass)
                 {
-                    comp.ResetIndex();
-                    yield return comp;
+                    components.ResetIndex();
+                    yield return components;
                 }
             }
 

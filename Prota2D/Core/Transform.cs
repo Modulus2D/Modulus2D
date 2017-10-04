@@ -1,5 +1,5 @@
-﻿using Prota2D.Entities;
-using Prota2D.Math;
+﻿using Microsoft.Xna.Framework;
+using Prota2D.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,7 +11,7 @@ namespace Prota2D.Core
     public class Transform : IComponent
     {
         private Vector2 position = Vector2.Zero;
-        private Vector2 scale = Vector2.Unit;
+        private Vector2 scale = new Vector2(1f, 1f);
         private float rotation = 0f;
 
         public Vector2 Position {

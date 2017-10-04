@@ -13,7 +13,7 @@ namespace Prota2D.Core
         private PhysicsSystem physicsSystem;
         private SpriteSystem spriteSystem;
 
-        public void Load(RenderWindow window)
+        public void Load(Window window)
         {
             spriteSystem = new SpriteSystem(window);
             physicsSystem = new PhysicsSystem(physics);

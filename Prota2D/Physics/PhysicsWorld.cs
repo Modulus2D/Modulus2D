@@ -1,5 +1,5 @@
 ﻿using FarseerPhysics.Dynamics;
-using Prota2D.Math;
+using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,7 +10,7 @@ namespace Prota2D.Entities
 {
     public class PhysicsWorld
     {
-        public World world = new World(new Microsoft.Xna.Framework.Vector2(0f, 1.5f));
+        public World world = new World(new Vector2(0f, 0.5f));
         private float stepTime = 1 / 60f;
         private float accumulator = 0f;
 
@@ -18,8 +18,7 @@ namespace Prota2D.Entities
 
         public void SetGravity(Vector2 gravity)
         {
-            world.Gravity.X = gravity.X;
-            world.Gravity.Y = gravity.Y;
+            world.Gravity = gravity;
         }
 
         public void Update(float dt)

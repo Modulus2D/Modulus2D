@@ -7,14 +7,13 @@ using Prota2D.Graphics;
 using Prota2D.Entities;
 using SFML.Graphics;
 using SFML.System;
-using SFML.Window;
 
 namespace Prota2D.Core
 {
     public class Game
     {
         // Window
-        private RenderWindow window;
+        private Window window;
 
         // Scenes
         public List<Scene> scenes = new List<Scene>();
@@ -22,36 +21,33 @@ namespace Prota2D.Core
         // Time
         private Clock clock = new Clock();
 
-        // Graphics
-        private TextureLoader textures = new TextureLoader();
-
-        public TextureLoader Textures { get => textures; }
+        public Window Window { get => window; set => window = value; }
 
         public Game(uint width, uint height, string name)
         {
-            window = new RenderWindow(new VideoMode(width, height), name);
+            Window = new Window(new RenderWindow(new SFML.Window.VideoMode(width, height), name));
         }
 
         public void Start()
         {
-            window.SetActive();
-            window.Closed += new EventHandler(OnClosed);
+            Window.RenderWindow.SetActive();
+            Window.RenderWindow.Closed += new EventHandler(OnClosed);
             
-            while (window.IsOpen)
+            while (Window.RenderWindow.IsOpen)
             {
-                window.DispatchEvents();
+                Window.RenderWindow.DispatchEvents();
 
-                window.Clear(new Color(0, 0, 0));
+                Window.RenderWindow.Clear(new Color(0, 0, 0));
 
                 Update();
 
-                window.Display();
+                Window.RenderWindow.Display();
             }
         }
 
         public void Load(Scene scene)
         {
-            scene.Load(window);
+            scene.Load(Window);
             scenes.Add(scene);
         }
 
@@ -84,7 +80,7 @@ namespace Prota2D.Core
 
         static void OnClosed(object sender, EventArgs e)
         {
-            Window window = (Window)sender;
+            SFML.Window.Window window = (SFML.Window.Window)sender;
             window.Close();
         }
     }

@@ -10,8 +10,6 @@ namespace Prota2D.Entities
     {
         public List<IComponent> components = new List<IComponent>();
         private int i = 0;
-
-        public int id = 0;
         
         public void Allocate()
         {
