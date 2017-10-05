@@ -3,38 +3,35 @@ using Modulus2D.Entities;
 using Microsoft.Xna.Framework;
 using System;
 using Modulus2D.Core;
+using SFML.Graphics;
 
 namespace Modulus2D.Graphics
 {
     public class SpriteSystem : EntitySystem
     {
-        private Window window;
+        private RenderTarget target;
         private EntityFilter filter = new EntityFilter();
         private SpriteBatch batch;
 
-        Map map = new Map("Resources/Maps/Test.tmx");
-
-        public SpriteSystem(Window window)
+        public SpriteSystem(RenderTarget target)
         {
-            this.window = window;
+            this.target = target;
 
-            batch = new SpriteBatch(window);
+            batch = new SpriteBatch(target);
 
-            filter.Add<Transform>();
-            filter.Add<SpriteRenderer>();
+            filter.Add<TransformComponent>();
+            filter.Add<SpriteComponent>();
         }
         
-        public override void Update(EntityWorld world, float deltaTime)
+        public override void Update(float deltaTime)
         {
             batch.Begin();
 
-            foreach (Components components in world.Iterate(filter))
+            foreach (Components components in World.Iterate(filter))
             {
-                Transform transform = components.Next<Transform>();
-                batch.Draw(components.Next<SpriteRenderer>().Texture, transform.Position, transform.Rotation);
+                TransformComponent transform = components.Next<TransformComponent>();
+                batch.Draw(components.Next<SpriteComponent>().Texture, transform.Position, transform.Rotation);
             }
-
-            map.Draw(batch);
 
             batch.End();
         }

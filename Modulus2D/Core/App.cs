@@ -7,47 +7,55 @@ using Modulus2D.Graphics;
 using Modulus2D.Entities;
 using SFML.Graphics;
 using SFML.System;
+using Prota2D.Core;
 
 namespace Modulus2D.Core
 {
-    public class Game
+    public class App
     {
         // Window
-        private Window window;
+        private RenderWindow window;
 
         // Scenes
-        public List<Scene> scenes = new List<Scene>();
+        private List<Scene> scenes = new List<Scene>();
 
         // Time
         private Clock clock = new Clock();
 
-        public Window Window { get => window; set => window = value; }
+        // Game listener
+        private IGame game;
 
-        public Game(uint width, uint height, string name)
+        public App(IGame game)
         {
-            Window = new Window(new RenderWindow(new SFML.Window.VideoMode(width, height), name));
+            this.game = game;
+
+            Config config = game.Config();
+
+            window = new RenderWindow(new SFML.Window.VideoMode(config.Width, config.Height), config.Name);
         }
 
         public void Start()
         {
-            Window.RenderWindow.SetActive();
-            Window.RenderWindow.Closed += new EventHandler(OnClosed);
-            
-            while (Window.RenderWindow.IsOpen)
-            {
-                Window.RenderWindow.DispatchEvents();
+            window.SetActive();
+            window.Closed += new EventHandler(OnClosed);
 
-                Window.RenderWindow.Clear(new Color(0, 0, 0));
+            game.Start(this);
+            
+            while (window.IsOpen)
+            {
+                window.DispatchEvents();
+
+                window.Clear(new Color(0, 0, 0));
 
                 Update();
 
-                Window.RenderWindow.Display();
+                window.Display();
             }
         }
 
         public void Load(Scene scene)
         {
-            scene.Load(Window);
+            scene.Load(window);
             scenes.Add(scene);
         }
 
@@ -60,6 +68,8 @@ namespace Modulus2D.Core
         {
             float dt = clock.ElapsedTime.AsSeconds();
             clock.Restart();
+
+            game.Update(dt, window, scenes[0]);
 
             // Update
             for (int i = 0; i < scenes.Count; i++)

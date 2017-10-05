@@ -127,13 +127,14 @@ namespace Modulus2D.Entities
         {
             foreach (EntitySystem system in systems)
             {
-                system.Update(this, deltaTime);
+                system.Update(deltaTime);
             }
         }
 
         public void AddSystem(EntitySystem system)
         {
-            system.Init(this);
+            system.World = this;
+            system.Start();
             systems.Add(system);
         }
 

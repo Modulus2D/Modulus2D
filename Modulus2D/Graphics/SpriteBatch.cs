@@ -15,22 +15,22 @@ namespace Modulus2D.Graphics
         private uint cutoff;
 
         // 32 pixels per meter
-        public float pixelsToMeters = 0.03125f;
+        public static float PixelsToMeters = 0.03125f;
 
         private Vertex[] vertices;
         private uint start = 0;
         private uint end = 0;
 
-        private RenderWindow window;
+        private RenderTarget target;
 
         private RenderStates states = new RenderStates();
         private Texture lastTexture;
 
         public uint MaxSprites { get => maxSprites; set => maxSprites = value; }
 
-        public SpriteBatch(Window window)
+        public SpriteBatch(RenderTarget target)
         {
-            this.window = window.RenderWindow;
+            this.target = target;
 
             vertices = new Vertex[4 * MaxSprites];
 
@@ -69,8 +69,8 @@ namespace Modulus2D.Graphics
         {
             DrawInit(texture);
 
-            float halfWidth = texture.Size.X * pixelsToMeters * 0.5f;
-            float halfHeight = texture.Size.Y * pixelsToMeters * 0.5f;
+            float halfWidth = texture.Size.X * PixelsToMeters * 0.5f;
+            float halfHeight = texture.Size.Y * PixelsToMeters * 0.5f;
             
             if (rotation == 0f)
             {
@@ -105,8 +105,8 @@ namespace Modulus2D.Graphics
         {
             DrawInit(texture);
 
-            float halfWidth = (uv2.X - uv1.X) * pixelsToMeters * 0.5f;
-            float halfHeight = (uv2.Y - uv1.Y) * pixelsToMeters * 0.5f;
+            float halfWidth = (uv2.X - uv1.X) * PixelsToMeters * 0.5f;
+            float halfHeight = (uv2.Y - uv1.Y) * PixelsToMeters * 0.5f;
             
             vertices[end + 0] = new Vertex(new Vector2f(position.X - halfWidth,
                                                         position.Y - halfHeight), new Vector2f(uv1.X, uv1.Y));
@@ -120,6 +120,20 @@ namespace Modulus2D.Graphics
             end += 4;
         }
 
+        public static void DrawRegion(Texture texture, Vector2 position, Vector2 uv1, Vector2 uv2, VertexArray array)
+        {
+            float halfWidth = 32f * PixelsToMeters * 0.5f;
+            float halfHeight = 32f * PixelsToMeters * 0.5f;
+
+            array.Append(new Vertex(new Vector2f(position.X - halfWidth,
+                                                        position.Y - halfHeight), new Vector2f(uv1.X, uv1.Y)));
+            array.Append(new Vertex(new Vector2f(position.X + halfWidth,
+                                                        position.Y - halfHeight), new Vector2f(uv2.X, uv1.Y)));
+            array.Append(new Vertex(new Vector2f(position.X + halfWidth,
+                                                        position.Y + halfHeight), new Vector2f(uv2.X, uv2.Y)));
+            array.Append(new Vertex(new Vector2f(position.X - halfWidth,
+                                                        position.Y + halfHeight), new Vector2f(uv1.X, uv2.Y)));
+        }
 
         public void End()
         {
@@ -133,7 +147,7 @@ namespace Modulus2D.Graphics
 
         private void Flush()
         {
-            window.Draw(vertices, start, end - start, PrimitiveType.Quads, new RenderStates(lastTexture));
+            target.Draw(vertices, start, end - start, PrimitiveType.Quads, new RenderStates(lastTexture));
 
             start = end;
         }

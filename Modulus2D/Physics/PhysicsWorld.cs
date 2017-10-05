@@ -10,7 +10,7 @@ namespace Modulus2D.Entities
 {
     public class PhysicsWorld
     {
-        public World world = new World(new Vector2(0f, 0.5f));
+        public World world = new World(new Vector2(0f, 9.8f));
         private float stepTime = 1 / 60f;
         private float accumulator = 0f;
 

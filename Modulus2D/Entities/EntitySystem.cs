@@ -9,12 +9,16 @@ namespace Modulus2D.Entities
 {
     public abstract class EntitySystem
     {
-        public virtual void Init(EntityWorld world)
+        private EntityWorld world;
+
+        public EntityWorld World { get => world; set => world = value; }
+
+        public virtual void Start()
         {
 
         }
 
-        public virtual void Update(EntityWorld world, float deltaTime)
+        public virtual void Update(float deltaTime)
         {
 
         }

@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Modulus2D.Physics
 {
-    public class Rigidbody : IComponent
+    public class PhysicsComponent : IComponent
     {
         private Body body;
         public Body Body { get => body; set => body = value; }

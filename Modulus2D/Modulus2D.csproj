@@ -61,6 +61,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Core\Config.cs" />
+    <Compile Include="Core\DebugSystem.cs" />
+    <Compile Include="Core\IGame.cs" />
     <Compile Include="Core\Map.cs" />
     <Compile Include="Core\Scene.cs" />
     <Compile Include="Entities\Components.cs" />
@@ -75,20 +78,19 @@
     <Compile Include="Entities\EntityWorld.cs" />
     <Compile Include="Entities\IComponent.cs" />
     <Compile Include="Core\FPSCounterSystem.cs" />
-    <Compile Include="Core\Game.cs" />
+    <Compile Include="Core\App.cs" />
     <Compile Include="Graphics\SpriteBatch.cs" />
     <Compile Include="Graphics\Viewport.cs" />
-    <Compile Include="Graphics\Window.cs" />
     <Compile Include="Graphics\OrthoCamera.cs" />
     <Compile Include="Physics\BoxCollider.cs" />
     <Compile Include="Physics\CircleCollider.cs" />
     <Compile Include="Physics\PhysicsSystem.cs" />
     <Compile Include="Physics\PhysicsWorld.cs" />
-    <Compile Include="Graphics\SpriteRenderer.cs" />
+    <Compile Include="Graphics\SpriteComponent.cs" />
     <Compile Include="Graphics\SpriteSystem.cs" />
-    <Compile Include="Physics\Rigidbody.cs" />
+    <Compile Include="Physics\PhysicsComponent.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Core\Transform.cs" />
+    <Compile Include="Core\TransformComponent.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

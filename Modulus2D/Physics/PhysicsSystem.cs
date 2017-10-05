@@ -15,32 +15,32 @@ namespace Modulus2D.Physics
         private static Logger logger = LogManager.GetCurrentClassLogger();
 
         private EntityFilter filter = new EntityFilter();
-        private PhysicsWorld world;
+        private PhysicsWorld physicsWorld;
 
         public PhysicsSystem(PhysicsWorld physicsWorld)
         {
-            world = physicsWorld;
+            this.physicsWorld = physicsWorld;
 
-            filter.Add<Transform>();
-            filter.Add<Rigidbody>();
+            filter.Add<TransformComponent>();
+            filter.Add<PhysicsComponent>();
         }
 
-        public override void Init(EntityWorld world)
+        public override void Start()
         {
-            world.AddListener<Rigidbody>(Created);
-            world.AddListener<CircleCollider>(CircleColliderAdded);
-            world.AddListener<BoxCollider>(BoxColliderAdded);
+            World.AddListener<PhysicsComponent>(Created);
+            World.AddListener<CircleCollider>(CircleColliderAdded);
+            World.AddListener<BoxCollider>(BoxColliderAdded);
         }
 
         public void Created(Entity entity)
         {
-            Rigidbody rigidbody = entity.GetComponent<Rigidbody>();
-            rigidbody.Init(world.world);
+            PhysicsComponent rigidbody = entity.GetComponent<PhysicsComponent>();
+            rigidbody.Init(physicsWorld.world);
         }
 
         public void CircleColliderAdded(Entity entity)
         {
-            Rigidbody rigidbody = entity.GetComponent<Rigidbody>();
+            PhysicsComponent rigidbody = entity.GetComponent<PhysicsComponent>();
 
             if(rigidbody == null)
             {
@@ -54,7 +54,7 @@ namespace Modulus2D.Physics
 
         public void BoxColliderAdded(Entity entity)
         {
-            Rigidbody rigidbody = entity.GetComponent<Rigidbody>();
+            PhysicsComponent rigidbody = entity.GetComponent<PhysicsComponent>();
 
             if (rigidbody == null)
             {
@@ -66,17 +66,17 @@ namespace Modulus2D.Physics
             collider.Init(rigidbody.Body);
         }
 
-        public override void Update(EntityWorld world, float deltaTime)
+        public override void Update(float deltaTime)
         {
-            foreach(Components components in world.Iterate(filter))
+            foreach(Components components in World.Iterate(filter))
             {
-                Transform transform = components.Next<Transform>();
-                Rigidbody rigidbody = components.Next<Rigidbody>();
+                TransformComponent transform = components.Next<TransformComponent>();
+                PhysicsComponent rigidbody = components.Next<PhysicsComponent>();
                 
                 if (rigidbody.Body != null)
                 {
                     transform.Position = rigidbody.Body.Position;
-                    transform.Rotation = rigidbody.Body.Rotation;
+                    transform.Rotation = -rigidbody.Body.Rotation;
                 }
             }
         }

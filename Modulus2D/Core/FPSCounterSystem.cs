@@ -15,7 +15,7 @@ namespace Modulus2D.Core
 
         public float printFrequency = 1f;
         
-        public override void Update(EntityWorld world, float deltaTime)
+        public override void Update(float deltaTime)
         {
             totalTicks += 1f;
             printTimer += deltaTime;

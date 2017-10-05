@@ -13,9 +13,9 @@ namespace Modulus2D.Core
         private PhysicsSystem physicsSystem;
         private SpriteSystem spriteSystem;
 
-        public void Load(Window window)
+        public void Load(RenderTarget target)
         {
-            spriteSystem = new SpriteSystem(window);
+            spriteSystem = new SpriteSystem(target);
             physicsSystem = new PhysicsSystem(physics);
 
             world.AddSystem(spriteSystem);

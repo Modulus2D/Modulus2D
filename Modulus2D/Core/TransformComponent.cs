@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Modulus2D.Core
 {
-    public class Transform : IComponent
+    public class TransformComponent : IComponent
     {
         private Vector2 position = Vector2.Zero;
         private Vector2 scale = new Vector2(1f, 1f);
