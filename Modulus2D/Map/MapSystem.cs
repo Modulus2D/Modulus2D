@@ -1,32 +1,32 @@
 ﻿using FarseerPhysics.Collision.Shapes;
 using FarseerPhysics.Common;
-using FarseerPhysics.Dynamics;
 using Microsoft.Xna.Framework;
 using Modulus2D.Entities;
 using Modulus2D.Graphics;
 using Modulus2D.Physics;
-using NLog;
 using SFML.Graphics;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TiledSharp;
 
 namespace Modulus2D.Map
 {
     public class MapSystem : EntitySystem
     {
-        private static Logger logger = LogManager.GetCurrentClassLogger();
-        
+        private bool render = false;
+
         private List<MapComponent> maps = new List<MapComponent>();
         private List<PhysicsComponent> physicsComponents = new List<PhysicsComponent>();
 
         private SpriteBatch batch;
 
+        public MapSystem()
+        {
+        }
+
         public MapSystem(SpriteBatch batch)
         {
+            render = true;
             this.batch = batch;
         }
 
@@ -48,7 +48,7 @@ namespace Modulus2D.Map
             PhysicsComponent physics = entity.GetComponent<PhysicsComponent>();
             if (physics == null)
             {
-                logger.Error("Attempted to map collider before adding physics");
+                //logger.Error("Attempted to map collider before adding physics");
                 return;
             }
 
@@ -112,7 +112,10 @@ namespace Modulus2D.Map
                         }
 
                         // Draw into array
-                        SpriteBatch.DrawRegion(texture, new Vector2(tile.X, tile.Y), new Vector2(uvX, uvY), new Vector2(uvX + tiles.TileWidth, uvY + tiles.TileHeight), map.Vertices);
+                        if (render)
+                        {
+                            SpriteBatch.DrawRegion(texture, new Vector2(tile.X, tile.Y), new Vector2(uvX, uvY), new Vector2(uvX + tiles.TileWidth, uvY + tiles.TileHeight), map.Vertices);
+                        }
                     }
                 }
             }
@@ -120,10 +123,13 @@ namespace Modulus2D.Map
 
         public override void Update(float deltaTime)
         {
-            for (int i = 0; i < maps.Count; i++)
+            if(render)
             {
-                MapComponent map = maps[i];
-                batch.Draw(map.Vertices, map.States);
+                for (int i = 0; i < maps.Count; i++)
+                {
+                    MapComponent map = maps[i];
+                    batch.Draw(map.Vertices, map.States);
+                }
             }
         }
     }

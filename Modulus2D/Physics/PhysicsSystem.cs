@@ -1,5 +1,4 @@
 ﻿using FarseerPhysics.Dynamics;
-using NLog;
 using Modulus2D.Core;
 using Modulus2D.Entities;
 using Microsoft.Xna.Framework;
@@ -8,8 +7,6 @@ namespace Modulus2D.Physics
 {
     public class PhysicsSystem : EntitySystem
     {
-        private static Logger logger = LogManager.GetCurrentClassLogger();
-
         private EntityFilter filter = new EntityFilter();
         private World physicsWorld;
 
@@ -54,7 +51,7 @@ namespace Modulus2D.Physics
 
             if(physics == null)
             {
-                logger.Error("Attempted to add collider before adding rigidbody");
+                //logger.Error("Attempted to add collider before adding rigidbody");
                 return;
             }
 
@@ -68,7 +65,7 @@ namespace Modulus2D.Physics
 
             if (physics == null)
             {
-                logger.Error("Attempted to add collider before adding rigidbody");
+                //logger.Error("Attempted to add collider before adding rigidbody");
                 return;
             }
 

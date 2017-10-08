@@ -25,7 +25,6 @@ namespace Modulus2D.Graphics
             this.target = target;
 
             batch = new SpriteBatch(target);
-            batch.BlendMode = BlendMode.Multiply;
 
             filter.Add<TransformComponent>();
             filter.Add<LightComponent>();

@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Example
 {
-    class CameraSystem : EntitySystem
+    public class CameraSystem : EntitySystem
     {
         OrthoCamera camera;
         TransformComponent target;

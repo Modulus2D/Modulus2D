@@ -1,6 +1,7 @@
 ﻿using FarseerPhysics.Dynamics;
 using Microsoft.Xna.Framework;
 using Modulus2D.Entities;
+using Prota2D.Core;
 using SFML.Graphics;
 using System;
 using System.Collections.Generic;
@@ -12,16 +13,11 @@ namespace Modulus2D.Core
 {
     public class State
     {
-        private RenderTarget target;
+        private RenderWindow graphics;
+        private Input input;
 
-        public RenderTarget Target { get => target; set => target = value; }
-
-        public void Load(RenderTarget target)
-        {
-            Target = target;
-
-            Start();
-        }
+        public RenderWindow Graphics { get => graphics; set => graphics = value; }
+        public Input Input { get => input; set => input = value; }
 
         public virtual void Start()
         {

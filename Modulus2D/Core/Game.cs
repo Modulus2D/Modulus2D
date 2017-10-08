@@ -1,5 +1,7 @@
-﻿using SFML.Graphics;
+﻿using Prota2D.Core;
+using SFML.Graphics;
 using SFML.System;
+using SFML.Window;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,16 +18,18 @@ namespace Modulus2D.Core
         // Window
         private RenderWindow window;
 
+        // Input
+        private Input input = new Input();
+
         // Time
         private Clock clock = new Clock();
-
-        public RenderWindow Window { get => window; set => window = value; }
 
         public State State {
             get => state;
             set {
                 state = value;
-                state.Target = Window;
+                state.Graphics = window;
+                state.Input = input;
                 state.Start();
             }
         }
@@ -33,23 +37,28 @@ namespace Modulus2D.Core
         public void Start(State state, string name, uint width, uint height)
         {
             // Create window
-            Window = new RenderWindow(new SFML.Window.VideoMode(width, height), name);
-            Window.SetActive();
-            Window.Closed += new EventHandler(OnClosed);
+            window = new RenderWindow(new VideoMode(width, height), name);
+            window.SetActive();
+            window.Closed += new EventHandler(OnClosed);
+            
+            // Add input handlers
+            window.KeyPressed += new EventHandler<KeyEventArgs>(input.OnKeyPressed);
+            window.KeyReleased += new EventHandler<KeyEventArgs>(input.OnKeyReleased);
 
             // Set state
             State = state;
 
             // Render loop
-            while (Window.IsOpen)
+            while (window.IsOpen)
             {
-                Window.DispatchEvents();
+                window.DispatchEvents();
+                Joystick.Update();
 
-                Window.Clear(new Color(0, 0, 0));
+                window.Clear(new Color(0, 0, 0));
 
                 Update();
 
-                Window.Display();
+                window.Display();
             }
         }
 
@@ -68,9 +77,9 @@ namespace Modulus2D.Core
 
         }*/
 
-        static void OnClosed(object sender, EventArgs e)
+        public void OnClosed(object sender, EventArgs e)
         {
-            SFML.Window.Window window = (SFML.Window.Window)sender;
+            Window window = (Window)sender;
             window.Close();
         }
     }

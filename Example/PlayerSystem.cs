@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Example
 {
-    class PlayerSystem : EntitySystem
+    public class PlayerSystem : EntitySystem
     {
         private float speed = 200f;
         private float jump = 1000f;
@@ -33,17 +33,17 @@ namespace Example
 
                 float move = 0f;
 
-                if (Keyboard.IsKeyPressed(Keyboard.Key.Right))
+                if (Keyboard.IsKeyPressed(Keyboard.Key.Right) || Keyboard.IsKeyPressed(Keyboard.Key.D))
                 {
                     move += 1f;
                 }
 
-                if (Keyboard.IsKeyPressed(Keyboard.Key.Left))
+                if (Keyboard.IsKeyPressed(Keyboard.Key.Left) || Keyboard.IsKeyPressed(Keyboard.Key.A))
                 {
                     move -= 1f;
                 }
 
-                if (Keyboard.IsKeyPressed(Keyboard.Key.Up))
+                if (Keyboard.IsKeyPressed(Keyboard.Key.Up) || Keyboard.IsKeyPressed(Keyboard.Key.W) || Keyboard.IsKeyPressed(Keyboard.Key.Space) || Joystick.IsButtonPressed(0, 0))
                 {
                     physics.Body.ApplyForce(new Vector2(0f, -jump * deltaTime));
                 }

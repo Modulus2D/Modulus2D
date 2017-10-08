@@ -11,8 +11,8 @@ namespace Modulus2D.Graphics
 {
     public class SpriteBatch
     {
-        private uint maxSprites = 500;
-        private uint cutoff;
+        private uint maxSprites = 2048;
+        public uint MaxSprites { get => maxSprites; set => maxSprites = value; }
 
         // 32 pixels per meter
         public static float PixelsToMeters = 0.03125f;
@@ -24,12 +24,6 @@ namespace Modulus2D.Graphics
 
         private RenderTarget target;
 
-        public uint MaxSprites { get => maxSprites; set => maxSprites = value; }
-
-        public BlendMode BlendMode { get => blendMode; set => blendMode = value; }
-
-        private BlendMode blendMode = BlendMode.Add;
-
         private OrthoCamera camera;
         public OrthoCamera Camera { get => camera; set => camera = value; }
 
@@ -38,12 +32,11 @@ namespace Modulus2D.Graphics
             this.target = target;
 
             vertices = new Vertex[4 * MaxSprites];
-
-            cutoff = 4 * maxSprites;
         }
 
         public void Begin()
         {
+            // Update camera
             target.SetView(camera.View);
 
             index = 0;
@@ -53,20 +46,21 @@ namespace Modulus2D.Graphics
         // Draw with all parameters
         public void Draw(Texture texture, Vector2 position, Vector2 scale, Vector2 uv1, Vector2 uv2, float rotation)
         {
+            if (index >= 4 * MaxSprites)
+            {
+                // Render if MaxSprites is exceeded
+                Render();
+
+                index = 0;
+                infos.Clear();
+            }
+
             if (infos.Count == 0)
             {
                 infos.Add(new SpriteInfo(new RenderStates(texture)));
             } else if (texture != infos[infos.Count - 1].states.Texture)
             {
                 // Render on texture change
-                infos.Add(new SpriteInfo(new RenderStates(texture)));
-            }
-
-            if (index > (maxSprites-1)*4)
-            {
-                Render();
-                index = 0;
-                infos.Clear();
                 infos.Add(new SpriteInfo(new RenderStates(texture)));
             }
 

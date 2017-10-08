@@ -15,5 +15,13 @@ namespace Modulus2D.Network
         {
             filter.Add<NetworkComponent>();
         }
+
+        public void Transmit()
+        {
+            foreach (Components components in World.Iterate(filter))
+            {
+                NetworkComponent network = components.Next<NetworkComponent>();
+            }
+        }
     }
 }

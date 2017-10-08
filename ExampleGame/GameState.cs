@@ -1,17 +1,13 @@
-﻿using Microsoft.Xna.Framework;
+﻿using Example;
+using Microsoft.Xna.Framework;
 using Modulus2D.Core;
 using Modulus2D.Entities;
 using Modulus2D.Graphics;
 using Modulus2D.Map;
 using Modulus2D.Physics;
 using SFML.Graphics;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Example
+namespace ExampleGame
 {
     class GameState : State
     {
@@ -24,12 +20,12 @@ namespace Example
             // Add physics system
             PhysicsSystem physicsSystem = new PhysicsSystem();
             entityWorld.AddSystem(physicsSystem);
-
+                        
             // Add sprite system
-            SpriteBatch batch = new SpriteBatch(Target);
+            SpriteBatch batch = new SpriteBatch(Graphics);
             SpriteSystem spriteSystem = new SpriteSystem(batch)
             {
-                Priority = -1 // Render sprites last
+                Priority = -2 // Render sprites last
             };
             entityWorld.AddSystem(spriteSystem);
 
@@ -49,13 +45,12 @@ namespace Example
 
             // Create debug system
             entityWorld.AddSystem(new DebugSystem(maps));
-            
 
             // Load textures
             Texture face = new Texture("Resources/Textures/Face.png");
 
             // Create camera
-            OrthoCamera camera = new OrthoCamera(new Viewport(Target.Size.X, Target.Size.Y, 10f))
+            OrthoCamera camera = new OrthoCamera(new Viewport(Graphics.Size.X, Graphics.Size.Y, 10f))
             {
                 Position = new Vector2(0f, 0f)
             };
@@ -73,7 +68,7 @@ namespace Example
             player.AddComponent(new PlayerComponent());
             player.AddComponent(new CircleCollider(0.5f));
             player.GetComponent<PhysicsComponent>().Body.Position = new Vector2(0f, 0f);
-
+            
             // Add camera system
             CameraSystem cameraSystem = new CameraSystem(camera, player.GetComponent<TransformComponent>());
             entityWorld.AddSystem(cameraSystem);
