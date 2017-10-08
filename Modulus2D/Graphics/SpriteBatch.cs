@@ -11,22 +11,27 @@ namespace Modulus2D.Graphics
 {
     public class SpriteBatch
     {
-        private uint maxSprites = 100000;
+        private uint maxSprites = 500;
         private uint cutoff;
 
         // 32 pixels per meter
         public static float PixelsToMeters = 0.03125f;
 
         private Vertex[] vertices;
-        private uint start = 0;
-        private uint end = 0;
+        private List<SpriteInfo> infos = new List<SpriteInfo>();
+
+        private uint index = 0;
 
         private RenderTarget target;
 
-        private RenderStates states = new RenderStates();
-        private Texture lastTexture;
-
         public uint MaxSprites { get => maxSprites; set => maxSprites = value; }
+
+        public BlendMode BlendMode { get => blendMode; set => blendMode = value; }
+
+        private BlendMode blendMode = BlendMode.Add;
+
+        private OrthoCamera camera;
+        public OrthoCamera Camera { get => camera; set => camera = value; }
 
         public SpriteBatch(RenderTarget target)
         {
@@ -39,85 +44,89 @@ namespace Modulus2D.Graphics
 
         public void Begin()
         {
-            start = 0;
-            end = 0;
+            target.SetView(camera.View);
+
+            index = 0;
+            infos.Clear();
         }
 
-        private void DrawInit(Texture texture)
+        // Draw with all parameters
+        public void Draw(Texture texture, Vector2 position, Vector2 scale, Vector2 uv1, Vector2 uv2, float rotation)
         {
-            if (lastTexture == null)
+            if (infos.Count == 0)
             {
-                lastTexture = texture;
-            }
-
-            if (texture != lastTexture)
+                infos.Add(new SpriteInfo(new RenderStates(texture)));
+            } else if (texture != infos[infos.Count - 1].states.Texture)
             {
                 // Render on texture change
-                Flush();
-                lastTexture = texture;
+                infos.Add(new SpriteInfo(new RenderStates(texture)));
             }
 
-            if (end >= cutoff)
+            if (index > (maxSprites-1)*4)
             {
-                // Reset on overflow
-                Flush();
-                Begin();
+                Render();
+                index = 0;
+                infos.Clear();
+                infos.Add(new SpriteInfo(new RenderStates(texture)));
             }
-        }
 
-        public void Draw(Texture texture, Vector2 position, float rotation)
-        {
-            DrawInit(texture);
+            float halfWidth = texture.Size.X * scale.X * PixelsToMeters * 0.5f;
+            float halfHeight = texture.Size.Y * scale.Y * PixelsToMeters * 0.5f;
 
-            float halfWidth = texture.Size.X * PixelsToMeters * 0.5f;
-            float halfHeight = texture.Size.Y * PixelsToMeters * 0.5f;
-            
             if (rotation == 0f)
             {
-                vertices[end + 0] = new Vertex(new Vector2f(position.X - halfWidth,
-                                                            position.Y - halfHeight), new Vector2f(0f, 0f));
-                vertices[end + 1] = new Vertex(new Vector2f(position.X + halfWidth,
-                                                            position.Y - halfHeight), new Vector2f(texture.Size.X, 0f));
-                vertices[end + 2] = new Vertex(new Vector2f(position.X + halfWidth,
-                                                            position.Y + halfHeight), new Vector2f(texture.Size.X, texture.Size.X));
-                vertices[end + 3] = new Vertex(new Vector2f(position.X - halfWidth,
-                                                            position.Y + halfHeight), new Vector2f(0f, texture.Size.X));
-            } else
+                vertices[index + 0] = new Vertex(new Vector2f(position.X - halfWidth,
+                                                            position.Y - halfHeight), new Vector2f(uv1.X, uv1.Y));
+                vertices[index + 1] = new Vertex(new Vector2f(position.X + halfWidth,
+                                                            position.Y - halfHeight), new Vector2f(uv2.X, uv1.Y));
+                vertices[index + 2] = new Vertex(new Vector2f(position.X + halfWidth,
+                                                            position.Y + halfHeight), new Vector2f(uv2.X, uv2.Y));
+                vertices[index + 3] = new Vertex(new Vector2f(position.X - halfWidth,
+                                                            position.Y + halfHeight), new Vector2f(uv1.X, uv2.Y));
+            }
+            else
             {
                 // Rotate if necessary
                 float cos = (float)Math.Cos(rotation);
                 float sin = (float)Math.Sin(rotation);
 
-                vertices[end + 0] = new Vertex(new Vector2f(position.X - halfWidth * sin + halfHeight * cos,
-                                                            position.Y - halfWidth * cos - halfHeight * sin), new Vector2f(0f, 0f));
-                vertices[end + 1] = new Vertex(new Vector2f(position.X - halfWidth * sin - halfHeight * cos,
-                                                            position.Y - halfWidth * cos + halfHeight * sin), new Vector2f(texture.Size.X, 0f));
-                vertices[end + 2] = new Vertex(new Vector2f(position.X + halfWidth * sin - halfHeight * cos,
-                                                            position.Y + halfWidth * cos + halfHeight * sin), new Vector2f(texture.Size.X, texture.Size.Y));
-                vertices[end + 3] = new Vertex(new Vector2f(position.X + halfWidth * sin + halfHeight * cos,
-                                                            position.Y + halfWidth * cos - halfHeight * sin), new Vector2f(0f, texture.Size.Y));
+                vertices[index + 0] = new Vertex(new Vector2f(position.X - halfWidth * sin + halfHeight * cos,
+                                                            position.Y - halfWidth * cos - halfHeight * sin), new Vector2f(uv1.X, uv1.Y));
+                vertices[index + 1] = new Vertex(new Vector2f(position.X - halfWidth * sin - halfHeight * cos,
+                                                            position.Y - halfWidth * cos + halfHeight * sin), new Vector2f(uv2.X, uv1.Y));
+                vertices[index + 2] = new Vertex(new Vector2f(position.X + halfWidth * sin - halfHeight * cos,
+                                                            position.Y + halfWidth * cos + halfHeight * sin), new Vector2f(uv2.X, uv2.Y));
+                vertices[index + 3] = new Vertex(new Vector2f(position.X + halfWidth * sin + halfHeight * cos,
+                                                            position.Y + halfWidth * cos - halfHeight * sin), new Vector2f(uv1.X, uv2.Y));
             }
 
-            end += 4;
+            index += 4;
+            infos[infos.Count - 1].length += 4;
         }
 
-        public void DrawRegion(Texture texture, Vector2 position, Vector2 uv1, Vector2 uv2)
+        public void Draw(Texture texture, Vector2 position)
         {
-            DrawInit(texture);
+            Draw(texture, position, new Vector2(1f, 1f), new Vector2(0f, 0f), new Vector2(texture.Size.X, texture.Size.Y), 0f);
+        }
 
-            float halfWidth = (uv2.X - uv1.X) * PixelsToMeters * 0.5f;
-            float halfHeight = (uv2.Y - uv1.Y) * PixelsToMeters * 0.5f;
-            
-            vertices[end + 0] = new Vertex(new Vector2f(position.X - halfWidth,
-                                                        position.Y - halfHeight), new Vector2f(uv1.X, uv1.Y));
-            vertices[end + 1] = new Vertex(new Vector2f(position.X + halfWidth,
-                                                        position.Y - halfHeight), new Vector2f(uv2.X, uv1.Y));
-            vertices[end + 2] = new Vertex(new Vector2f(position.X + halfWidth,
-                                                        position.Y + halfHeight), new Vector2f(uv2.X, uv2.Y));
-            vertices[end + 3] = new Vertex(new Vector2f(position.X - halfWidth,
-                                                        position.Y + halfHeight), new Vector2f(uv1.X, uv2.Y));
+        public void Draw(Texture texture, Vector2 position, float rotation)
+        {
+            Draw(texture, position, new Vector2(1f, 1f), new Vector2(0f, 0f), new Vector2(texture.Size.X, texture.Size.Y), rotation);
+        }
 
-            end += 4;
+        public void Draw(Texture texture, Vector2 position, Vector2 scale)
+        {
+            Draw(texture, position, scale, new Vector2(0f, 0f), new Vector2(texture.Size.X, texture.Size.Y), 0f);
+        }
+
+        public void Draw(Texture texture, Vector2 position, Vector2 scale, float rotation)
+        {
+            Draw(texture, position, scale, new Vector2(0f, 0f), new Vector2(texture.Size.X, texture.Size.Y), rotation);
+        }
+
+        public void Draw(VertexArray vertices, RenderStates states)
+        {
+            target.Draw(vertices, states);
         }
 
         public static void DrawRegion(Texture texture, Vector2 position, Vector2 uv1, Vector2 uv2, VertexArray array)
@@ -135,21 +144,28 @@ namespace Modulus2D.Graphics
                                                         position.Y + halfHeight), new Vector2f(uv1.X, uv2.Y)));
         }
 
-        public void End()
+        public void Render()
         {
-            if (vertices.Length > 0)
+            uint current = 0;
+
+            for (int i = 0; i < infos.Count; i++)
             {
-                Flush();
+                SpriteInfo info = infos[i];
+
+                target.Draw(vertices, current, info.length, PrimitiveType.Quads, info.states);
+                current += info.length;
             }
-
-            lastTexture = null;
         }
+    }
 
-        private void Flush()
+    class SpriteInfo
+    {
+        public RenderStates states;
+        public uint length;
+
+        public SpriteInfo(RenderStates states)
         {
-            target.Draw(vertices, start, end - start, PrimitiveType.Quads, new RenderStates(lastTexture));
-
-            start = end;
+            this.states = states;
         }
     }
 }

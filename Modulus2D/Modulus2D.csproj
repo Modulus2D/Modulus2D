@@ -61,11 +61,13 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Core\Config.cs" />
     <Compile Include="Core\DebugSystem.cs" />
-    <Compile Include="Core\IGame.cs" />
-    <Compile Include="Core\Map.cs" />
-    <Compile Include="Core\Scene.cs" />
+    <Compile Include="Core\Game.cs" />
+    <Compile Include="Core\Server.cs" />
+    <Compile Include="Core\State.cs" />
+    <Compile Include="Graphics\LightComponent.cs" />
+    <Compile Include="Graphics\LightSystem.cs" />
+    <Compile Include="Map\MapComponent.cs" />
     <Compile Include="Entities\Components.cs" />
     <Compile Include="Entities\ComponentStorage.cs" />
     <Compile Include="Entities\Entity.cs" />
@@ -78,14 +80,18 @@
     <Compile Include="Entities\EntityWorld.cs" />
     <Compile Include="Entities\IComponent.cs" />
     <Compile Include="Core\FPSCounterSystem.cs" />
-    <Compile Include="Core\App.cs" />
     <Compile Include="Graphics\SpriteBatch.cs" />
     <Compile Include="Graphics\Viewport.cs" />
     <Compile Include="Graphics\OrthoCamera.cs" />
+    <Compile Include="Map\MapSystem.cs" />
+    <Compile Include="Network\IReceive.cs" />
+    <Compile Include="Network\ITransmit.cs" />
+    <Compile Include="Network\IUpdate.cs" />
+    <Compile Include="Network\NetworkComponent.cs" />
+    <Compile Include="Network\NetworkSystem.cs" />
     <Compile Include="Physics\BoxCollider.cs" />
     <Compile Include="Physics\CircleCollider.cs" />
     <Compile Include="Physics\PhysicsSystem.cs" />
-    <Compile Include="Physics\PhysicsWorld.cs" />
     <Compile Include="Graphics\SpriteComponent.cs" />
     <Compile Include="Graphics\SpriteSystem.cs" />
     <Compile Include="Physics\PhysicsComponent.cs" />

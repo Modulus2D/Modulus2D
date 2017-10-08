@@ -1,5 +1,6 @@
 ﻿using Modulus2D.Core;
 using Modulus2D.Entities;
+using Modulus2D.Map;
 using SFML.Window;
 using System;
 using System.Collections.Generic;
@@ -7,16 +8,16 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Prota2D.Core
+namespace Modulus2D.Core
 {
     public class DebugSystem : EntitySystem
     {
-        private Map map;
         private float reloadTimer = 0f;
+        private MapSystem mapSystem;
 
-        public DebugSystem(Map map)
+        public DebugSystem(MapSystem mapSystem)
         {
-            this.map = map;
+            this.mapSystem = mapSystem;
         }
 
         public override void Update(float deltaTime)
@@ -26,7 +27,7 @@ namespace Prota2D.Core
             if (Keyboard.IsKeyPressed(Keyboard.Key.R) && reloadTimer > 1f)
             {
                 Console.WriteLine("Reload");
-                map.Reload();
+                mapSystem.ReloadAll();
                 reloadTimer = 0f;
             }
         }

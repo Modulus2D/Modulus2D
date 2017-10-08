@@ -6,8 +6,8 @@ namespace Example
     {
         static void Main(string[] args)
         {
-            App game = new App(new ExampleGame());
-            game.Start();
+            Game game = new Game();
+            game.Start(new GameState(), "Example", 1336, 768);
         }
     }
 }

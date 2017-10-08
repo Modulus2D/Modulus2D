@@ -7,20 +7,28 @@ using System.Threading.Tasks;
 
 namespace Modulus2D.Entities
 {
+    /// <summary>
+    /// Base entity system class
+    /// </summary>
     public abstract class EntitySystem
     {
-        private EntityWorld world;
+        private int priority = 0;
 
+        private EntityWorld world;
         public EntityWorld World { get => world; set => world = value; }
 
-        public virtual void Start()
+        /// <summary>
+        /// Entity Systems are executed in descending order from highest to lowest priority
+        /// </summary>
+        public int Priority { get => priority; set => priority = value; }
+
+        public virtual void AddedToWorld()
         {
 
         }
 
         public virtual void Update(float deltaTime)
         {
-
         }
     }
 }

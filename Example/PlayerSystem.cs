@@ -13,42 +13,43 @@ namespace Example
 {
     class PlayerSystem : EntitySystem
     {
-        private OrthoCamera camera;
-        private Entity player;
-        private PhysicsComponent physics;
         private float speed = 200f;
         private float jump = 1000f;
 
-        public PlayerSystem(OrthoCamera camera, Entity player)
-        {
-            this.camera = camera;
-            this.player = player;
+        private EntityFilter filter = new EntityFilter();
 
-            physics = player.GetComponent<PhysicsComponent>();
+        public PlayerSystem()
+        {
+            filter.Add<PlayerComponent>();
+            filter.Add<PhysicsComponent>();
         }
 
         public override void Update(float deltaTime)
         {
-            camera.Position = physics.Body.Position;
-
-            float move = 0f;
-
-            if (Keyboard.IsKeyPressed(Keyboard.Key.Right))
+            foreach (Components components in World.Iterate(filter))
             {
-                move += 1f;
-            }
+                PlayerComponent player = components.Next<PlayerComponent>();
+                PhysicsComponent physics = components.Next<PhysicsComponent>();
 
-            if (Keyboard.IsKeyPressed(Keyboard.Key.Left))
-            {
-                move -= 1f;
-            }
+                float move = 0f;
 
-            if (Keyboard.IsKeyPressed(Keyboard.Key.Up))
-            {
-                physics.Body.ApplyForce(new Vector2(0f, -jump * deltaTime));
-            }
+                if (Keyboard.IsKeyPressed(Keyboard.Key.Right))
+                {
+                    move += 1f;
+                }
 
-            physics.Body.ApplyForce(new Vector2(move * speed * deltaTime, 0f));
+                if (Keyboard.IsKeyPressed(Keyboard.Key.Left))
+                {
+                    move -= 1f;
+                }
+
+                if (Keyboard.IsKeyPressed(Keyboard.Key.Up))
+                {
+                    physics.Body.ApplyForce(new Vector2(0f, -jump * deltaTime));
+                }
+
+                physics.Body.ApplyForce(new Vector2(move * speed * deltaTime, 0f));
+            }
         }
     }
 }

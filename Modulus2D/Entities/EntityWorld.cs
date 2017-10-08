@@ -13,7 +13,8 @@ namespace Modulus2D.Entities
         private EntityAllocator allocator = new EntityAllocator();
         private List<EntitySystem> systems = new List<EntitySystem>();
         private Dictionary<Type, IComponentStorage> storages = new Dictionary<Type, IComponentStorage>();
-        private Dictionary<Type, List<Action<Entity>>> entityListeners = new Dictionary<Type, List<Action<Entity>>>();
+        private Dictionary<Type, List<Action<Entity>>> entityCreationListeners = new Dictionary<Type, List<Action<Entity>>>();
+        private Dictionary<IComponentStorage, List<Action<Entity>>> entityDestructionListeners = new Dictionary<IComponentStorage, List<Action<Entity>>>();
 
         public Entity Create()
         {
@@ -25,6 +26,20 @@ namespace Modulus2D.Entities
             allocator.Remove(id);
             foreach (IComponentStorage storage in storages.Values)
             {
+                // Notify listeners
+                if (storage.Has(id))
+                {
+                    List<Action<Entity>> listeners = GetDestructionListeners(storage);
+                    if (listeners.Count > 0)
+                    {
+                        Entity entity = new Entity(id, this);
+                        foreach (Action<Entity> listener in listeners)
+                        {
+                            listener(entity);
+                        }
+                    }
+                }
+
                 storage.Clear(id);
             }
         }
@@ -64,7 +79,7 @@ namespace Modulus2D.Entities
                 storage.list[id] = component;
             }
 
-            List<Action<Entity>> listeners = GetListeners<T>();
+            List<Action<Entity>> listeners = GetCreationListeners<T>();
             if(listeners.Count > 0)
             {
                 Entity entity = new Entity(id, this);
@@ -75,21 +90,40 @@ namespace Modulus2D.Entities
             }
         }
 
-        public void AddListener<T>(Action<Entity> action) where T : IComponent
+        public void AddCreationListener<T>(Action<Entity> action) where T : IComponent
         {
-            GetListeners<T>().Add(action);
+            GetCreationListeners<T>().Add(action);
         }
 
-        private List<Action<Entity>> GetListeners<T>() where T : IComponent
+        private List<Action<Entity>> GetCreationListeners<T>() where T : IComponent
         {
-            if (entityListeners.TryGetValue(typeof(T), out List<Action<Entity>> listeners))
+            if (entityCreationListeners.TryGetValue(typeof(T), out List<Action<Entity>> listeners))
             {
                 return listeners;
             }
             else
             {
                 List<Action<Entity>> newListeners = new List<Action<Entity>>();
-                entityListeners.Add(typeof(T), newListeners);
+                entityCreationListeners.Add(typeof(T), newListeners);
+                return newListeners;
+            }
+        }
+
+        public void AddDestructionListener<T>(Action<Entity> action) where T : IComponent
+        {
+            GetDestructionListeners(GetStorage<T>()).Add(action);
+        }
+
+        private List<Action<Entity>> GetDestructionListeners(IComponentStorage storage)
+        {
+            if (entityDestructionListeners.TryGetValue(storage, out List<Action<Entity>> listeners))
+            {
+                return listeners;
+            }
+            else
+            {
+                List<Action<Entity>> newListeners = new List<Action<Entity>>();
+                entityDestructionListeners.Add(storage, newListeners);
                 return newListeners;
             }
         }
@@ -125,17 +159,31 @@ namespace Modulus2D.Entities
 
         public void Update(float deltaTime)
         {
-            foreach (EntitySystem system in systems)
+            // Run systems
+            for (int i = 0; i < systems.Count; i++)
             {
-                system.Update(deltaTime);
+                systems[i].Update(deltaTime);
             }
         }
 
         public void AddSystem(EntitySystem system)
         {
             system.World = this;
-            system.Start();
             systems.Add(system);
+            system.AddedToWorld();
+
+            SortSystems();
+        }
+
+        public void SortSystems()
+        {
+            // Sort systems by priority
+            systems.Sort(delegate (EntitySystem system1, EntitySystem system2) { return system2.Priority.CompareTo(system1.Priority); });
+        }
+
+        public void RemoveSystem(EntitySystem system)
+        {
+            systems.Remove(system);
         }
 
         public EntityIterator Iterate(EntityFilter filter)

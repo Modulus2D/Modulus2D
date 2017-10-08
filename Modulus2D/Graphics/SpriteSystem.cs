@@ -9,15 +9,12 @@ namespace Modulus2D.Graphics
 {
     public class SpriteSystem : EntitySystem
     {
-        private RenderTarget target;
         private EntityFilter filter = new EntityFilter();
         private SpriteBatch batch;
 
-        public SpriteSystem(RenderTarget target)
+        public SpriteSystem(SpriteBatch batch)
         {
-            this.target = target;
-
-            batch = new SpriteBatch(target);
+            this.batch = batch;
 
             filter.Add<TransformComponent>();
             filter.Add<SpriteComponent>();
@@ -33,7 +30,7 @@ namespace Modulus2D.Graphics
                 batch.Draw(components.Next<SpriteComponent>().Texture, transform.Position, transform.Rotation);
             }
 
-            batch.End();
+            batch.Render();
         }
     }
 }

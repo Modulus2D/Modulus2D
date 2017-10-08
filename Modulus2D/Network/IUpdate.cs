@@ -1,13 +1,12 @@
-﻿using Modulus2D.Entities;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Example
+namespace Modulus2D.Network
 {
-    class Player : IComponent
+    public interface IUpdate
     {
     }
 }
