@@ -52,20 +52,20 @@
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="FarseerPhysics, Version=3.5.0.38023, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\FarseerPhysics.3.5.0\lib\NET40\FarseerPhysics.dll</HintPath>
+    <Reference Include="FarseerPhysics">
+      <HintPath>..\Dependencies\Farseer\FarseerPhysics.dll</HintPath>
     </Reference>
     <Reference Include="sfmlnet-audio-2">
-      <HintPath>..\Deps\SFML.Net-2.2\lib\sfmlnet-audio-2.dll</HintPath>
+      <HintPath>..\Dependencies\SFML\sfmlnet-audio-2.dll</HintPath>
     </Reference>
     <Reference Include="sfmlnet-graphics-2">
-      <HintPath>..\Deps\SFML.Net-2.2\lib\sfmlnet-graphics-2.dll</HintPath>
+      <HintPath>..\Dependencies\SFML\sfmlnet-graphics-2.dll</HintPath>
     </Reference>
     <Reference Include="sfmlnet-system-2">
-      <HintPath>..\Deps\SFML.Net-2.2\lib\sfmlnet-system-2.dll</HintPath>
+      <HintPath>..\Dependencies\SFML\sfmlnet-system-2.dll</HintPath>
     </Reference>
     <Reference Include="sfmlnet-window-2">
-      <HintPath>..\Deps\SFML.Net-2.2\lib\sfmlnet-window-2.dll</HintPath>
+      <HintPath>..\Dependencies\SFML\sfmlnet-window-2.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -75,6 +75,9 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
+    <Reference Include="TiledSharp">
+      <HintPath>..\Dependencies\Tiled\TiledSharp.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="GameState.cs" />
@@ -83,7 +86,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Example\Example.csproj">
@@ -91,7 +93,7 @@
       <Name>Example</Name>
     </ProjectReference>
     <ProjectReference Include="..\Modulus2D\Modulus2D.csproj">
-      <Project>{9BE6F005-8A9A-4BFB-9DA1-4D1804098872}</Project>
+      <Project>{e72b2608-5855-4e98-bed6-48de097c10f7}</Project>
       <Name>Modulus2D</Name>
     </ProjectReference>
   </ItemGroup>
