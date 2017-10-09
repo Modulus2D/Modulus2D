@@ -33,6 +33,9 @@
     <Reference Include="FarseerPhysics">
       <HintPath>..\Dependencies\Farseer\FarseerPhysics.dll</HintPath>
     </Reference>
+    <Reference Include="Lidgren.Network, Version=2012.1.7.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\Dependencies\Lidgren\Lidgren.Network.dll</HintPath>
+    </Reference>
     <Reference Include="sfmlnet-audio-2">
       <HintPath>..\Dependencies\SFML\sfmlnet-audio-2.dll</HintPath>
     </Reference>
@@ -82,13 +85,13 @@
     <Compile Include="Graphics\Viewport.cs" />
     <Compile Include="Graphics\OrthoCamera.cs" />
     <Compile Include="Map\MapSystem.cs" />
+    <Compile Include="Network\ClientSystem.cs" />
     <Compile Include="Network\IReceive.cs" />
     <Compile Include="Network\ITransmit.cs" />
     <Compile Include="Network\IUpdate.cs" />
     <Compile Include="Network\NetworkComponent.cs" />
     <Compile Include="Network\NetworkSystem.cs" />
-    <Compile Include="Physics\BoxCollider.cs" />
-    <Compile Include="Physics\CircleCollider.cs" />
+    <Compile Include="Network\ServerSystem.cs" />
     <Compile Include="Physics\PhysicsSystem.cs" />
     <Compile Include="Graphics\SpriteComponent.cs" />
     <Compile Include="Graphics\SpriteSystem.cs" />

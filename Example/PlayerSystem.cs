@@ -30,7 +30,7 @@ namespace Example
             {
                 PlayerComponent player = components.Next<PlayerComponent>();
                 PhysicsComponent physics = components.Next<PhysicsComponent>();
-
+                
                 float move = 0f;
 
                 if (Keyboard.IsKeyPressed(Keyboard.Key.Right) || Keyboard.IsKeyPressed(Keyboard.Key.D))

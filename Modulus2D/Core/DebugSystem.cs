@@ -24,12 +24,13 @@ namespace Modulus2D.Core
         {
             reloadTimer += deltaTime;
 
-            if (Keyboard.IsKeyPressed(Keyboard.Key.R) && reloadTimer > 1f)
+            // Disabled until console is implemented            
+            /*if (Keyboard.IsKeyPressed(Keyboard.Key.R) && reloadTimer > 1f)
             {
                 Console.WriteLine("Reload");
                 mapSystem.ReloadAll();
                 reloadTimer = 0f;
-            }
+            }*/
         }
     }
 }

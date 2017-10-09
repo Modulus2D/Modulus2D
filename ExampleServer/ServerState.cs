@@ -3,6 +3,7 @@ using Modulus2D.Core;
 using Modulus2D.Entities;
 using Modulus2D.Graphics;
 using Modulus2D.Map;
+using Modulus2D.Network;
 using Modulus2D.Physics;
 using SFML.Graphics;
 using System;
@@ -11,7 +12,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Example
+namespace ExampleServer
 {
     class ServerState : State
     {
@@ -41,25 +42,16 @@ namespace Example
 
             // Create debug system
             entityWorld.AddSystem(new DebugSystem(maps));
-
-            // Add player system
-            PlayerSystem playerSystem = new PlayerSystem();
-            entityWorld.AddSystem(playerSystem);
             
-            // Create player
-            Entity player = entityWorld.Create();
-            player.AddComponent(new TransformComponent());
-            player.AddComponent(new PhysicsComponent());
-            player.AddComponent(new PlayerComponent());
-            player.AddComponent(new CircleCollider(0.5f));
-            player.GetComponent<PhysicsComponent>().Body.Position = new Vector2(0f, 0f);
-
             // Add FPS counter
             entityWorld.AddSystem(new FPSCounterSystem());
+            
+            // Create server system
+            entityWorld.AddSystem(new ServerSystem(14356));
         }
 
         public override void Update(float deltaTime)
-        {            
+        {
             entityWorld.Update(deltaTime);
         }
     }

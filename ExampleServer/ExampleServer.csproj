@@ -80,6 +80,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ServerState.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -89,10 +90,19 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Example\Example.csproj">
+      <Project>{ced56192-b356-4ee0-894a-988b13b896a8}</Project>
+      <Name>Example</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Modulus2D\Modulus2D.csproj">
       <Project>{e72b2608-5855-4e98-bed6-48de097c10f7}</Project>
       <Name>Modulus2D</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="csfml-system-2.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

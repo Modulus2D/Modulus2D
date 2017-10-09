@@ -13,6 +13,7 @@ namespace Modulus2D.Core
         private State state;
 
         // Time
+        // TODO: Replace with custom Clock class to remove SFML dependency
         private Clock clock = new Clock();
 
         public State State

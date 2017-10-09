@@ -13,9 +13,6 @@ namespace ExampleGame
         {
             Game game = new Game();
             game.Start(new GameState(), "Example", 1336, 768);
-
-            //Server server = new Server();
-            //server.Start(new ServerState());
         }
     }
 }

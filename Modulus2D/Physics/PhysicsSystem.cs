@@ -11,7 +11,7 @@ namespace Modulus2D.Physics
         private World physicsWorld;
 
         public World PhysicsWorld { get => physicsWorld; set => physicsWorld = value; }
-        private float stepTime = 1 / 60f;
+        private float stepTime = 0.015f; // ~66 FPS
         private float accumulator = 0f;
 
         public PhysicsSystem()
@@ -26,10 +26,6 @@ namespace Modulus2D.Physics
         {
             World.AddCreationListener<PhysicsComponent>(Created);
             World.AddDestructionListener<PhysicsComponent>(Destroyed);
-
-            // To be removed
-            World.AddCreationListener<CircleCollider>(CircleColliderAdded);
-            World.AddCreationListener<BoxCollider>(BoxColliderAdded);
         }
 
         public void Created(Entity entity)
@@ -44,40 +40,11 @@ namespace Modulus2D.Physics
             PhysicsWorld.RemoveBody(physics.Body);
         }
 
-        // TODO: Remove specific colliders
-        public void CircleColliderAdded(Entity entity)
-        {
-            PhysicsComponent physics = entity.GetComponent<PhysicsComponent>();
-
-            if(physics == null)
-            {
-                //logger.Error("Attempted to add collider before adding rigidbody");
-                return;
-            }
-
-            CircleCollider collider = entity.GetComponent<CircleCollider>();
-            collider.Init(physics.Body);
-        }
-
-        public void BoxColliderAdded(Entity entity)
-        {
-            PhysicsComponent physics = entity.GetComponent<PhysicsComponent>();
-
-            if (physics == null)
-            {
-                //logger.Error("Attempted to add collider before adding rigidbody");
-                return;
-            }
-
-            BoxCollider collider = entity.GetComponent<BoxCollider>();
-            collider.Init(physics.Body);
-        }
-
         public override void Update(float deltaTime)
         {
             // Update world
             accumulator += deltaTime;
-
+            
             while (accumulator >= stepTime)
             {
                 PhysicsWorld.Step(stepTime);
@@ -92,8 +59,11 @@ namespace Modulus2D.Physics
                 
                 if (physics.Body != null)
                 {
-                    transform.Position = physics.Body.Position;
-                    transform.Rotation = -physics.Body.Rotation;
+                    // Lerp body position
+                    transform.Position += (physics.Body.Position - transform.Position) * accumulator / stepTime;
+                    
+                    // TODO: Negative rotation?
+                    transform.Rotation += (-physics.Body.Rotation - transform.Rotation) * accumulator / stepTime;
                 }
             }
         }

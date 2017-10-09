@@ -1,4 +1,6 @@
-﻿using FarseerPhysics.Dynamics;
+﻿using FarseerPhysics.Collision.Shapes;
+using FarseerPhysics.Common;
+using FarseerPhysics.Dynamics;
 using FarseerPhysics.Factories;
 using Modulus2D.Entities;
 using System;
@@ -18,6 +20,18 @@ namespace Modulus2D.Physics
         {
             Body = BodyFactory.CreateBody(world);
             Body.BodyType = BodyType.Dynamic;
+        }
+
+        public Fixture CreateBox(float width, float height, float density)
+        {
+            Shape shape = new PolygonShape(PolygonTools.CreateRectangle(width / 2f, height / 2f), density);
+            return Body.CreateFixture(shape);
+        }
+
+        public Fixture CreateCircle(float radius, float density)
+        {
+            Shape shape = new CircleShape(radius, density);
+            return Body.CreateFixture(shape);
         }
     }
 }

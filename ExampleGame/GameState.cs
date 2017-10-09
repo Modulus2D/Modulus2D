@@ -4,6 +4,7 @@ using Modulus2D.Core;
 using Modulus2D.Entities;
 using Modulus2D.Graphics;
 using Modulus2D.Map;
+using Modulus2D.Network;
 using Modulus2D.Physics;
 using SFML.Graphics;
 
@@ -11,15 +12,15 @@ namespace ExampleGame
 {
     class GameState : State
     {
-        private EntityWorld entityWorld;
+        private EntityWorld world;
 
         public override void Start()
         {
-            entityWorld = new EntityWorld();
+            world = new EntityWorld();
 
             // Add physics system
             PhysicsSystem physicsSystem = new PhysicsSystem();
-            entityWorld.AddSystem(physicsSystem);
+            world.AddSystem(physicsSystem);
                         
             // Add sprite system
             SpriteBatch batch = new SpriteBatch(Graphics);
@@ -27,24 +28,24 @@ namespace ExampleGame
             {
                 Priority = -2 // Render sprites last
             };
-            entityWorld.AddSystem(spriteSystem);
+            world.AddSystem(spriteSystem);
 
             // Add map system
             MapSystem maps = new MapSystem(batch)
             {
                 Priority = -1 // Render map last
             };
-            entityWorld.AddSystem(maps);
+            world.AddSystem(maps);
 
             // Load map
-            Entity map = entityWorld.Create();
+            Entity map = world.Create();
             map.AddComponent(new TransformComponent());
             map.AddComponent(new PhysicsComponent());
             map.GetComponent<PhysicsComponent>().Body.IsStatic = true;
             map.AddComponent(new MapComponent("Resources/Maps/Test.tmx"));
 
             // Create debug system
-            entityWorld.AddSystem(new DebugSystem(maps));
+            world.AddSystem(new DebugSystem(maps));
 
             // Load textures
             Texture face = new Texture("Resources/Textures/Face.png");
@@ -58,28 +59,31 @@ namespace ExampleGame
 
             // Add player system
             PlayerSystem playerSystem = new PlayerSystem();
-            entityWorld.AddSystem(playerSystem);
+            world.AddSystem(playerSystem);
             
             // Create player
-            Entity player = entityWorld.Create();
+            Entity player = world.Create();
             player.AddComponent(new TransformComponent());
             player.AddComponent(new SpriteComponent(face));
-            player.AddComponent(new PhysicsComponent());
             player.AddComponent(new PlayerComponent());
-            player.AddComponent(new CircleCollider(0.5f));
-            player.GetComponent<PhysicsComponent>().Body.Position = new Vector2(0f, 0f);
-            
+            PhysicsComponent playerPhysics = new PhysicsComponent();
+            player.AddComponent(playerPhysics);
+            playerPhysics.CreateCircle(0.5f, 1f);
+
             // Add camera system
             CameraSystem cameraSystem = new CameraSystem(camera, player.GetComponent<TransformComponent>());
-            entityWorld.AddSystem(cameraSystem);
+            world.AddSystem(cameraSystem);
 
             // Add FPS counter
-            entityWorld.AddSystem(new FPSCounterSystem());
+            world.AddSystem(new FPSCounterSystem());
+
+            // Add client system
+            world.AddSystem(new ClientSystem("127.0.0.1", 14356));
         }
 
         public override void Update(float deltaTime)
         {            
-            entityWorld.Update(deltaTime);
+            world.Update(deltaTime);
         }
     }
 }
