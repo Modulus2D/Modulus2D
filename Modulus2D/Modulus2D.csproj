@@ -68,6 +68,10 @@
     <Compile Include="Core\State.cs" />
     <Compile Include="Graphics\LightComponent.cs" />
     <Compile Include="Graphics\LightSystem.cs" />
+    <Compile Include="Network\Networker.cs" />
+    <Compile Include="Network\Packet.cs" />
+    <Compile Include="UI\UISystem.cs" />
+    <Compile Include="UI\TextComponent.cs" />
     <Compile Include="Map\MapComponent.cs" />
     <Compile Include="Entities\Components.cs" />
     <Compile Include="Entities\ComponentStorage.cs" />

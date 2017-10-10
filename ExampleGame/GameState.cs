@@ -6,7 +6,9 @@ using Modulus2D.Graphics;
 using Modulus2D.Map;
 using Modulus2D.Network;
 using Modulus2D.Physics;
+using Modulus2D.UI;
 using SFML.Graphics;
+using SFML.System;
 
 namespace ExampleGame
 {
@@ -37,6 +39,11 @@ namespace ExampleGame
             };
             world.AddSystem(maps);
 
+            // Add UI system
+            world.AddSystem(new UISystem(Graphics));
+
+            Entity text = world.Create();
+
             // Load map
             Entity map = world.Create();
             map.AddComponent(new TransformComponent());
@@ -45,7 +52,7 @@ namespace ExampleGame
             map.AddComponent(new MapComponent("Resources/Maps/Test.tmx"));
 
             // Create debug system
-            world.AddSystem(new DebugSystem(maps));
+            // world.AddSystem(new DebugSystem(maps));
 
             // Load textures
             Texture face = new Texture("Resources/Textures/Face.png");
@@ -77,8 +84,12 @@ namespace ExampleGame
             // Add FPS counter
             world.AddSystem(new FPSCounterSystem());
 
+            // Add network system
+            NetworkSystem networkSystem = new NetworkSystem();
+            world.AddSystem(networkSystem);
+            
             // Add client system
-            world.AddSystem(new ClientSystem("127.0.0.1", 14356));
+            world.AddSystem(new ClientSystem(networkSystem, "127.0.0.1", 14356));
         }
 
         public override void Update(float deltaTime)

@@ -30,7 +30,7 @@ namespace Modulus2D.Graphics
                 batch.Draw(components.Next<SpriteComponent>().Texture, transform.Position, transform.Rotation);
             }
 
-            batch.Render();
+            batch.End();
         }
     }
 }

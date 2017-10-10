@@ -49,7 +49,7 @@ namespace Modulus2D.Graphics
             if (index >= 4 * MaxSprites)
             {
                 // Render if MaxSprites is exceeded
-                Render();
+                End();
 
                 index = 0;
                 infos.Clear();
@@ -138,7 +138,7 @@ namespace Modulus2D.Graphics
                                                         position.Y + halfHeight), new Vector2f(uv1.X, uv2.Y)));
         }
 
-        public void Render()
+        public void End()
         {
             uint current = 0;
 

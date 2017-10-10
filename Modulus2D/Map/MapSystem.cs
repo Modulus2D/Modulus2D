@@ -152,11 +152,15 @@ namespace Modulus2D.Map
         {
             if(render)
             {
+                batch.Begin();
+
                 for (int i = 0; i < maps.Count; i++)
                 {
                     MapComponent map = maps[i];
                     batch.Draw(map.Vertices, map.States);
                 }
+
+                batch.End();
             }
         }
     }

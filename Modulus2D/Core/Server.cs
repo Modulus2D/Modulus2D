@@ -34,18 +34,18 @@ namespace Modulus2D.Core
             // Game loop
             while (true)
             {
-                Update();
+                float dt = clock.ElapsedTime.AsSeconds();
+                clock.Restart();
+                
+                State.Update(dt);
+
+                // Avoid extreme CPU usage
+                System.Threading.Thread.Sleep(0);
             }
         }
 
         public void Update()
         {
-            float dt = clock.ElapsedTime.AsSeconds();
-            clock.Restart();
-
-            // Update state
-            State.Update(dt);
         }
-
     }
 }

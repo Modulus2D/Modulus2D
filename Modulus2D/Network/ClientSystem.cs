@@ -12,19 +12,39 @@ namespace Modulus2D.Network
     public class ClientSystem : EntitySystem
     {
         NetClient client;
+        NetIncomingMessage message;
+        NetworkSystem networkSystem;
+        Networker networker;
 
-        public ClientSystem(string host, int port)
+        private float updateTime = 0.025f; // 40 UPS
+        private float accumulator = 0f;
+
+        public ClientSystem(NetworkSystem networkSystem, string host, int port)
         {
-            NetPeerConfiguration config = new NetPeerConfiguration("Network");
+            this.networkSystem = networkSystem;
+
+            NetPeerConfiguration config = new NetPeerConfiguration("Modulus");
             client = new NetClient(config);
 
             client.Start();
             client.Connect(host, port);
+
+            networker = new Networker(client);
         }
 
         public override void Update(float deltaTime)
         {
-            NetOutgoingMessage message = client.CreateMessage();
+            networker.ReadMessages();
+
+            accumulator += deltaTime;
+
+            // Send update
+            if (accumulator > updateTime)
+            {
+                client.SendMessage(networker.CreateUpdate(networkSystem.Transmit()), NetDeliveryMethod.UnreliableSequenced);
+
+                accumulator = 0f;
+            }
         }
     }
 }

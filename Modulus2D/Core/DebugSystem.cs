@@ -1,6 +1,9 @@
 ﻿using Modulus2D.Core;
 using Modulus2D.Entities;
 using Modulus2D.Map;
+using Modulus2D.UI;
+using SFML.Graphics;
+using SFML.System;
 using SFML.Window;
 using System;
 using System.Collections.Generic;
@@ -14,10 +17,17 @@ namespace Modulus2D.Core
     {
         private float reloadTimer = 0f;
         private MapSystem mapSystem;
+        private TextComponent text;
 
         public DebugSystem(MapSystem mapSystem)
         {
             this.mapSystem = mapSystem;
+
+            Entity textEntity = World.Create();
+
+            Font font = new Font("Resources/Fonts/Inconsolata-Regular.ttf");
+            text = new TextComponent(font);
+            textEntity.AddComponent(text);
         }
 
         public override void Update(float deltaTime)

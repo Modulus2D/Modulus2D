@@ -2,7 +2,6 @@
 using Modulus2D.Entities;
 using System;
 using System.IO;
-using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 
 namespace Modulus2D.Network
@@ -11,50 +10,40 @@ namespace Modulus2D.Network
     {
         NetServer server;
         NetIncomingMessage message;
+        NetworkSystem networkSystem;
+        Networker networker;
 
-        public ServerSystem(int port)
+        private float updateTime = 0.025f; // 40 UPS
+        private float accumulator = 0f;
+
+        public ServerSystem(NetworkSystem networkSystem, int port)
         {
-            NetPeerConfiguration config = new NetPeerConfiguration("Network")
+            this.networkSystem = networkSystem;
+
+            // TODO: Not hard-coded?
+            NetPeerConfiguration config = new NetPeerConfiguration("Modulus")
             {
                 Port = port
             };
 
             server = new NetServer(config);
             server.Start();
+
+            networker = new Networker(server);
         }
         
         public override void Update(float deltaTime)
         {
-            while ((message = server.ReadMessage()) != null)
+            networker.ReadMessages();
+
+            accumulator += deltaTime;
+
+            // Send update
+            if (accumulator > updateTime)
             {
-                switch (message.MessageType)
-                {
-                    case NetIncomingMessageType.Data:
-                        break;
+                server.SendToAll(networker.CreateUpdate(networkSystem.Transmit()), NetDeliveryMethod.UnreliableSequenced);
 
-                    case NetIncomingMessageType.StatusChanged:
-                        switch (message.SenderConnection.Status)
-                        {
-                            case NetConnectionStatus.Connected:
-                                Console.WriteLine("Connection");
-                                break;
-                            case NetConnectionStatus.Disconnected:
-                                Console.WriteLine("Disconnection");
-                                break;
-                        }
-                        break;
-
-                    case NetIncomingMessageType.DebugMessage:
-                        Console.WriteLine(message.ReadString());
-                        break;
-
-                    default:
-                        Console.WriteLine("unhandled message with type: "
-                            + message.MessageType);
-                        break;
-                }
-
-                server.Recycle(message);
+                accumulator = 0f;
             }
         }
     }

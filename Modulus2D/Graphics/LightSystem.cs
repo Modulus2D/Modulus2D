@@ -42,7 +42,7 @@ namespace Modulus2D.Graphics
                 batch.Draw(pointLight, transform.Position, new Vector2(0.3f, 0.3f));
             }
 
-            batch.Render();
+            batch.End();
         }
     }
 }
