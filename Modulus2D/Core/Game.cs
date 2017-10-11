@@ -1,4 +1,5 @@
-﻿using Prota2D.Core;
+﻿using Modulus2D.Core;
+using Modulus2D.Input;
 using SFML.Graphics;
 using SFML.System;
 using SFML.Window;
@@ -19,7 +20,7 @@ namespace Modulus2D.Core
         private RenderWindow window;
 
         // Input
-        private Input input = new Input();
+        private InputManager input = new InputManager();
 
         // Time
         private Clock clock = new Clock();

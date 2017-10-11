@@ -33,7 +33,7 @@ namespace Modulus2D.Map
 
         public override void AddedToWorld()
         {
-            World.AddCreationListener<MapComponent>(AddMap);
+            World.AddCreatedListener<MapComponent>(AddMap);
         }
 
         public void ReloadAll()

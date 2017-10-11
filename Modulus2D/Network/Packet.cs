@@ -15,24 +15,26 @@ namespace Modulus2D.Network
     [Serializable]
     public class UpdatePacket
     {
-        public List<EntityPacket> packets = new List<EntityPacket>();
+        public List<EntityPacket> packets;
     }
 
     [Serializable]
     public class EntityPacket
     {
-        private uint id;
-        private List<IUpdate> updates;
-
-        public uint Id { get => id; set => id = value; }
-        public List<IUpdate> Updates { get => updates; set => updates = value; }
+        public uint id;
+        public List<IUpdate> updates;
     }
 
     [Serializable]
     public class EventPacket
     {
-        private string name;
+        public string name;
+        public IUpdate update;
+    }
 
-        public string Name { get => name; set => name = value; }
+    [Serializable]
+    public class InitialPacket
+    {
+        public List<EventPacket> events;
     }
 }

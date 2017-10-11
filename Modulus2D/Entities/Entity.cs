@@ -39,7 +39,7 @@ namespace Modulus2D.Entities
 
         public void Destroy()
         {
-            world.Destroy(id);
+            world.Remove(id);
         }
     }
 }

@@ -13,15 +13,15 @@ namespace Modulus2D.Entities
         private EntityAllocator allocator = new EntityAllocator();
         private List<EntitySystem> systems = new List<EntitySystem>();
         private Dictionary<Type, IComponentStorage> storages = new Dictionary<Type, IComponentStorage>();
-        private Dictionary<Type, List<Action<Entity>>> entityCreationListeners = new Dictionary<Type, List<Action<Entity>>>();
-        private Dictionary<IComponentStorage, List<Action<Entity>>> entityDestructionListeners = new Dictionary<IComponentStorage, List<Action<Entity>>>();
+        private Dictionary<Type, List<Action<Entity>>> entityCreatedListeners = new Dictionary<Type, List<Action<Entity>>>();
+        private Dictionary<IComponentStorage, List<Action<Entity>>> entityRemovedListeners = new Dictionary<IComponentStorage, List<Action<Entity>>>();
 
         public Entity Create()
         {
             return new Entity(allocator.Create(), this);
         }
 
-        public void Destroy(int id)
+        public void Remove(int id)
         {
             allocator.Remove(id);
             foreach (IComponentStorage storage in storages.Values)
@@ -29,7 +29,7 @@ namespace Modulus2D.Entities
                 // Notify listeners
                 if (storage.Has(id))
                 {
-                    List<Action<Entity>> listeners = GetDestructionListeners(storage);
+                    List<Action<Entity>> listeners = GetRemovedListeners(storage);
                     if (listeners.Count > 0)
                     {
                         Entity entity = new Entity(id, this);
@@ -79,7 +79,7 @@ namespace Modulus2D.Entities
                 storage.list[id] = component;
             }
 
-            List<Action<Entity>> listeners = GetCreationListeners<T>();
+            List<Action<Entity>> listeners = GetCreatedListeners<T>();
             if(listeners.Count > 0)
             {
                 Entity entity = new Entity(id, this);
@@ -90,40 +90,40 @@ namespace Modulus2D.Entities
             }
         }
 
-        public void AddCreationListener<T>(Action<Entity> action) where T : IComponent
+        public void AddCreatedListener<T>(Action<Entity> action) where T : IComponent
         {
-            GetCreationListeners<T>().Add(action);
+            GetCreatedListeners<T>().Add(action);
         }
 
-        private List<Action<Entity>> GetCreationListeners<T>() where T : IComponent
+        private List<Action<Entity>> GetCreatedListeners<T>() where T : IComponent
         {
-            if (entityCreationListeners.TryGetValue(typeof(T), out List<Action<Entity>> listeners))
+            if (entityCreatedListeners.TryGetValue(typeof(T), out List<Action<Entity>> listeners))
             {
                 return listeners;
             }
             else
             {
                 List<Action<Entity>> newListeners = new List<Action<Entity>>();
-                entityCreationListeners.Add(typeof(T), newListeners);
+                entityCreatedListeners.Add(typeof(T), newListeners);
                 return newListeners;
             }
         }
 
-        public void AddDestructionListener<T>(Action<Entity> action) where T : IComponent
+        public void AddRemovedListener<T>(Action<Entity> action) where T : IComponent
         {
-            GetDestructionListeners(GetStorage<T>()).Add(action);
+            GetRemovedListeners(GetStorage<T>()).Add(action);
         }
 
-        private List<Action<Entity>> GetDestructionListeners(IComponentStorage storage)
+        private List<Action<Entity>> GetRemovedListeners(IComponentStorage storage)
         {
-            if (entityDestructionListeners.TryGetValue(storage, out List<Action<Entity>> listeners))
+            if (entityRemovedListeners.TryGetValue(storage, out List<Action<Entity>> listeners))
             {
                 return listeners;
             }
             else
             {
                 List<Action<Entity>> newListeners = new List<Action<Entity>>();
-                entityDestructionListeners.Add(storage, newListeners);
+                entityRemovedListeners.Add(storage, newListeners);
                 return newListeners;
             }
         }

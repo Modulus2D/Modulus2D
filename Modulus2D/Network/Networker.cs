@@ -62,7 +62,7 @@ namespace Modulus2D.Network
                         break;
 
                     default:
-                        Console.WriteLine("Unhandled message with type: " + message.MessageType);
+                        // Console.WriteLine("Unhandled message with type: " + message.MessageType);
                         break;
                 }
 

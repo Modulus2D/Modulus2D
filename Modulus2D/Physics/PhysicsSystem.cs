@@ -24,8 +24,8 @@ namespace Modulus2D.Physics
 
         public override void AddedToWorld()
         {
-            World.AddCreationListener<PhysicsComponent>(Created);
-            World.AddDestructionListener<PhysicsComponent>(Destroyed);
+            World.AddCreatedListener<PhysicsComponent>(Created);
+            World.AddRemovedListener<PhysicsComponent>(Destroyed);
         }
 
         public void Created(Entity entity)

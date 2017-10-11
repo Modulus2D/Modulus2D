@@ -12,7 +12,6 @@ namespace Modulus2D.Network
     public class ClientSystem : EntitySystem
     {
         NetClient client;
-        NetIncomingMessage message;
         NetworkSystem networkSystem;
         Networker networker;
 

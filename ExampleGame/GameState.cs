@@ -1,5 +1,4 @@
-﻿using Example;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Modulus2D.Core;
 using Modulus2D.Entities;
 using Modulus2D.Graphics;
@@ -7,8 +6,13 @@ using Modulus2D.Map;
 using Modulus2D.Network;
 using Modulus2D.Physics;
 using Modulus2D.UI;
+using Modulus2D.Player;
 using SFML.Graphics;
 using SFML.System;
+using Modulus2D.Player.Platformer;
+using Example;
+using Modulus2D.Input;
+using SFML.Window;
 
 namespace ExampleGame
 {
@@ -67,12 +71,26 @@ namespace ExampleGame
             // Add player system
             PlayerSystem playerSystem = new PlayerSystem();
             world.AddSystem(playerSystem);
-            
+
+            // Add player input system
+            InputValue moveX = Input.Create();
+            moveX.AddKey(Keyboard.Key.D, 1f);
+            moveX.AddKey(Keyboard.Key.A, -1f);
+            moveX.AddKey(Keyboard.Key.Right, 1f);
+            moveX.AddKey(Keyboard.Key.Left, -1f);
+
+            InputValue jump = Input.Create();
+            jump.AddKey(Keyboard.Key.W, 1f);
+            jump.AddKey(Keyboard.Key.Up, 1f);
+
+            world.AddSystem(new PlayerInputSystem(moveX, jump));
+
             // Create player
             Entity player = world.Create();
             player.AddComponent(new TransformComponent());
             player.AddComponent(new SpriteComponent(face));
             player.AddComponent(new PlayerComponent());
+            player.AddComponent(new PlayerInputComponent());
             PhysicsComponent playerPhysics = new PhysicsComponent();
             player.AddComponent(playerPhysics);
             playerPhysics.CreateCircle(0.5f, 1f);

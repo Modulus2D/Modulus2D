@@ -1,15 +1,11 @@
 ﻿using Lidgren.Network;
 using Modulus2D.Entities;
-using System;
-using System.IO;
-using System.Runtime.Serialization.Formatters.Binary;
 
 namespace Modulus2D.Network
 {
     public class ServerSystem : EntitySystem
     {
         NetServer server;
-        NetIncomingMessage message;
         NetworkSystem networkSystem;
         Networker networker;
 

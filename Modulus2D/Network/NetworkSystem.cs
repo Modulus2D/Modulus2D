@@ -23,8 +23,8 @@ namespace Modulus2D.Network
 
         public override void AddedToWorld()
         {
-            World.AddCreationListener<NetworkComponent>(Added);
-            World.AddDestructionListener<NetworkComponent>(Removed);
+            World.AddCreatedListener<NetworkComponent>(Added);
+            World.AddRemovedListener<NetworkComponent>(Removed);
         }
 
         public void Added(Entity entity)
@@ -54,10 +54,10 @@ namespace Modulus2D.Network
 
                 EntityPacket entityPacket = new EntityPacket()
                 {
-                    Id = network.Id
+                    id = network.Id
                 };
 
-                entityPacket.Updates = network.Transmit();
+                entityPacket.updates = network.Transmit();
 
                 packet.packets.Add(entityPacket);
             }

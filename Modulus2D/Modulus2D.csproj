@@ -63,13 +63,18 @@
   <ItemGroup>
     <Compile Include="Core\DebugSystem.cs" />
     <Compile Include="Core\Game.cs" />
-    <Compile Include="Core\Input.cs" />
     <Compile Include="Core\Server.cs" />
     <Compile Include="Core\State.cs" />
     <Compile Include="Graphics\LightComponent.cs" />
     <Compile Include="Graphics\LightSystem.cs" />
+    <Compile Include="Input\InputManager.cs" />
+    <Compile Include="Input\InputValue.cs" />
     <Compile Include="Network\Networker.cs" />
     <Compile Include="Network\Packet.cs" />
+    <Compile Include="Player\Platformer\PlayerComponent.cs" />
+    <Compile Include="Player\Platformer\PlayerInputComponent.cs" />
+    <Compile Include="Player\Platformer\PlayerInputSystem.cs" />
+    <Compile Include="Player\Platformer\PlayerSystem.cs" />
     <Compile Include="UI\UISystem.cs" />
     <Compile Include="UI\TextComponent.cs" />
     <Compile Include="Map\MapComponent.cs" />
