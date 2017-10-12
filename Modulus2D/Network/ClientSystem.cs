@@ -1,6 +1,11 @@
 ﻿using Ionic.Zlib;
 using Lidgren.Network;
+using Modulus2D.Core;
 using Modulus2D.Entities;
+using Modulus2D.Graphics;
+using Modulus2D.Physics;
+using Modulus2D.Player.Platformer;
+using SFML.Graphics;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -29,6 +34,63 @@ namespace Modulus2D.Network
             client.Connect(host, port);
 
             networker = new Networker(client);
+
+            networker.Connect += OnConnect;
+            networker.Disconnect += OnDisconnect;
+            networker.Update += OnUpdate;
+
+            networker.RegisterEvent("CreatePlayer", CreatePlayer);
+        }
+
+        public void OnConnect(NetConnection connection)
+        {
+            Console.WriteLine("Connect");
+        }
+
+        public void OnDisconnect()
+        {
+
+        }
+
+        public void OnUpdate(UpdatePacket packet)
+        {
+            networkSystem.Receive(packet);
+        }
+
+        public void CreatePlayer(IUpdate update)
+        {
+            CreatePlayerUpdate playerUpdate = (CreatePlayerUpdate)update;
+
+            Console.WriteLine("Create player " + playerUpdate.id);
+
+            // Create player
+            Texture face = new Texture("Resources/Textures/Face.png");
+
+            Entity entity = World.Create();
+            entity.AddComponent(new TransformComponent());
+            entity.AddComponent(new SpriteComponent(face));
+
+            PlayerComponent player = new PlayerComponent();
+            entity.AddComponent(player);
+            
+            PhysicsComponent physics = new PhysicsComponent();
+            entity.AddComponent(physics);
+            physics.CreateCircle(0.5f, 1f);
+
+            NetworkComponent network = new NetworkComponent();
+            entity.AddComponent(network);
+            network.Id = playerUpdate.id;
+            
+            // Receive physics information
+            network.AddReceiver(physics);
+
+            if (playerUpdate.isMine)
+            {
+                entity.AddComponent(new PlayerInputComponent());
+
+                // Transmit player information
+                network.AddTransmitter(player);
+            }
         }
 
         public override void Update(float deltaTime)

@@ -16,8 +16,8 @@ namespace Modulus2D.Network
         private uint id;
         public uint Id { get => id; set => id = value; }
 
-        private List<ITransmit> transmitters;
-        private List<IReceive> receivers;
+        private List<ITransmit> transmitters = new List<ITransmit>();
+        private List<IReceive> receivers = new List<IReceive>();
 
         public void AddTransmitter<T>(T transmitter) where T : ITransmit
         {
@@ -43,7 +43,9 @@ namespace Modulus2D.Network
 
         public void ReceiveUpdate(List<IUpdate> updates)
         {
-            for (int i = 0; i < receivers.Count; i++)
+            int max = Math.Min(receivers.Count, updates.Count);
+
+            for (int i = 0; i < max; i++)
             {
                 receivers[i].Receive(updates[i]);
             }

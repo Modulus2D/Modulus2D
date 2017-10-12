@@ -45,6 +45,8 @@ namespace Modulus2D.Core
             // Add input handlers
             window.KeyPressed += new EventHandler<KeyEventArgs>(input.OnKeyPressed);
             window.KeyReleased += new EventHandler<KeyEventArgs>(input.OnKeyReleased);
+            window.JoystickButtonPressed += new EventHandler<JoystickButtonEventArgs>(input.OnJoystickButtonPressed);
+            window.JoystickButtonReleased += new EventHandler<JoystickButtonEventArgs>(input.OnJoystickButtonReleased);
 
             // Set state
             State = state;

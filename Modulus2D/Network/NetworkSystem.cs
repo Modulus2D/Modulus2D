@@ -30,7 +30,7 @@ namespace Modulus2D.Network
         public void Added(Entity entity)
         {
             NetworkComponent network = entity.GetComponent<NetworkComponent>();
-
+            
             networkComponents[currentId] = network;
             network.Id = currentId;
 
@@ -51,15 +51,8 @@ namespace Modulus2D.Network
             foreach (Components components in World.Iterate(filter))
             {
                 NetworkComponent network = components.Next<NetworkComponent>();
-
-                EntityPacket entityPacket = new EntityPacket()
-                {
-                    id = network.Id
-                };
-
-                entityPacket.updates = network.Transmit();
-
-                packet.packets.Add(entityPacket);
+                
+                packet.packets[network.Id] = network.Transmit();
             }
 
             return packet;
@@ -70,6 +63,11 @@ namespace Modulus2D.Network
             foreach (Components components in World.Iterate(filter))
             {
                 NetworkComponent network = components.Next<NetworkComponent>();
+                
+                if (packet.packets.TryGetValue(network.Id, out List<IUpdate> updates))
+                {
+                    network.ReceiveUpdate(updates);
+                }
             }
         }
     }

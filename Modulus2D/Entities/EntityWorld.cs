@@ -7,14 +7,16 @@ using Modulus2D.Graphics;
 
 namespace Modulus2D.Entities
 {
+    public delegate void EntityCreated(Entity entity);
+    public delegate void EntityRemoved(Entity entity);
 
     public class EntityWorld
     {
         private EntityAllocator allocator = new EntityAllocator();
         private List<EntitySystem> systems = new List<EntitySystem>();
         private Dictionary<Type, IComponentStorage> storages = new Dictionary<Type, IComponentStorage>();
-        private Dictionary<Type, List<Action<Entity>>> entityCreatedListeners = new Dictionary<Type, List<Action<Entity>>>();
-        private Dictionary<IComponentStorage, List<Action<Entity>>> entityRemovedListeners = new Dictionary<IComponentStorage, List<Action<Entity>>>();
+        private Dictionary<Type, List<EntityCreated>> entityCreatedListeners = new Dictionary<Type, List<EntityCreated>>();
+        private Dictionary<IComponentStorage, List<EntityRemoved>> entityRemovedListeners = new Dictionary<IComponentStorage, List<EntityRemoved>>();
 
         public Entity Create()
         {
@@ -29,11 +31,11 @@ namespace Modulus2D.Entities
                 // Notify listeners
                 if (storage.Has(id))
                 {
-                    List<Action<Entity>> listeners = GetRemovedListeners(storage);
+                    List<EntityRemoved> listeners = GetRemovedListeners(storage);
                     if (listeners.Count > 0)
                     {
                         Entity entity = new Entity(id, this);
-                        foreach (Action<Entity> listener in listeners)
+                        foreach (EntityRemoved listener in listeners)
                         {
                             listener(entity);
                         }
@@ -79,50 +81,50 @@ namespace Modulus2D.Entities
                 storage.list[id] = component;
             }
 
-            List<Action<Entity>> listeners = GetCreatedListeners<T>();
+            List<EntityCreated> listeners = GetCreatedListeners<T>();
             if(listeners.Count > 0)
             {
                 Entity entity = new Entity(id, this);
-                foreach (Action<Entity> listener in listeners)
+                foreach (EntityCreated listener in listeners)
                 {
                     listener(entity);
                 }
             }
         }
 
-        public void AddCreatedListener<T>(Action<Entity> action) where T : IComponent
+        public void AddCreatedListener<T>(EntityCreated listener) where T : IComponent
         {
-            GetCreatedListeners<T>().Add(action);
+            GetCreatedListeners<T>().Add(listener);
         }
 
-        private List<Action<Entity>> GetCreatedListeners<T>() where T : IComponent
+        private List<EntityCreated> GetCreatedListeners<T>() where T : IComponent
         {
-            if (entityCreatedListeners.TryGetValue(typeof(T), out List<Action<Entity>> listeners))
+            if (entityCreatedListeners.TryGetValue(typeof(T), out List<EntityCreated> listeners))
             {
                 return listeners;
             }
             else
             {
-                List<Action<Entity>> newListeners = new List<Action<Entity>>();
+                List<EntityCreated> newListeners = new List<EntityCreated>();
                 entityCreatedListeners.Add(typeof(T), newListeners);
                 return newListeners;
             }
         }
 
-        public void AddRemovedListener<T>(Action<Entity> action) where T : IComponent
+        public void AddRemovedListener<T>(EntityRemoved listener) where T : IComponent
         {
-            GetRemovedListeners(GetStorage<T>()).Add(action);
+            GetRemovedListeners(GetStorage<T>()).Add(listener);
         }
 
-        private List<Action<Entity>> GetRemovedListeners(IComponentStorage storage)
+        private List<EntityRemoved> GetRemovedListeners(IComponentStorage storage)
         {
-            if (entityRemovedListeners.TryGetValue(storage, out List<Action<Entity>> listeners))
+            if (entityRemovedListeners.TryGetValue(storage, out List<EntityRemoved> listeners))
             {
                 return listeners;
             }
             else
             {
-                List<Action<Entity>> newListeners = new List<Action<Entity>>();
+                List<EntityRemoved> newListeners = new List<EntityRemoved>();
                 entityRemovedListeners.Add(storage, newListeners);
                 return newListeners;
             }

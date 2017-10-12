@@ -62,7 +62,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Core\DebugSystem.cs" />
-    <Compile Include="Core\Game.cs" />
+    <Compile Include="Entities\Game.cs" />
     <Compile Include="Core\Server.cs" />
     <Compile Include="Core\State.cs" />
     <Compile Include="Graphics\LightComponent.cs" />
@@ -71,6 +71,7 @@
     <Compile Include="Input\InputValue.cs" />
     <Compile Include="Network\Networker.cs" />
     <Compile Include="Network\Packet.cs" />
+    <Compile Include="Network\CreatePlayerUpdate.cs" />
     <Compile Include="Player\Platformer\PlayerComponent.cs" />
     <Compile Include="Player\Platformer\PlayerInputComponent.cs" />
     <Compile Include="Player\Platformer\PlayerInputSystem.cs" />

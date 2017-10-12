@@ -58,9 +58,6 @@ namespace ExampleGame
             // Create debug system
             // world.AddSystem(new DebugSystem(maps));
 
-            // Load textures
-            Texture face = new Texture("Resources/Textures/Face.png");
-
             // Create camera
             OrthoCamera camera = new OrthoCamera(new Viewport(Graphics.Size.X, Graphics.Size.Y, 10f))
             {
@@ -82,22 +79,13 @@ namespace ExampleGame
             InputValue jump = Input.Create();
             jump.AddKey(Keyboard.Key.W, 1f);
             jump.AddKey(Keyboard.Key.Up, 1f);
+            jump.AddGamepadButton(Xbox.A, 1f);
 
             world.AddSystem(new PlayerInputSystem(moveX, jump));
-
-            // Create player
-            Entity player = world.Create();
-            player.AddComponent(new TransformComponent());
-            player.AddComponent(new SpriteComponent(face));
-            player.AddComponent(new PlayerComponent());
-            player.AddComponent(new PlayerInputComponent());
-            PhysicsComponent playerPhysics = new PhysicsComponent();
-            player.AddComponent(playerPhysics);
-            playerPhysics.CreateCircle(0.5f, 1f);
-
+            
             // Add camera system
-            CameraSystem cameraSystem = new CameraSystem(camera, player.GetComponent<TransformComponent>());
-            world.AddSystem(cameraSystem);
+            //CameraSystem cameraSystem = new CameraSystem(camera, player.GetComponent<TransformComponent>());
+            //world.AddSystem(cameraSystem);
 
             // Add FPS counter
             world.AddSystem(new FPSCounterSystem());

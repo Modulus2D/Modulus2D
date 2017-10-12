@@ -9,12 +9,23 @@ using System.Threading.Tasks;
 
 namespace Modulus2D.Network
 {
+    public delegate void NetworkEvent(IUpdate update);
+    public delegate void NetworkUpdate(UpdatePacket packet);
+    public delegate void Connect(NetConnection connection);
+    public delegate void Disconnect();
+
     // TODO: Better name?
     public class Networker
     {
+        public event Connect Connect;
+        public event Disconnect Disconnect;
+        public event NetworkUpdate Update;
+
         NetPeer peer;
         NetIncomingMessage message;
         BinaryFormatter formatter = new BinaryFormatter();
+
+        private Dictionary<string, NetworkEvent> events = new Dictionary<string, NetworkEvent>();
 
         public Networker(NetPeer peer)
         {
@@ -33,12 +44,20 @@ namespace Modulus2D.Network
                         {
                             case (byte)DataType.Update:
                                 MemoryStream updateStream = new MemoryStream(message.ReadBytes(message.LengthBytes - 1));
-                                UpdatePacket packet = (UpdatePacket)formatter.Deserialize(updateStream);
+                                Update((UpdatePacket)formatter.Deserialize(updateStream));
 
                                 break;
                             case (byte)DataType.Event:
                                 MemoryStream eventStream = new MemoryStream(message.ReadBytes(message.LengthBytes - 1));
-                                EventPacket evt = (EventPacket) formatter.Deserialize(eventStream);
+                                EventPacket eventPacket = (EventPacket) formatter.Deserialize(eventStream);
+
+                                if (events.TryGetValue(eventPacket.name, out NetworkEvent listener))
+                                {
+                                    listener(eventPacket.update);
+                                } else
+                                {
+                                    Console.WriteLine("Unknown event received: " + eventPacket.name);
+                                }
 
                                 break;
                         }
@@ -49,10 +68,10 @@ namespace Modulus2D.Network
                         switch (message.SenderConnection.Status)
                         {
                             case NetConnectionStatus.Connected:
-                                Console.WriteLine("Connection");
+                                Connect(message.SenderConnection);
                                 break;
                             case NetConnectionStatus.Disconnected:
-                                Console.WriteLine("Disconnection");
+                                Disconnect();
                                 break;
                         }
                         break;
@@ -70,12 +89,43 @@ namespace Modulus2D.Network
             }
         }
 
+        public void RegisterEvent(string name, NetworkEvent listener)
+        {
+            events.Add(name, listener);
+        }
+
+        public void UnregisterEvent(string name)
+        {
+            events.Remove(name);
+        }
+
+        public NetOutgoingMessage CreateEvent(string name, IUpdate update)
+        {
+            NetOutgoingMessage message = peer.CreateMessage();
+
+            MemoryStream stream = new MemoryStream();
+
+            // Write data type
+            message.Write((byte)DataType.Event);
+
+            EventPacket packet = new EventPacket()
+            {
+                name = name,
+                update = update
+            };
+
+            // Write packet
+            formatter.Serialize(stream, packet);
+            message.Write(stream.ToArray());
+
+            return message;
+        }
+
         public NetOutgoingMessage CreateUpdate(UpdatePacket packet)
         {
             NetOutgoingMessage message = peer.CreateMessage();
 
             MemoryStream stream = new MemoryStream();
-            BinaryFormatter formatter = new BinaryFormatter();
 
             // Write data type
             message.Write((byte)DataType.Update);

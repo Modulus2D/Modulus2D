@@ -7,7 +7,10 @@ using System.Threading.Tasks;
 
 namespace Modulus2D.Network
 {
-    public interface IUpdate
+    [Serializable]
+    class CreatePlayerUpdate : IUpdate
     {
+        public uint id;
+        public bool isMine = false;
     }
 }

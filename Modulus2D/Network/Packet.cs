@@ -15,14 +15,7 @@ namespace Modulus2D.Network
     [Serializable]
     public class UpdatePacket
     {
-        public List<EntityPacket> packets;
-    }
-
-    [Serializable]
-    public class EntityPacket
-    {
-        public uint id;
-        public List<IUpdate> updates;
+        public Dictionary<uint, List<IUpdate>> packets = new Dictionary<uint, List<IUpdate>>();
     }
 
     [Serializable]

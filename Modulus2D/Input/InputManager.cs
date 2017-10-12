@@ -7,6 +7,26 @@ using System.Threading.Tasks;
 
 namespace Modulus2D.Input
 {
+    public static class Xbox
+    {
+        public const uint A = 0;
+        public const uint B = 1;
+        public const uint X = 2;
+        public const uint Y = 3;
+        public const uint LeftButton = 4;
+        public const uint RightButton = 5;
+        public const uint LeftTrigger = 6;
+        public const uint RightTrigger = 7;
+        public const uint Back = 8;
+        public const uint Select = 9;
+        public const uint LeftJoystick = 10;
+        public const uint RightJoystick = 11;
+        public const uint Up = 12;
+        public const uint Down = 13;
+        public const uint Left = 14;
+        public const uint Right = 15;
+    }
+
     public class InputManager
     {
         List<InputValue> values = new List<InputValue>();
@@ -36,6 +56,22 @@ namespace Modulus2D.Input
             for (int i = 0; i < values.Count; i++)
             {
                 values[i].OnKeyReleased(e.Code);
+            }
+        }
+
+        public void OnJoystickButtonPressed(object sender, JoystickButtonEventArgs e)
+        {
+            for (int i = 0; i < values.Count; i++)
+            {
+                values[i].OnJoystickButtonPressed(e.Button);
+            }
+        }
+
+        public void OnJoystickButtonReleased(object sender, JoystickButtonEventArgs e)
+        {
+            for (int i = 0; i < values.Count; i++)
+            {
+                values[i].OnJoystickButtonReleased(e.Button);
             }
         }
     }

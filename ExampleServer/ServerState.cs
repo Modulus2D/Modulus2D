@@ -5,6 +5,7 @@ using Modulus2D.Graphics;
 using Modulus2D.Map;
 using Modulus2D.Network;
 using Modulus2D.Physics;
+using Modulus2D.Player.Platformer;
 using SFML.Graphics;
 using System;
 using System.Collections.Generic;
@@ -40,9 +41,13 @@ namespace ExampleServer
             map.GetComponent<PhysicsComponent>().Body.IsStatic = true;
             map.AddComponent(new MapComponent("Resources/Maps/Test.tmx"));
 
+            // Add player system
+            PlayerSystem playerSystem = new PlayerSystem();
+            world.AddSystem(playerSystem);
+
             // Create debug system
             //entityWorld.AddSystem(new DebugSystem(maps));
-            
+
             // Add FPS counter
             world.AddSystem(new FPSCounterSystem());
 

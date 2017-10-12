@@ -13,31 +13,52 @@ namespace Modulus2D.Input
 
         public float Value { get => value; set => this.value = value; }
 
-        private Dictionary<Keyboard.Key, Pair> keys = new Dictionary<Keyboard.Key, Pair>();
+        private Dictionary<Keyboard.Key, Button> keys = new Dictionary<Keyboard.Key, Button>();
+        private Dictionary<uint, Button> joystickButtons = new Dictionary<uint, Button>();
 
         public void OnKeyPressed(Keyboard.Key key)
         {
-            if (keys.TryGetValue(key, out Pair pair))
+            if (keys.TryGetValue(key, out Button pair))
             {
                 pair.active = true;
             }
 
-            CalculateValue();
+            Recalculate();
         }
 
         public void OnKeyReleased(Keyboard.Key key)
         {
-            if (keys.TryGetValue(key, out Pair pair))
+            if (keys.TryGetValue(key, out Button pair))
             {
                 pair.active = false;
             }
 
-            CalculateValue();
+            Recalculate();
+        }
+
+        public void OnJoystickButtonPressed(uint button)
+        {
+            if (joystickButtons.TryGetValue(button, out Button pair))
+            {
+                pair.active = true;
+            }
+
+            Recalculate();
+        }
+
+        public void OnJoystickButtonReleased(uint button)
+        {
+            if (joystickButtons.TryGetValue(button, out Button pair))
+            {
+                pair.active = false;
+            }
+
+            Recalculate();
         }
 
         public void AddKey(Keyboard.Key key, float effect)
         {
-            Pair pair = new Pair()
+            Button pair = new Button()
             {
                 effect = effect
             };
@@ -50,15 +71,40 @@ namespace Modulus2D.Input
             keys.Remove(key);
         }
 
-        private void CalculateValue()
+        public void AddGamepadButton(uint button, float effect)
+        {
+            Button pair = new Button()
+            {
+                effect = effect
+            };
+
+            joystickButtons.Add(button, pair);
+        }
+
+        public void RemoveGamepadButton(uint button)
+        {
+            joystickButtons.Remove(button);
+        }
+
+        private void Recalculate()
         {
             Value = 0f;
 
-            foreach (Pair pair in keys.Values)
+            // Calculate keyboard
+            foreach (Button button in keys.Values)
             {
-                if (pair.active)
+                if (button.active)
                 {
-                    Value += pair.effect;
+                    Value += button.effect;
+                }
+            }
+
+            // Calculate joystick buttons
+            foreach (Button button in joystickButtons.Values)
+            {
+                if (button.active)
+                {
+                    Value += button.effect;
                 }
             }
 
@@ -74,7 +120,7 @@ namespace Modulus2D.Input
         }
     }
 
-    class Pair
+    class Button
     {
         public float effect;
         public bool active = false;
