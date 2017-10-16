@@ -11,7 +11,7 @@ namespace Modulus2D.Physics
         private World physicsWorld;
 
         public World PhysicsWorld { get => physicsWorld; set => physicsWorld = value; }
-        private float stepTime = 0.015f; // ~66 FPS
+        private float stepTime = 1/60f; // ~66 FPS
         private float accumulator = 0f;
 
         public PhysicsSystem()

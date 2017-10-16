@@ -15,24 +15,10 @@ namespace Modulus2D.Physics
 {
     public class PhysicsComponent : IComponent, ITransmit, IReceive
     {
-        private float lerpDistance = 0.3f;
-        private float lerp = 0.4f;
+        private float lerpDistance = 0.0f;
+        private float positionLerp = 0.005f;
+        private float rotationLerp = 0.005f;
         private float snapDistance = 2f;
-
-        /// <summary>
-        /// Distance at which a body's position is lerped
-        /// </summary>
-        public float LerpDistance { get => lerpDistance; set => lerpDistance = value; }
-
-        /// <summary>
-        /// Amount of linear interpolation
-        /// </summary>
-        public float Lerp { get => lerp; set => lerp = value; }
-
-        /// <summary>
-        /// Distance at which a body's position is snapped
-        /// </summary>
-        public float SnapDistance { get => snapDistance; set => snapDistance = value; }
 
         private Body body;
         public Body Body { get => body; set => body = value; }
@@ -49,6 +35,12 @@ namespace Modulus2D.Physics
             return Body.CreateFixture(shape);
         }
 
+        public Fixture CreateBox(float width, float height, Vector2 position, float density)
+        {
+            Shape shape = new PolygonShape(PolygonTools.CreateRectangle(width / 2f, height / 2f, position, 0f), density);
+            return Body.CreateFixture(shape);
+        }
+
         public Fixture CreateCircle(float radius, float density)
         {
             Shape shape = new CircleShape(radius, density);
@@ -57,10 +49,13 @@ namespace Modulus2D.Physics
 
         public IUpdate Send()
         {
+            Console.WriteLine("SEND");
+
             return new PhysicsUpdate()
             {
                 x = Body.Position.X,
                 y = Body.Position.Y,
+                rot = Body.Rotation,
                 xVel = Body.LinearVelocity.X,
                 yVel = Body.LinearVelocity.Y
             };
@@ -68,24 +63,30 @@ namespace Modulus2D.Physics
 
         public void Receive(IUpdate update)
         {
+            Console.WriteLine("RECE");
+
             PhysicsUpdate physicsUpdate = (PhysicsUpdate)update;
 
             Vector2 truePosition = new Vector2(physicsUpdate.x, physicsUpdate.y);
             float diff = Vector2.Distance(Body.Position, truePosition);
-
-            if (diff > LerpDistance)
+            
+            if (diff > snapDistance)
             {
-                if (diff > SnapDistance)
-                {
-                    Body.Position = truePosition;
-                } else
-                {
-                    Body.Position = Vector2.Lerp(Body.Position, truePosition, Lerp);
-                }
+                //Body.Position = truePosition;
+
+                //Console.WriteLine("Snap");
+            } else
+            {
+                // Body.Position = Vector2.Lerp(Body.Position, truePosition, rotationLerp);
+
+                // Console.WriteLine("Lerp");
             }
 
+            // Snap rotation
+            //Body.Rotation += rotationLerp * (physicsUpdate.rot - Body.Rotation);
+
             // Snap velocity
-            Body.LinearVelocity = new Vector2(physicsUpdate.xVel, physicsUpdate.yVel);
+            //Body.LinearVelocity = new Vector2(physicsUpdate.xVel, physicsUpdate.yVel);
         }
     }
     
@@ -94,6 +95,8 @@ namespace Modulus2D.Physics
     {
         public float x = 0f;
         public float y = 0f;
+
+        public float rot = 0f;
 
         public float xVel = 0f;
         public float yVel = 0f;

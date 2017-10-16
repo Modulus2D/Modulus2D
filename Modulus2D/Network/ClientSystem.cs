@@ -1,55 +1,77 @@
-﻿using Ionic.Zlib;
-using Lidgren.Network;
-using Modulus2D.Core;
+﻿using Lidgren.Network;
 using Modulus2D.Entities;
-using Modulus2D.Graphics;
-using Modulus2D.Physics;
-using Modulus2D.Player.Platformer;
-using SFML.Graphics;
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Runtime.Serialization.Formatters.Binary;
 
 namespace Modulus2D.Network
 {
-
+    /// <summary>
+    /// Client-specific networking system
+    /// </summary>
     public class ClientSystem : EntitySystem
     {
-        NetClient client;
-        NetworkSystem networkSystem;
-        Networker networker;
+        private NetClient client;
+        private NetworkSystem networkSystem;
+        private Peer peer;
 
         private float updateTime = 0.025f; // 40 UPS
         private float accumulator = 0f;
+
+        // Current builder ID
+        private uint currentBuilderId = 0;
+
+        // Maps a builder ID to a builder
+        private Dictionary<uint, Builder> builderRegister;
 
         public ClientSystem(NetworkSystem networkSystem, string host, int port)
         {
             this.networkSystem = networkSystem;
 
+            builderRegister = new Dictionary<uint, Builder>();
+
             NetPeerConfiguration config = new NetPeerConfiguration("Modulus");
             client = new NetClient(config);
-
             client.Start();
+
             client.Connect(host, port);
 
-            networker = new Networker(client);
+            peer = new Peer(client);
 
-            networker.Connect += OnConnect;
-            networker.Disconnect += OnDisconnect;
-            networker.Update += OnUpdate;
-
-            networker.RegisterEvent("CreatePlayer", CreatePlayer);
+            peer.Connect += OnConnect;
+            peer.Disconnect += OnDisconnect;
+            peer.Update += OnUpdate;
+            peer.Add += OnAdd;
         }
 
         public void OnConnect(NetConnection connection)
         {
-            Console.WriteLine("Connect");
         }
 
-        public void OnDisconnect()
+        public void OnDisconnect(NetConnection connection)
         {
 
+        }
+
+        public void OnAdd(Dictionary<uint, uint> builders)
+        {
+            foreach (KeyValuePair<uint, uint> pair in builders)
+            {
+                uint id = pair.Key;
+                Builder builder = builderRegister[pair.Value];
+
+                Entity entity = World.Add();
+                builder.Build(entity);
+                builder.BuildGraphics(entity);
+
+                NetworkComponent network = new NetworkComponent()
+                {
+                    Id = id
+                };
+
+                builder.BuildClient(entity, network);
+                
+                Console.WriteLine("ADD");
+            }
         }
 
         public void OnUpdate(UpdatePacket packet)
@@ -57,55 +79,54 @@ namespace Modulus2D.Network
             networkSystem.Receive(packet);
         }
 
-        public void CreatePlayer(IUpdate update)
+        public void RegisterEvent(string name, NetEvent netEvent)
         {
-            CreatePlayerUpdate playerUpdate = (CreatePlayerUpdate)update;
-
-            Console.WriteLine("Create player " + playerUpdate.id);
-
-            // Create player
-            Texture face = new Texture("Resources/Textures/Face.png");
-
-            Entity entity = World.Create();
-            entity.AddComponent(new TransformComponent());
-            entity.AddComponent(new SpriteComponent(face));
-
-            PlayerComponent player = new PlayerComponent();
-            entity.AddComponent(player);
-            
-            PhysicsComponent physics = new PhysicsComponent();
-            entity.AddComponent(physics);
-            physics.CreateCircle(0.5f, 1f);
-
-            NetworkComponent network = new NetworkComponent();
-            entity.AddComponent(network);
-            network.Id = playerUpdate.id;
-            
-            // Receive physics information
-            network.AddReceiver(physics);
-
-            if (playerUpdate.isMine)
-            {
-                entity.AddComponent(new PlayerInputComponent());
-
-                // Transmit player information
-                network.AddTransmitter(player);
-            }
+            peer.RegisterEvent(name, netEvent);
         }
 
         public override void Update(float deltaTime)
         {
-            networker.ReadMessages();
+            peer.ReadMessages();
 
             accumulator += deltaTime;
 
             // Send update
             if (accumulator > updateTime)
             {
-                client.SendMessage(networker.CreateUpdate(networkSystem.Transmit()), NetDeliveryMethod.UnreliableSequenced);
+                client.SendMessage(peer.CreatePacket(networkSystem.Transmit(), PacketType.Update), NetDeliveryMethod.UnreliableSequenced);
 
                 accumulator = 0f;
+
+                // Log ping
+                /*if (client.ServerConnection != null)
+                {
+                    Console.WriteLine("Ping: " + client.ServerConnection.AverageRoundtripTime);
+                }*/
             }
+        }
+
+        /// <summary>
+        /// Registers a builder class. This must be done in the same order on the client and the server.
+        /// </summary>
+        /// <param name="builder">Builder to register</param>
+        public void RegisterBuilder(Builder builder)
+        {
+            builderRegister.Add(currentBuilderId, builder);
+            currentBuilderId++;
+        }
+
+        /// <summary>
+        /// Sends a user-defined event to the server
+        /// </summary>
+        public void SendEvent(string name, IUpdate update)
+        {
+            EventPacket packet = new EventPacket()
+            {
+                name = name,
+                update = update
+            };
+
+            client.SendMessage(peer.CreatePacket(packet, PacketType.Event), NetDeliveryMethod.ReliableOrdered);
         }
     }
 }

@@ -29,16 +29,14 @@ namespace Modulus2D.Input
 
     public class InputManager
     {
-        List<InputValue> values = new List<InputValue>();
+        List<BasicInput> values = new List<BasicInput>();
 
-        public InputValue Create()
+        public void Add(BasicInput value)
         {
-            InputValue value = new InputValue();
             values.Add(value);
-            return value;
         }
 
-        public void Remove(InputValue value)
+        public void Remove(BasicInput value)
         {
             values.Remove(value);
         }

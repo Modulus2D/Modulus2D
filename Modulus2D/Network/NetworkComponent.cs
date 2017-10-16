@@ -14,10 +14,26 @@ namespace Modulus2D.Network
     public class NetworkComponent : IComponent
     {
         private uint id;
+        private uint builderId;
+
+        private List<ITransmit> transmitters;
+        private List<IReceive> receivers;
+
+        /// <summary>
+        /// Network ID to uniquely identify entity
+        /// </summary>
         public uint Id { get => id; set => id = value; }
 
-        private List<ITransmit> transmitters = new List<ITransmit>();
-        private List<IReceive> receivers = new List<IReceive>();
+        /// <summary>
+        /// Entity builder ID stored for initialization buffer
+        /// </summary>
+        public uint BuilderId { get => builderId; set => builderId = value; }
+
+        public NetworkComponent()
+        {
+            transmitters = new List<ITransmit>();
+            receivers = new List<IReceive>();
+        }
 
         public void AddTransmitter<T>(T transmitter) where T : ITransmit
         {

@@ -1,4 +1,6 @@
-﻿using Microsoft.Xna.Framework;
+﻿using Example;
+using FarseerPhysics.Dynamics;
+using Microsoft.Xna.Framework;
 using Modulus2D.Core;
 using Modulus2D.Entities;
 using Modulus2D.Graphics;
@@ -35,14 +37,14 @@ namespace ExampleServer
             world.AddSystem(maps);
 
             // Load map
-            Entity map = world.Create();
+            Entity map = world.Add();
             map.AddComponent(new TransformComponent());
             map.AddComponent(new PhysicsComponent());
             map.GetComponent<PhysicsComponent>().Body.IsStatic = true;
             map.AddComponent(new MapComponent("Resources/Maps/Test.tmx"));
 
             // Add player system
-            PlayerSystem playerSystem = new PlayerSystem();
+            PlayerSystem playerSystem = new PlayerSystem(physicsSystem);
             world.AddSystem(playerSystem);
 
             // Create debug system
@@ -55,8 +57,40 @@ namespace ExampleServer
             NetworkSystem networkSystem = new NetworkSystem();
             world.AddSystem(networkSystem);
 
+            PlayerBuilder builder = new PlayerBuilder();
+
             // Create server system
-            world.AddSystem(new ServerSystem(networkSystem, 14356));
+            ServerSystem serverSystem = new ServerSystem(networkSystem, 14357);
+
+            // serverSystem.RegisterBuilder(builder);
+
+            world.AddSystem(serverSystem);
+
+            // Create player on connection
+            serverSystem.Connect += () =>
+            {
+                Entity entity = world.Add();
+
+                entity.AddComponent(new TransformComponent());
+
+                PhysicsComponent physics = new PhysicsComponent();
+                entity.AddComponent(physics);
+
+                Fixture fixture = physics.CreateCircle(0.5f, 0.59f);
+                fixture.Friction = 10f;
+
+                PlayerComponent player = new PlayerComponent();
+                entity.AddComponent(player);
+
+                NetworkComponent network = new NetworkComponent();
+                entity.AddComponent(network);
+
+                // Transmit physics information
+                network.AddTransmitter(entity.GetComponent<PhysicsComponent>());
+
+                // Receive input information
+                network.AddReceiver(entity.GetComponent<PlayerComponent>());
+            };
         }
 
         public override void Update(float deltaTime)

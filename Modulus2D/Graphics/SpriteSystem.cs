@@ -17,7 +17,7 @@ namespace Modulus2D.Graphics
             this.batch = batch;
 
             filter.Add<TransformComponent>();
-            filter.Add<SpriteComponent>();
+            filter.Add<SpriteRendererComponent>();
         }
         
         public override void Update(float deltaTime)
@@ -27,7 +27,12 @@ namespace Modulus2D.Graphics
             foreach (Components components in World.Iterate(filter))
             {
                 TransformComponent transform = components.Next<TransformComponent>();
-                batch.Draw(components.Next<SpriteComponent>().Texture, transform.Position, transform.Rotation);
+                SpriteRendererComponent sprites = components.Next<SpriteRendererComponent>();
+
+                for (int i = 0; i < sprites.sprites.Count; i++)
+                {
+                    batch.Draw(sprites.sprites[i].texture, transform.Position, transform.Rotation);
+                }
             }
 
             batch.End();

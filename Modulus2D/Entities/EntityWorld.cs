@@ -18,9 +18,18 @@ namespace Modulus2D.Entities
         private Dictionary<Type, List<EntityCreated>> entityCreatedListeners = new Dictionary<Type, List<EntityCreated>>();
         private Dictionary<IComponentStorage, List<EntityRemoved>> entityRemovedListeners = new Dictionary<IComponentStorage, List<EntityRemoved>>();
 
-        public Entity Create()
+        public Entity Add()
         {
             return new Entity(allocator.Create(), this);
+        }
+
+        public Entity Create(Builder builder)
+        {
+            Entity entity = Add();
+            builder.Build(entity);
+            builder.BuildGraphics(entity);
+
+            return entity;
         }
 
         public void Remove(int id)

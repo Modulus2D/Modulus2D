@@ -11,19 +11,23 @@ namespace Example
 {
     public class CameraSystem : EntitySystem
     {
-        OrthoCamera camera;
-        TransformComponent target;
+        private OrthoCamera camera;
+        public List<TransformComponent> targets = new List<TransformComponent>();
 
-        public CameraSystem(OrthoCamera camera, TransformComponent target)
+        private float lerp = 5f;
+
+        public CameraSystem(OrthoCamera camera)
         {
             this.camera = camera;
-            this.target = target;
         }
 
         public override void Update(float deltaTime)
         {
-            camera.Position = target.Position;
-            camera.Update();
+            if (targets.Count > 0)
+            {
+                camera.Position += (targets[0].Position - camera.Position) * lerp * deltaTime;
+                camera.Update();
+            }
         }
     }
 }

@@ -9,39 +9,17 @@ using System.Threading.Tasks;
 
 namespace Modulus2D.Network
 {
+    /// <summary>
+    /// Networking system for both server and client, generates transmissions and receives updates
+    /// </summary>
     public class NetworkSystem : EntitySystem
     {
-        private EntityFilter filter = new EntityFilter();
-        private Dictionary<uint, NetworkComponent> networkComponents = new Dictionary<uint, NetworkComponent>();
-
-        private uint currentId = 0;
+        private EntityFilter filter;
 
         public NetworkSystem()
         {
+            filter = new EntityFilter();
             filter.Add<NetworkComponent>();
-        }
-
-        public override void AddedToWorld()
-        {
-            World.AddCreatedListener<NetworkComponent>(Added);
-            World.AddRemovedListener<NetworkComponent>(Removed);
-        }
-
-        public void Added(Entity entity)
-        {
-            NetworkComponent network = entity.GetComponent<NetworkComponent>();
-            
-            networkComponents[currentId] = network;
-            network.Id = currentId;
-
-            currentId++;
-        }
-
-        public void Removed(Entity entity)
-        {
-            NetworkComponent network = entity.GetComponent<NetworkComponent>();
-
-            networkComponents.Remove(network.Id);
         }
 
         public UpdatePacket Transmit()

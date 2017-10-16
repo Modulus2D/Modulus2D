@@ -1,5 +1,6 @@
 ﻿using Modulus2D.Core;
 using Modulus2D.Entities;
+using Modulus2D.Input;
 using Modulus2D.Map;
 using Modulus2D.UI;
 using SFML.Graphics;
@@ -15,32 +16,30 @@ namespace Modulus2D.Core
 {
     public class DebugSystem : EntitySystem
     {
-        private float reloadTimer = 0f;
         private MapSystem mapSystem;
-        private TextComponent text;
+        // private TextComponent text;
+        private OneShotInput reload;
 
-        public DebugSystem(MapSystem mapSystem)
+        public DebugSystem(MapSystem mapSystem, OneShotInput reload)
         {
             this.mapSystem = mapSystem;
+            this.reload = reload;
 
-            Entity textEntity = World.Create();
+            /*Entity textEntity = World.Create();
 
             Font font = new Font("Resources/Fonts/Inconsolata-Regular.ttf");
             text = new TextComponent(font);
-            textEntity.AddComponent(text);
+            textEntity.AddComponent(text);*/
         }
 
         public override void Update(float deltaTime)
         {
-            reloadTimer += deltaTime;
-
             // Disabled until console is implemented            
-            /*if (Keyboard.IsKeyPressed(Keyboard.Key.R) && reloadTimer > 1f)
+            if (reload.Active)
             {
                 Console.WriteLine("Reload");
                 mapSystem.ReloadAll();
-                reloadTimer = 0f;
-            }*/
+            }
         }
     }
 }

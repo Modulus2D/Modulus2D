@@ -46,17 +46,22 @@ namespace ExampleGame
             // Add UI system
             world.AddSystem(new UISystem(Graphics));
 
-            Entity text = world.Create();
+            Entity text = world.Add();
 
             // Load map
-            Entity map = world.Create();
+            Entity map = world.Add();
             map.AddComponent(new TransformComponent());
             map.AddComponent(new PhysicsComponent());
             map.GetComponent<PhysicsComponent>().Body.IsStatic = true;
             map.AddComponent(new MapComponent("Resources/Maps/Test.tmx"));
 
             // Create debug system
-            // world.AddSystem(new DebugSystem(maps));
+            OneShotInput reload = new OneShotInput();
+            Input.Add(reload);
+
+            reload.AddKey(Keyboard.Key.R, 1f);
+
+            world.AddSystem(new DebugSystem(maps, reload));
 
             // Create camera
             OrthoCamera camera = new OrthoCamera(new Viewport(Graphics.Size.X, Graphics.Size.Y, 10f))
@@ -66,17 +71,21 @@ namespace ExampleGame
             batch.Camera = camera;
 
             // Add player system
-            PlayerSystem playerSystem = new PlayerSystem();
+            PlayerSystem playerSystem = new PlayerSystem(physicsSystem);
             world.AddSystem(playerSystem);
 
             // Add player input system
-            InputValue moveX = Input.Create();
+            ContinuousInput moveX = new ContinuousInput();
+            Input.Add(moveX);
+
             moveX.AddKey(Keyboard.Key.D, 1f);
             moveX.AddKey(Keyboard.Key.A, -1f);
             moveX.AddKey(Keyboard.Key.Right, 1f);
             moveX.AddKey(Keyboard.Key.Left, -1f);
 
-            InputValue jump = Input.Create();
+            OneShotInput jump = new OneShotInput();
+            Input.Add(jump);
+
             jump.AddKey(Keyboard.Key.W, 1f);
             jump.AddKey(Keyboard.Key.Up, 1f);
             jump.AddGamepadButton(Xbox.A, 1f);
@@ -84,18 +93,34 @@ namespace ExampleGame
             world.AddSystem(new PlayerInputSystem(moveX, jump));
             
             // Add camera system
-            //CameraSystem cameraSystem = new CameraSystem(camera, player.GetComponent<TransformComponent>());
-            //world.AddSystem(cameraSystem);
+            CameraSystem cameraSystem = new CameraSystem(camera);
+            world.AddSystem(cameraSystem);
 
             // Add FPS counter
             world.AddSystem(new FPSCounterSystem());
-
+            
             // Add network system
             NetworkSystem networkSystem = new NetworkSystem();
             world.AddSystem(networkSystem);
             
             // Add client system
-            world.AddSystem(new ClientSystem(networkSystem, "127.0.0.1", 14356));
+            ClientSystem clientSystem = new ClientSystem(networkSystem, "127.0.0.1", 14357);
+
+            // Create player builder
+            PlayerBuilder playerBuilder = new PlayerBuilder()
+            {
+                cameraSystem = cameraSystem
+            };
+
+            // Register player builder
+            // clientSystem.RegisterBuilder(playerBuilder);
+
+            world.AddSystem(clientSystem);
+
+            clientSystem.RegisterEvent("CreatePlayer", (update) =>
+            {
+
+            });
         }
 
         public override void Update(float deltaTime)
