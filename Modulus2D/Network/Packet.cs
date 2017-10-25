@@ -56,21 +56,7 @@ namespace Modulus2D.Network
     public class EventPacket : Packet
     {
         public string name;
-        public IUpdate update;
-    }
-
-    /// <summary>
-    /// Describes one or more entities being added to the world
-    /// </summary>
-    [Serializable]
-    public class AddPacket : Packet
-    {
-        public Dictionary<uint, uint> builders;
-
-        public AddPacket()
-        {
-            builders = new Dictionary<uint, uint>();
-        }
+        public object[] args;
     }
 
     /// <summary>

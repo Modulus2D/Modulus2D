@@ -7,10 +7,11 @@ using System.Threading.Tasks;
 namespace Modulus2D.Network
 {
     /// <summary>
-    /// An interface for receiving authoritative information. 
+    /// An interface implemented by components to allow the transmission and reception of data over the network
     /// </summary>
-    public interface IReceive
+    public interface INetComponent
     {
+        IUpdate Transmit();
         void Receive(IUpdate update);
     }
 }

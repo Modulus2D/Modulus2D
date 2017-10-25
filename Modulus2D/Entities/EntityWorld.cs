@@ -12,24 +12,30 @@ namespace Modulus2D.Entities
 
     public class EntityWorld
     {
-        private EntityAllocator allocator = new EntityAllocator();
-        private List<EntitySystem> systems = new List<EntitySystem>();
-        private Dictionary<Type, IComponentStorage> storages = new Dictionary<Type, IComponentStorage>();
-        private Dictionary<Type, List<EntityCreated>> entityCreatedListeners = new Dictionary<Type, List<EntityCreated>>();
-        private Dictionary<IComponentStorage, List<EntityRemoved>> entityRemovedListeners = new Dictionary<IComponentStorage, List<EntityRemoved>>();
+        private EntityAllocator allocator;
+
+        private List<EntitySystem> systems;
+
+        private Dictionary<Type, IComponentStorage> storages;
+
+        private Dictionary<Type, List<EntityCreated>> entityCreatedListeners;
+        private Dictionary<IComponentStorage, List<EntityRemoved>> entityRemovedListeners;
+
+        public EntityWorld()
+        {
+            allocator = new EntityAllocator();
+
+            systems = new List<EntitySystem>();
+
+            storages = new Dictionary<Type, IComponentStorage>();
+
+            entityCreatedListeners = new Dictionary<Type, List<EntityCreated>>();
+            entityRemovedListeners = new Dictionary<IComponentStorage, List<EntityRemoved>>();
+        }
 
         public Entity Add()
         {
             return new Entity(allocator.Create(), this);
-        }
-
-        public Entity Create(Builder builder)
-        {
-            Entity entity = Add();
-            builder.Build(entity);
-            builder.BuildGraphics(entity);
-
-            return entity;
         }
 
         public void Remove(int id)
@@ -153,7 +159,7 @@ namespace Modulus2D.Entities
             }
         }
 
-        public IComponentStorage GetGenericStorage(Type type)
+        public IComponentStorage GetStorage(Type type)
         {
             if (storages.TryGetValue(type, out IComponentStorage storage))
             {
@@ -181,7 +187,7 @@ namespace Modulus2D.Entities
         {
             system.World = this;
             systems.Add(system);
-            system.AddedToWorld();
+            system.OnAdded();
 
             SortSystems();
         }

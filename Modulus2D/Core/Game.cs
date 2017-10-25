@@ -5,6 +5,7 @@ using SFML.System;
 using SFML.Window;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -20,10 +21,18 @@ namespace Modulus2D.Core
         private RenderWindow window;
 
         // Input
-        private InputManager input = new InputManager();
+        private InputManager input;
 
         // Time
-        private Clock clock = new Clock();
+        private Stopwatch stopwatch;
+
+        public Game()
+        {
+            stopwatch = new Stopwatch();
+            stopwatch.Start();
+            
+            input = new InputManager();
+        }
 
         public State State {
             get => state;
@@ -67,18 +76,12 @@ namespace Modulus2D.Core
 
         public void Update()
         {
-            float dt = clock.ElapsedTime.AsSeconds();
-            clock.Restart();
+            float dt = (float)stopwatch.Elapsed.TotalSeconds;
+            stopwatch.Restart();
 
             // Update state
             State.Update(dt);
         }
-
-        // TODO: Create separate render loop?
-        /*public void Render()
-        {
-
-        }*/
 
         public void OnClosed(object sender, EventArgs e)
         {

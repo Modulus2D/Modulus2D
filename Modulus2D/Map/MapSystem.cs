@@ -31,7 +31,7 @@ namespace Modulus2D.Map
             this.batch = batch;
         }
 
-        public override void AddedToWorld()
+        public override void OnAdded()
         {
             World.AddCreatedListener<MapComponent>(AddMap);
         }
@@ -141,6 +141,7 @@ namespace Modulus2D.Map
                             float uvX = tiles.TileWidth * column;
                             float uvY = tiles.TileWidth * row;
 
+                            // FIXME: This is bad
                             SpriteBatch.DrawRegion(texture, new Vector2(tile.X, tile.Y), new Vector2(uvX, uvY), new Vector2(uvX + tiles.TileWidth, uvY + tiles.TileHeight), map.Vertices);
                         }
                     }

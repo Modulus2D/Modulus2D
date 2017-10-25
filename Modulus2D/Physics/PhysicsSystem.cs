@@ -2,68 +2,78 @@
 using Modulus2D.Core;
 using Modulus2D.Entities;
 using Microsoft.Xna.Framework;
+using Modulus2D.Network;
+using System;
+using Lidgren.Network;
 
 namespace Modulus2D.Physics
 {
     public class PhysicsSystem : EntitySystem
     {
-        private EntityFilter filter = new EntityFilter();
+        private EntityFilter filter;
+        private EntityFilter networkFilter;
+        private ComponentStorage<TransformComponent> transformComponents;
+        private ComponentStorage<PhysicsComponent> physicsComponents;
+        private ComponentStorage<NetComponent> netComponents;
+
         private World physicsWorld;
+        private float stepTime = 1 / 60f;
+        private float accumulator = 0f;
 
         public World PhysicsWorld { get => physicsWorld; set => physicsWorld = value; }
-        private float stepTime = 1/60f; // ~66 FPS
-        private float accumulator = 0f;
+        public float StepTime { get => stepTime; set => stepTime = value; }
 
         public PhysicsSystem()
         {
             PhysicsWorld = new World(new Vector2(0f, 9.8f));
-
-            filter.Add<TransformComponent>();
-            filter.Add<PhysicsComponent>();
         }
 
-        public override void AddedToWorld()
+        public override void OnAdded()
         {
-            World.AddCreatedListener<PhysicsComponent>(Created);
-            World.AddRemovedListener<PhysicsComponent>(Destroyed);
-        }
+            transformComponents = World.GetStorage<TransformComponent>();
+            physicsComponents = World.GetStorage<PhysicsComponent>();
+            netComponents = World.GetStorage<NetComponent>();
 
-        public void Created(Entity entity)
-        {
-            PhysicsComponent physics = entity.GetComponent<PhysicsComponent>();
-            physics.Init(PhysicsWorld);
-        }
+            filter = new EntityFilter(transformComponents, physicsComponents);
+            networkFilter = new EntityFilter(physicsComponents, netComponents);
 
-        public void Destroyed(Entity entity)
-        {
-            PhysicsComponent physics = entity.GetComponent<PhysicsComponent>();
-            PhysicsWorld.RemoveBody(physics.Body);
+            World.AddCreatedListener<PhysicsComponent>(entity =>
+            {
+                PhysicsComponent physics = physicsComponents.Get(entity);
+                physics.Init(PhysicsWorld);
+            });
+            World.AddRemovedListener<PhysicsComponent>(entity =>
+            {
+                PhysicsComponent physics = physicsComponents.Get(entity);
+                PhysicsWorld.RemoveBody(physics.Body);
+            });
         }
 
         public override void Update(float deltaTime)
         {
             // Update world
             accumulator += deltaTime;
-            
-            while (accumulator >= stepTime)
+
+            while (accumulator >= StepTime)
             {
-                PhysicsWorld.Step(stepTime);
-                accumulator -= stepTime;
+                PhysicsWorld.Step(StepTime);
+                accumulator -= StepTime;
             }
-            
+
             // Update transforms
-            foreach (Components components in World.Iterate(filter))
+            foreach (int id in World.Iterate(filter))
             {
-                TransformComponent transform = components.Next<TransformComponent>();
-                PhysicsComponent physics = components.Next<PhysicsComponent>();
-                
+                TransformComponent transform = transformComponents.Get(id);
+                PhysicsComponent physics = physicsComponents.Get(id);
+
+                // TODO: Can this be removed?
                 if (physics.Body != null)
                 {
                     // Lerp body position
-                    transform.Position += (physics.Body.Position - transform.Position) * accumulator / stepTime;
-                    
+                    transform.Position += (physics.Body.Position - transform.Position) * accumulator / StepTime;
+
                     // TODO: Negative rotation?
-                    transform.Rotation += (-physics.Body.Rotation - transform.Rotation) * accumulator / stepTime;
+                    transform.Rotation += (-physics.Body.Rotation - transform.Rotation) * accumulator / StepTime;
                 }
             }
         }

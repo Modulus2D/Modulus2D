@@ -62,23 +62,23 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Core\DebugSystem.cs" />
-    <Compile Include="Entities\Game.cs" />
+    <Compile Include="Core\Game.cs" />
     <Compile Include="Core\Server.cs" />
     <Compile Include="Core\State.cs" />
-    <Compile Include="Entities\Builder.cs" />
     <Compile Include="Graphics\LightComponent.cs" />
     <Compile Include="Graphics\LightSystem.cs" />
     <Compile Include="Input\OneShotInput.cs" />
     <Compile Include="Input\ConstantInput.cs" />
     <Compile Include="Input\InputManager.cs" />
     <Compile Include="Input\BasicInput.cs" />
-    <Compile Include="Network\NetworkPlayer.cs" />
+    <Compile Include="Network\INetComponent.cs" />
+    <Compile Include="Network\NetPlayer.cs" />
     <Compile Include="Network\Peer.cs" />
     <Compile Include="Network\Packet.cs" />
+    <Compile Include="Physics\ClientPhysicsSystem.cs" />
     <Compile Include="UI\UISystem.cs" />
     <Compile Include="UI\TextComponent.cs" />
     <Compile Include="Map\MapComponent.cs" />
-    <Compile Include="Entities\Components.cs" />
     <Compile Include="Entities\ComponentStorage.cs" />
     <Compile Include="Entities\Entity.cs" />
     <Compile Include="Entities\EntityAllocator.cs" />
@@ -94,11 +94,9 @@
     <Compile Include="Graphics\OrthoCamera.cs" />
     <Compile Include="Map\MapSystem.cs" />
     <Compile Include="Network\ClientSystem.cs" />
-    <Compile Include="Network\IReceive.cs" />
-    <Compile Include="Network\ITransmit.cs" />
     <Compile Include="Network\IUpdate.cs" />
-    <Compile Include="Network\NetworkComponent.cs" />
-    <Compile Include="Network\NetworkSystem.cs" />
+    <Compile Include="Network\NetComponent.cs" />
+    <Compile Include="Network\NetSystem.cs" />
     <Compile Include="Network\ServerSystem.cs" />
     <Compile Include="Physics\PhysicsSystem.cs" />
     <Compile Include="Graphics\SpriteComponent.cs" />

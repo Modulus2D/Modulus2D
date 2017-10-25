@@ -84,7 +84,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CameraSystem.cs" />
-    <Compile Include="PlayerBuilder.cs" />
     <Compile Include="PlayerComponent.cs" />
     <Compile Include="PlayerInputComponent.cs" />
     <Compile Include="PlayerInputSystem.cs" />

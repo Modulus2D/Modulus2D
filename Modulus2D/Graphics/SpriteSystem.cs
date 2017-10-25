@@ -9,25 +9,33 @@ namespace Modulus2D.Graphics
 {
     public class SpriteSystem : EntitySystem
     {
-        private EntityFilter filter = new EntityFilter();
+        private EntityFilter filter;// = new EntityFilter();
+        private ComponentStorage<TransformComponent> transformComponents;
+        private ComponentStorage<SpriteRendererComponent> spriteRendererComponents;
+
         private SpriteBatch batch;
 
         public SpriteSystem(SpriteBatch batch)
         {
             this.batch = batch;
-
-            filter.Add<TransformComponent>();
-            filter.Add<SpriteRendererComponent>();
         }
-        
+
+        public override void OnAdded()
+        {
+            transformComponents = World.GetStorage<TransformComponent>();
+            spriteRendererComponents = World.GetStorage<SpriteRendererComponent>();
+            
+            filter = new EntityFilter(transformComponents, spriteRendererComponents);
+        }
+
         public override void Update(float deltaTime)
         {
             batch.Begin();
-
-            foreach (Components components in World.Iterate(filter))
+            
+            foreach (int id in World.Iterate(filter))
             {
-                TransformComponent transform = components.Next<TransformComponent>();
-                SpriteRendererComponent sprites = components.Next<SpriteRendererComponent>();
+                TransformComponent transform = transformComponents.Get(id);
+                SpriteRendererComponent sprites = spriteRendererComponents.Get(id);
 
                 for (int i = 0; i < sprites.sprites.Count; i++)
                 {

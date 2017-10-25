@@ -11,36 +11,32 @@ namespace Modulus2D.Network
     /// A network component for receiving and transmitting information. Transmitters and receivers must be
     /// added in the same order on the server and the client.
     /// </summary>
-    public class NetworkComponent : IComponent
+    public class NetComponent : IComponent
     {
         private uint id;
-        private uint builderId;
 
-        private List<ITransmit> transmitters;
-        private List<IReceive> receivers;
+        private List<INetComponent> transmitters;
+        private List<INetComponent> receivers;
 
         /// <summary>
         /// Network ID to uniquely identify entity
         /// </summary>
         public uint Id { get => id; set => id = value; }
 
-        /// <summary>
-        /// Entity builder ID stored for initialization buffer
-        /// </summary>
-        public uint BuilderId { get => builderId; set => builderId = value; }
-
-        public NetworkComponent()
+        public NetComponent(uint id)
         {
-            transmitters = new List<ITransmit>();
-            receivers = new List<IReceive>();
+            this.id = id;
+
+            transmitters = new List<INetComponent>();
+            receivers = new List<INetComponent>();
         }
 
-        public void AddTransmitter<T>(T transmitter) where T : ITransmit
+        public void AddTransmitter<T>(T transmitter) where T : INetComponent
         {
             transmitters.Add(transmitter);
         }
 
-        public void AddReceiver<T>(T receiver) where T : IReceive
+        public void AddReceiver<T>(T receiver) where T : INetComponent
         {
             receivers.Add(receiver);
         }
@@ -51,7 +47,7 @@ namespace Modulus2D.Network
 
             for (int i = 0; i < transmitters.Count; i++)
             {
-                updates.Add(transmitters[i].Send());
+                updates.Add(transmitters[i].Transmit());
             }
 
             return updates;

@@ -1,9 +1,10 @@
-﻿using SFML.System;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Timers;
 
 namespace Modulus2D.Core
 {
@@ -13,8 +14,13 @@ namespace Modulus2D.Core
         private State state;
 
         // Time
-        // TODO: Replace with custom Clock class to remove SFML dependency
-        private Clock clock = new Clock();
+        private Stopwatch stopwatch;
+
+        public Server()
+        {
+            stopwatch = new Stopwatch();
+            stopwatch.Start();
+        }
 
         public State State
         {
@@ -34,13 +40,13 @@ namespace Modulus2D.Core
             // Game loop
             while (true)
             {
-                float dt = clock.ElapsedTime.AsSeconds();
-                clock.Restart();
-                
+                float dt = (float)stopwatch.Elapsed.TotalSeconds;
+                stopwatch.Restart();
+
                 State.Update(dt);
 
                 // Avoid extreme CPU usage
-                System.Threading.Thread.Sleep(0);
+                // System.Threading.Thread.Sleep(0);
             }
         }
 

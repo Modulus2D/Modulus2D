@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Modulus2D.Network
 {
-    public delegate void NetEvent(IUpdate update);
+    public delegate void NetEvent(params object[] args);
     public delegate void NetUpdate(UpdatePacket packet);
     public delegate void NetAdd(Dictionary<uint, uint> builders);
     public delegate void NetRemove(List<uint> entities);
@@ -53,10 +53,8 @@ namespace Modulus2D.Network
                         {
                             case (byte)PacketType.Update:
                                 {
-
                                     MemoryStream stream = new MemoryStream(message.ReadBytes(message.LengthBytes - 1));
                                     Update((UpdatePacket)formatter.Deserialize(stream));
-
                                 }
                                 break;
 
@@ -67,20 +65,12 @@ namespace Modulus2D.Network
 
                                     if (events.TryGetValue(packet.name, out NetEvent listener))
                                     {
-                                        listener(packet.update);
+                                        listener(packet.args);
                                     }
                                     else
                                     {
                                         Console.WriteLine("Unknown event received: " + packet.name);
                                     }
-                                }
-                                break;
-
-                            case (byte)PacketType.Add:
-                                {
-                                    MemoryStream stream = new MemoryStream(message.ReadBytes(message.LengthBytes - 1));
-                                    AddPacket packet = (AddPacket)formatter.Deserialize(stream);
-                                    Add(packet.builders);
                                 }
                                 break;
 

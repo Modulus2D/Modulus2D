@@ -14,7 +14,7 @@ namespace Modulus2D.Graphics
 {
     public class LightSystem : EntitySystem
     {
-        private RenderTarget target;
+        /*private RenderTarget target;
         private EntityFilter filter = new EntityFilter();
 
         private Texture pointLight = new Texture("Resources/Textures/PointLight.png");
@@ -43,6 +43,6 @@ namespace Modulus2D.Graphics
             }
 
             batch.End();
-        }
+        }*/
     }
 }

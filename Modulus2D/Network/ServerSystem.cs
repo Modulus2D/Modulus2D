@@ -5,8 +5,8 @@ using System.Collections.Generic;
 
 namespace Modulus2D.Network
 {
-    public delegate void PlayerConnect();
-    public delegate void PlayerDisconnect();
+    public delegate void PlayerConnect(NetPlayer player);
+    public delegate void PlayerDisconnect(NetPlayer player);
 
     /// <summary>
     /// Server-specific networking system
@@ -16,39 +16,30 @@ namespace Modulus2D.Network
         public event PlayerConnect Connect;
         public event PlayerDisconnect Disconnect;
 
-        // Used for intialization buffer
-        private EntityFilter filter;
-
         private NetServer server;
-        private NetworkSystem networkSystem;
+        private NetSystem networkSystem;
         private Peer peer;
 
-        private float updateTime = 0.025f; // 40 UPS
+        private float updateTime = 1 / 30f;
         private float accumulator = 0f;
+
+        private Dictionary<NetConnection, NetPlayer> players;
 
         // Current net ID
         private uint currentNetId = 0;
 
-        // Current builder ID
-        private uint currentBuilderId = 0;
-
-        // Maps a builder to a builder ID
-        private Dictionary<Builder, uint> builderRegister;
-
-        public ServerSystem(NetworkSystem networkSystem, int port)
+        public ServerSystem(NetSystem networkSystem, int port)
         {
             this.networkSystem = networkSystem;
 
-            builderRegister = new Dictionary<Builder, uint>();
-
-            filter = new EntityFilter();
-            filter.Add<NetworkComponent>();
+            players = new Dictionary<NetConnection, NetPlayer>();
 
             // TODO: Not hard-coded?
             NetPeerConfiguration config = new NetPeerConfiguration("Modulus")
             {
                 Port = port
             };
+
             server = new NetServer(config);
             server.Start();
             
@@ -62,7 +53,13 @@ namespace Modulus2D.Network
 
         private void OnConnect(NetConnection connection)
         {
-            // Create initialization buffer
+            NetPlayer player = new NetPlayer()
+            {
+                connection = connection
+            };
+            players.Add(connection, player);
+
+            /*// Create initialization buffer
             AddPacket init = new AddPacket();
             
             // Add network ID and builder ID for each entity
@@ -75,14 +72,15 @@ namespace Modulus2D.Network
 
             // Send initialization buffer to client
             server.SendToAll(peer.CreatePacket(init, PacketType.Add), NetDeliveryMethod.ReliableOrdered);
+            */
 
             // Trigger event
-            Connect();
+            Connect(player);
         }
 
         private void OnDisconnect(NetConnection connection)
         {
-            Disconnect();
+            // Disconnect(players[connection]);
         }
 
         private void OnUpdate(UpdatePacket packet)
@@ -107,40 +105,13 @@ namespace Modulus2D.Network
         }
 
         /// <summary>
-        /// Registers a builder class. This must be done in the same order on the client and the server.
+        /// Allocates a network ID for a new entity
         /// </summary>
-        /// <param name="builder">Builder to register</param>
-        public void RegisterBuilder(Builder builder)
+        /// <returns></returns>
+        public uint AllocateId()
         {
-            builderRegister.Add(builder, currentBuilderId);
-            currentBuilderId++;
-        }
-
-        /// <summary>
-        /// Adds an entity to the world and updates clients
-        /// </summary>
-        /// <param name="builder">Builder to use</param>
-        public void AddEntity(Builder builder)
-        {
-            Entity entity = World.Add();
-            builder.Build(entity);
-
-            uint builderId = builderRegister[builder];
-
-            NetworkComponent network = new NetworkComponent()
-            {
-                Id = currentNetId,
-                BuilderId = builderId
-            };
-
-            builder.BuildServer(entity, network);
-
-            AddPacket packet = new AddPacket();
-            packet.builders.Add(currentNetId, builderId);
-
-            server.SendToAll(peer.CreatePacket(packet, PacketType.Add), NetDeliveryMethod.ReliableOrdered);
-
             currentNetId++;
+            return (currentNetId - 1);
         }
 
         /// <summary>
@@ -157,12 +128,12 @@ namespace Modulus2D.Network
         /// <summary>
         /// Sends a user-defined event to all clients.
         /// </summary>
-        public void SendEvent(string name, IUpdate update)
+        public void SendEvent(string name, params object[] args)
         {
             EventPacket packet = new EventPacket()
             {
                 name = name,
-                update = update
+                args = args,
             };
 
             server.SendToAll(peer.CreatePacket(packet, PacketType.Event), NetDeliveryMethod.ReliableOrdered);
@@ -171,15 +142,15 @@ namespace Modulus2D.Network
         /// <summary>
         /// Sends a user-defined event to one client.
         /// </summary>
-        public void SendEvent(string name, IUpdate update, NetConnection connection)
+        public void SendEventToPlayer(string name, NetPlayer player, params object[] args)
         {
             EventPacket packet = new EventPacket()
             {
                 name = name,
-                update = update
+                args = args,
             };
 
-            server.SendMessage(peer.CreatePacket(packet, PacketType.Event), connection, NetDeliveryMethod.ReliableOrdered);
+            server.SendMessage(peer.CreatePacket(packet, PacketType.Event), player.connection, NetDeliveryMethod.ReliableOrdered);
         }
     }
 }

@@ -26,7 +26,17 @@ namespace Modulus2D.Entities
             list[id] = default(T);
         }
 
-        public IComponent Get(int id)
+        public T Get(int id)
+        {
+            return list[id];
+        }
+
+        public T Get(Entity entity)
+        {
+            return list[entity.id];
+        }
+
+        public IComponent GetGeneric(int id)
         {
             return list[id];
         }

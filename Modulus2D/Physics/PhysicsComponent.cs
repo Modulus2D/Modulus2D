@@ -13,15 +13,39 @@ using System.Threading.Tasks;
 
 namespace Modulus2D.Physics
 {
-    public class PhysicsComponent : IComponent, ITransmit, IReceive
+    public class PhysicsComponent : IComponent, INetComponent
     {
-        private float lerpDistance = 0.0f;
-        private float positionLerp = 0.005f;
-        private float rotationLerp = 0.005f;
-        private float snapDistance = 2f;
+        public enum NetMode
+        {
+            /// <summary>
+            /// Specifies that this entity should be snapped to the raw transform data received from the server
+            /// </summary>
+            Raw,
+            /// <summary>
+            /// Specifies that the transform of this entity should be interpolated
+            /// </summary>
+            Interpolate,
+            /// <summary>
+            /// Specifies that the transform of this entity should be calculated by the client and corrected
+            /// </summary>
+            Predict,
+            /// <summary>
+            /// Specifies that the transform of this entity should be calculated by the client and left uncorrected
+            /// </summary>
+            Client
+        }
 
+        private NetMode mode;
+        
         private Body body;
         public Body Body { get => body; set => body = value; }
+        public NetMode Mode { get => mode; set => mode = value; }
+
+        // Used to store last frames for interpolation
+        internal Vector2 lastPosition;
+        internal Vector2 correctPosition;
+        internal float lastRotation;
+        internal float correctRotation;
 
         public void Init(World world)
         {
@@ -47,58 +71,33 @@ namespace Modulus2D.Physics
             return Body.CreateFixture(shape);
         }
 
-        public IUpdate Send()
+        public IUpdate Transmit()
         {
-            Console.WriteLine("SEND");
-
             return new PhysicsUpdate()
             {
-                x = Body.Position.X,
-                y = Body.Position.Y,
-                rot = Body.Rotation,
-                xVel = Body.LinearVelocity.X,
-                yVel = Body.LinearVelocity.Y
+                X = Body.Position.X,
+                Y = Body.Position.Y,
+                Rotation = Body.Rotation
             };
         }
 
         public void Receive(IUpdate update)
         {
-            Console.WriteLine("RECE");
-
             PhysicsUpdate physicsUpdate = (PhysicsUpdate)update;
 
-            Vector2 truePosition = new Vector2(physicsUpdate.x, physicsUpdate.y);
-            float diff = Vector2.Distance(Body.Position, truePosition);
-            
-            if (diff > snapDistance)
-            {
-                //Body.Position = truePosition;
+            lastPosition = correctPosition;
+            correctPosition = new Vector2(physicsUpdate.X, physicsUpdate.Y);
 
-                //Console.WriteLine("Snap");
-            } else
-            {
-                // Body.Position = Vector2.Lerp(Body.Position, truePosition, rotationLerp);
-
-                // Console.WriteLine("Lerp");
-            }
-
-            // Snap rotation
-            //Body.Rotation += rotationLerp * (physicsUpdate.rot - Body.Rotation);
-
-            // Snap velocity
-            //Body.LinearVelocity = new Vector2(physicsUpdate.xVel, physicsUpdate.yVel);
+            lastRotation = correctRotation;
+            correctRotation = physicsUpdate.Rotation;
         }
-    }
-    
-    [Serializable]
-    class PhysicsUpdate : IUpdate
-    {
-        public float x = 0f;
-        public float y = 0f;
-
-        public float rot = 0f;
-
-        public float xVel = 0f;
-        public float yVel = 0f;
+        
+        [Serializable]
+        class PhysicsUpdate : IUpdate
+        {
+            public float X = 0f;
+            public float Y = 0f;
+            public float Rotation = 0f;
+        }
     }
 }

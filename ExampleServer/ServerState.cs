@@ -8,7 +8,6 @@ using Modulus2D.Map;
 using Modulus2D.Network;
 using Modulus2D.Physics;
 using Modulus2D.Player.Platformer;
-using SFML.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -41,7 +40,7 @@ namespace ExampleServer
             map.AddComponent(new TransformComponent());
             map.AddComponent(new PhysicsComponent());
             map.GetComponent<PhysicsComponent>().Body.IsStatic = true;
-            map.AddComponent(new MapComponent("Resources/Maps/Test.tmx"));
+            map.AddComponent(new MapComponent("Maps/Test.tmx"));
 
             // Add player system
             PlayerSystem playerSystem = new PlayerSystem(physicsSystem);
@@ -54,10 +53,8 @@ namespace ExampleServer
             world.AddSystem(new FPSCounterSystem());
 
             // Add network system
-            NetworkSystem networkSystem = new NetworkSystem();
+            NetSystem networkSystem = new NetSystem();
             world.AddSystem(networkSystem);
-
-            PlayerBuilder builder = new PlayerBuilder();
 
             // Create server system
             ServerSystem serverSystem = new ServerSystem(networkSystem, 14357);
@@ -67,22 +64,16 @@ namespace ExampleServer
             world.AddSystem(serverSystem);
 
             // Create player on connection
-            serverSystem.Connect += () =>
+            serverSystem.Connect += (netPlayer) =>
             {
                 Entity entity = world.Add();
 
                 entity.AddComponent(new TransformComponent());
 
-                PhysicsComponent physics = new PhysicsComponent();
-                entity.AddComponent(physics);
-
-                Fixture fixture = physics.CreateCircle(0.5f, 0.59f);
-                fixture.Friction = 10f;
-
                 PlayerComponent player = new PlayerComponent();
                 entity.AddComponent(player);
 
-                NetworkComponent network = new NetworkComponent();
+                NetComponent network = new NetComponent(serverSystem.AllocateId());
                 entity.AddComponent(network);
 
                 // Transmit physics information
@@ -90,6 +81,12 @@ namespace ExampleServer
 
                 // Receive input information
                 network.AddReceiver(entity.GetComponent<PlayerComponent>());
+
+                // Notify all clients of creation of player
+                serverSystem.SendEvent("CreatePlayer", network.Id);
+
+                // Notify player's client that they control the player
+                serverSystem.SendEventToPlayer("ControlPlayer", netPlayer, network.Id);
             };
         }
 

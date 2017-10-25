@@ -13,6 +13,8 @@ using Modulus2D.Player.Platformer;
 using Example;
 using Modulus2D.Input;
 using SFML.Window;
+using System;
+using FarseerPhysics.Dynamics;
 
 namespace ExampleGame
 {
@@ -26,8 +28,8 @@ namespace ExampleGame
 
             // Add physics system
             PhysicsSystem physicsSystem = new PhysicsSystem();
-            world.AddSystem(physicsSystem);
-                        
+            world.AddSystem(physicsSystem);          
+
             // Add sprite system
             SpriteBatch batch = new SpriteBatch(Graphics);
             SpriteSystem spriteSystem = new SpriteSystem(batch)
@@ -53,7 +55,7 @@ namespace ExampleGame
             map.AddComponent(new TransformComponent());
             map.AddComponent(new PhysicsComponent());
             map.GetComponent<PhysicsComponent>().Body.IsStatic = true;
-            map.AddComponent(new MapComponent("Resources/Maps/Test.tmx"));
+            map.AddComponent(new MapComponent("Maps/Test.tmx"));
 
             // Create debug system
             OneShotInput reload = new OneShotInput();
@@ -100,27 +102,60 @@ namespace ExampleGame
             world.AddSystem(new FPSCounterSystem());
             
             // Add network system
-            NetworkSystem networkSystem = new NetworkSystem();
+            NetSystem networkSystem = new NetSystem();
             world.AddSystem(networkSystem);
             
             // Add client system
-            ClientSystem clientSystem = new ClientSystem(networkSystem, "127.0.0.1", 14357);
-
-            // Create player builder
-            PlayerBuilder playerBuilder = new PlayerBuilder()
+            ClientSystem clientSystem = new ClientSystem(networkSystem, "45.55.179.215", 14357);
+            
+            clientSystem.RegisterEvent("CreatePlayer", (args) =>
             {
-                cameraSystem = cameraSystem
-            };
+                Entity entity = world.Add();
 
-            // Register player builder
-            // clientSystem.RegisterBuilder(playerBuilder);
+                entity.AddComponent(new TransformComponent());
+
+                PlayerComponent player = new PlayerComponent();
+                entity.AddComponent(player);
+
+                NetComponent network = new NetComponent((uint)args[0]);
+                entity.AddComponent(network);
+                
+                // Add graphics
+                SpriteRendererComponent sprites = new SpriteRendererComponent();
+                sprites.AddSprite(new Texture("Textures/Wheel.png"));
+                sprites.AddSprite(new Texture("Textures/Face.png"));
+                entity.AddComponent(sprites);
+
+                // Interpolate position
+                entity.GetComponent<PhysicsComponent>().Mode = PhysicsComponent.NetMode.Interpolate;
+
+                // Receive physics information
+                network.AddReceiver(entity.GetComponent<PhysicsComponent>());
+            });
+            
+            clientSystem.RegisterEvent("ControlPlayer", (args) =>
+            {
+                Entity entity = networkSystem.GetByNetId((uint)args[0]);
+
+                // Add input component
+                entity.AddComponent(new PlayerInputComponent());
+
+                NetComponent network = entity.GetComponent<NetComponent>();
+
+                // Transmit player information
+                PlayerComponent player = entity.GetComponent<PlayerComponent>();
+                network.AddTransmitter(player);
+
+                // Predict position
+                entity.GetComponent<PhysicsComponent>().Mode = PhysicsComponent.NetMode.Predict;
+
+                // Follow with camera
+                cameraSystem.targets.Add(entity.GetComponent<TransformComponent>());
+            });
 
             world.AddSystem(clientSystem);
 
-            clientSystem.RegisterEvent("CreatePlayer", (update) =>
-            {
-
-            });
+            world.AddSystem(new ClientPhysicsSystem(networkSystem));
         }
 
         public override void Update(float deltaTime)

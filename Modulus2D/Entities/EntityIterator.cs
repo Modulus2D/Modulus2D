@@ -9,49 +9,37 @@ namespace Modulus2D.Entities
 {
     public class EntityIterator : IEnumerable
     {
-        private int last;
+        private int lastIndex;
         private EntityWorld world;
         private EntityFilter filter;
-        private List<IComponentStorage> storages = new List<IComponentStorage>();
-        private Components components = new Components();
 
-        public EntityIterator(int lastIndex, EntityWorld entityWorld, EntityFilter entityFilter)
+        public EntityIterator(int lastIndex, EntityWorld world, EntityFilter filter)
         {
-            last = lastIndex;
-            world = entityWorld;
-            filter = entityFilter;
-
-            for (int i = 0; i < filter.components.Count; i++)
-            {
-                storages.Add(world.GetGenericStorage(filter.components[i]));
-                components.Allocate();
-            }
+            this.lastIndex = lastIndex;
+            this.world = world;
+            this.filter = filter;
         }
 
         public IEnumerator GetEnumerator()
         {
-            for (int i = 0; i < last; i++)
+            for (int i = 0; i < lastIndex; i++)
             {
                 bool pass = true;
 
-                for (int j = 0; j < storages.Count; j++)
+                for (int j = 0; j < filter.Storages.Count; j++)
                 {
-                    IComponentStorage storage = storages[j];
+                    IComponentStorage storage = filter.Storages[j];
 
                     if(!storage.Has(i))
                     {
                         pass = false;
                         break;
-                    } else
-                    {
-                        components.components[j] = storage.Get(i);
                     }
                 }
 
                 if (pass)
                 {
-                    components.ResetIndex();
-                    yield return components;
+                    yield return i;
                 }
             }
 

@@ -11,23 +11,15 @@ namespace Modulus2D.Network
     public class ClientSystem : EntitySystem
     {
         private NetClient client;
-        private NetworkSystem networkSystem;
+        private NetSystem networkSystem;
         private Peer peer;
 
-        private float updateTime = 0.025f; // 40 UPS
+        private float updateTime = 1 / 30f;
         private float accumulator = 0f;
 
-        // Current builder ID
-        private uint currentBuilderId = 0;
-
-        // Maps a builder ID to a builder
-        private Dictionary<uint, Builder> builderRegister;
-
-        public ClientSystem(NetworkSystem networkSystem, string host, int port)
+        public ClientSystem(NetSystem networkSystem, string host, int port)
         {
             this.networkSystem = networkSystem;
-
-            builderRegister = new Dictionary<uint, Builder>();
 
             NetPeerConfiguration config = new NetPeerConfiguration("Modulus");
             client = new NetClient(config);
@@ -40,7 +32,6 @@ namespace Modulus2D.Network
             peer.Connect += OnConnect;
             peer.Disconnect += OnDisconnect;
             peer.Update += OnUpdate;
-            peer.Add += OnAdd;
         }
 
         public void OnConnect(NetConnection connection)
@@ -50,28 +41,6 @@ namespace Modulus2D.Network
         public void OnDisconnect(NetConnection connection)
         {
 
-        }
-
-        public void OnAdd(Dictionary<uint, uint> builders)
-        {
-            foreach (KeyValuePair<uint, uint> pair in builders)
-            {
-                uint id = pair.Key;
-                Builder builder = builderRegister[pair.Value];
-
-                Entity entity = World.Add();
-                builder.Build(entity);
-                builder.BuildGraphics(entity);
-
-                NetworkComponent network = new NetworkComponent()
-                {
-                    Id = id
-                };
-
-                builder.BuildClient(entity, network);
-                
-                Console.WriteLine("ADD");
-            }
         }
 
         public void OnUpdate(UpdatePacket packet)
@@ -106,24 +75,14 @@ namespace Modulus2D.Network
         }
 
         /// <summary>
-        /// Registers a builder class. This must be done in the same order on the client and the server.
-        /// </summary>
-        /// <param name="builder">Builder to register</param>
-        public void RegisterBuilder(Builder builder)
-        {
-            builderRegister.Add(currentBuilderId, builder);
-            currentBuilderId++;
-        }
-
-        /// <summary>
         /// Sends a user-defined event to the server
         /// </summary>
-        public void SendEvent(string name, IUpdate update)
+        public void SendEvent(string name, params object[] args)
         {
             EventPacket packet = new EventPacket()
             {
                 name = name,
-                update = update
+                args = args
             };
 
             client.SendMessage(peer.CreatePacket(packet, PacketType.Event), NetDeliveryMethod.ReliableOrdered);

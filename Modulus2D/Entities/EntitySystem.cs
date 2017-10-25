@@ -22,11 +22,18 @@ namespace Modulus2D.Entities
         /// </summary>
         public int Priority { get => priority; set => priority = value; }
 
-        public virtual void AddedToWorld()
+        /// <summary>
+        /// Executed when the system is added to the world. Use this to initialize entity filters
+        /// </summary>
+        public virtual void OnAdded()
         {
 
         }
 
+        /// <summary>
+        /// Called every update
+        /// </summary>
+        /// <param name="deltaTime">The time taken to complete the last frame</param>
         public virtual void Update(float deltaTime)
         {
         }

@@ -8,16 +8,23 @@ namespace Modulus2D.Entities
 {
     public class EntityFilter
     {
-        public List<Type> components = new List<Type>();
+        private List<IComponentStorage> storages;
 
-        public void Add<T>() where T : IComponent
+        public List<IComponentStorage> Storages { get => storages; set => storages = value; }
+
+        public EntityFilter()
         {
-            components.Add(typeof(T));
+            Storages = new List<IComponentStorage>();
         }
 
-        public void Add(Type t)
+        public EntityFilter(params IComponentStorage[] storages)
         {
-            components.Add(t);
+            Storages = storages.ToList();
+        }
+
+        public void Add(IComponentStorage storage)
+        {
+            Storages.Add(storage);
         }
     }
 }
