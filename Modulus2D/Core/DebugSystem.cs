@@ -16,7 +16,7 @@ namespace Modulus2D.Core
 {
     public class DebugSystem : EntitySystem
     {
-        private MapSystem mapSystem;
+        /*private MapSystem mapSystem;
         // private TextComponent text;
         private OneShotInput reload;
 
@@ -25,11 +25,11 @@ namespace Modulus2D.Core
             this.mapSystem = mapSystem;
             this.reload = reload;
 
-            /*Entity textEntity = World.Create();
+            Entity textEntity = World.Create();
 
             Font font = new Font("Resources/Fonts/Inconsolata-Regular.ttf");
             text = new TextComponent(font);
-            textEntity.AddComponent(text);*/
+            textEntity.AddComponent(text);
         }
 
         public override void Update(float deltaTime)
@@ -40,6 +40,6 @@ namespace Modulus2D.Core
                 Console.WriteLine("Reload");
                 mapSystem.ReloadAll();
             }
-        }
+        }*/
     }
 }

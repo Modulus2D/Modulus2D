@@ -1,11 +1,11 @@
-﻿using FarseerPhysics.Collision.Shapes;
+﻿/*using FarseerPhysics.Collision.Shapes;
 using FarseerPhysics.Common;
 using Microsoft.Xna.Framework;
 using Modulus2D.Entities;
 using Modulus2D.Graphics;
 using Modulus2D.Physics;
 using SFML.Graphics;
-using System;
+using SFML.System;
 using System.Collections.Generic;
 using TiledSharp;
 
@@ -89,7 +89,7 @@ namespace Modulus2D.Map
                         int columns = tiles.Columns.Value;
 
                         int column = frame % columns;
-                        int row = (int)Math.Floor(frame / (double)columns);
+                        int row = (int)System.Math.Floor(frame / (double)columns);
 
                         float uvX = tiles.TileWidth * column;
                         float uvY = tiles.TileWidth * row;
@@ -120,10 +120,10 @@ namespace Modulus2D.Map
             if (render)
             {
                 // Create vertices
-                map.Vertices = new VertexArray(PrimitiveType.Quads);
+                map.Vertices = new SFML.Graphics.VertexArray(PrimitiveType.Quads);
 
                 // Load texture
-                Texture texture = new Texture(tiles.Image.Source);
+                SFML.Graphics.Texture texture = new SFML.Graphics.Texture(tiles.Image.Source);
                 map.States = new RenderStates(texture);
 
                 foreach (TmxLayer layer in tmxMap.Layers)
@@ -136,13 +136,23 @@ namespace Modulus2D.Map
                             int columns = tiles.Columns.Value;
 
                             int column = frame % columns;
-                            int row = (int)Math.Floor(frame / (double)columns);
+                            int row = (int)System.Math.Floor(frame / (double)columns);
 
                             float uvX = tiles.TileWidth * column;
                             float uvY = tiles.TileWidth * row;
 
-                            // FIXME: This is bad
-                            SpriteBatch.DrawRegion(texture, new Vector2(tile.X, tile.Y), new Vector2(uvX, uvY), new Vector2(uvX + tiles.TileWidth, uvY + tiles.TileHeight), map.Vertices);
+
+                            float halfWidth = 0.5f;
+                            float halfHeight = 0.5f;
+
+                            map.Vertices.Append(new Vertex(new Vector2f(tile.X - halfWidth,
+                                                                        tile.Y - halfHeight), new Vector2f(uvX, uvY)));
+                            map.Vertices.Append(new Vertex(new Vector2f(tile.X + halfWidth,
+                                                                        tile.Y - halfHeight), new Vector2f(uvX + tiles.TileWidth, uvY)));
+                            map.Vertices.Append(new Vertex(new Vector2f(tile.X + halfWidth,
+                                                                        tile.Y + halfHeight), new Vector2f(uvX + tiles.TileWidth, uvY + tiles.TileHeight)));
+                            map.Vertices.Append(new Vertex(new Vector2f(tile.X - halfWidth,
+                                                                        tile.Y + halfHeight), new Vector2f(uvX, uvY + tiles.TileHeight)));
                         }
                     }
                 }
@@ -165,4 +175,4 @@ namespace Modulus2D.Map
             }
         }
     }
-}
+}*/

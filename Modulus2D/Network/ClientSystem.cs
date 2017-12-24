@@ -2,90 +2,198 @@
 using Modulus2D.Entities;
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
 
 namespace Modulus2D.Network
 {
     /// <summary>
     /// Client-specific networking system
     /// </summary>
-    public class ClientSystem : EntitySystem
+    public class ClientSystem : NetSystem
     {
+        public event NetUpdate UpdateReceived;
+
         private NetClient client;
-        private NetSystem networkSystem;
-        private Peer peer;
+        private NetIncomingMessage message;
 
-        private float updateTime = 1 / 30f;
-        private float accumulator = 0f;
-
-        public ClientSystem(NetSystem networkSystem, string host, int port)
+        public ClientSystem(string host, int port) : base()
         {
-            this.networkSystem = networkSystem;
-
-            NetPeerConfiguration config = new NetPeerConfiguration("Modulus");
+            NetPeerConfiguration config = new NetPeerConfiguration(Identifier);
             client = new NetClient(config);
             client.Start();
 
             client.Connect(host, port);
-
-            peer = new Peer(client);
-
-            peer.Connect += OnConnect;
-            peer.Disconnect += OnDisconnect;
-            peer.Update += OnUpdate;
-        }
-
-        public void OnConnect(NetConnection connection)
-        {
-        }
-
-        public void OnDisconnect(NetConnection connection)
-        {
-
-        }
-
-        public void OnUpdate(UpdatePacket packet)
-        {
-            networkSystem.Receive(packet);
-        }
-
-        public void RegisterEvent(string name, NetEvent netEvent)
-        {
-            peer.RegisterEvent(name, netEvent);
         }
 
         public override void Update(float deltaTime)
         {
-            peer.ReadMessages();
+            while ((message = client.ReadMessage()) != null)
+            {
+                switch (message.MessageType)
+                {
+                    case NetIncomingMessageType.Data:
+                        PacketType type = (PacketType)message.ReadByte();
+
+                        switch (type)
+                        {
+                            case PacketType.Update:
+                                {
+                                    uint count = message.ReadUInt32();
+
+                                    for (int i = 0; i < count; i++)
+                                    {
+                                        uint id = message.ReadUInt32();
+
+                                        if (networkedEntities.TryGetValue(id, out Entity entity))
+                                        {
+                                            netComponents.Get(entity).Read(message);
+                                        }
+                                    }
+
+                                    UpdateReceived?.Invoke((float)stopwatch.Elapsed.TotalSeconds);
+                                    stopwatch.Restart();
+
+                                    break;
+                                }
+
+                            case PacketType.Event:
+                                {
+                                    string name = message.ReadString();
+
+                                    MemoryStream stream = new MemoryStream(message.ReadBytes(message.ReadInt32()));
+                                    object[] args = (object[])formatter.Deserialize(stream);
+
+                                    netEvents[name](args);
+                                    break;
+                                }
+
+                            case PacketType.Create:
+                                {
+                                    string name = message.ReadString();
+                                    uint id = message.ReadUInt32();
+
+                                    MemoryStream stream = new MemoryStream(message.ReadBytes(message.ReadInt32()));
+                                    object[] args = (object[])formatter.Deserialize(stream);
+                                    
+                                    if (creators.TryGetValue(name, out NetCreate creator))
+                                    {
+                                        // Create entity
+                                        Entity entity = World.Create();
+                                        NetComponent network = new NetComponent(id);
+                                        entity.AddComponent(network);
+                                        
+                                        // Add to networked entities
+                                        networkedEntities.Add(network.Id, entity);
+
+                                        creator(entity, args);
+                                    }
+
+                                    break;
+                                }
+
+                            case PacketType.Remove:
+                                {
+                                    uint id = message.ReadUInt32();
+
+                                    if (networkedEntities.TryGetValue(id, out Entity entity))
+                                    {
+                                        entity.Destroy();
+                                        networkedEntities.Remove(id);
+                                    }
+                                    
+                                    break;
+                                }
+
+                            case PacketType.Buffer:
+                                {
+                                    int count = message.ReadInt32();
+
+                                    Console.WriteLine(count);
+
+                                    for(int i = 0; i < count; i++)
+                                    {
+                                        string name = message.ReadString();
+                                        uint id = message.ReadUInt32();
+
+                                        MemoryStream stream = new MemoryStream(message.ReadBytes(message.ReadInt32()));
+                                        object[] args = (object[])formatter.Deserialize(stream);
+
+                                        if (creators.TryGetValue(name, out NetCreate creator))
+                                        {
+                                            // Create entity
+                                            Entity entity = World.Create();
+                                            NetComponent network = new NetComponent(id);
+                                            entity.AddComponent(network);
+
+                                            // Add to networked entities
+                                            if (networkedEntities.TryGetValue(id, out Entity spawned)) {
+                                                Console.WriteLine(id + " Already here");
+                                            } else
+                                            {
+                                                networkedEntities.Add(id, entity);
+                                                creator(entity, args);
+                                            }
+                                        }
+                                    }
+
+                                    break;
+                                }
+                        }
+
+                        break;
+
+                    default:
+                        break;
+                }
+            }
 
             accumulator += deltaTime;
 
             // Send update
             if (accumulator > updateTime)
             {
-                client.SendMessage(peer.CreatePacket(networkSystem.Transmit(), PacketType.Update), NetDeliveryMethod.UnreliableSequenced);
+                NetOutgoingMessage message = client.CreateMessage();
+                message.Write((byte)PacketType.Update);
+                message.Write(networkedEntities.Count);
+
+                foreach (Entity entity in networkedEntities.Values)
+                {
+                    netComponents.Get(entity).Write(message);
+                }
+
+                client.SendMessage(message, NetDeliveryMethod.UnreliableSequenced);
 
                 accumulator = 0f;
-
-                // Log ping
-                /*if (client.ServerConnection != null)
-                {
-                    Console.WriteLine("Ping: " + client.ServerConnection.AverageRoundtripTime);
-                }*/
             }
         }
 
         /// <summary>
-        /// Sends a user-defined event to the server
+        /// Register a networked event
         /// </summary>
-        public void SendEvent(string name, params object[] args)
+        /// <param name="name"></param>
+        /// <param name="netEvent"></param>
+        public void RegisterEvent(string name, NetEvent netEvent)
         {
-            EventPacket packet = new EventPacket()
-            {
-                name = name,
-                args = args
-            };
+            netEvents.Add(name, netEvent);
+        }
 
-            client.SendMessage(peer.CreatePacket(packet, PacketType.Event), NetDeliveryMethod.ReliableOrdered);
+        /// <summary>
+        /// Register an entity creator
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="creator"></param>
+        public void RegisterEntity(string name, NetCreate creator)
+        {
+            creators.Add(name, creator);
+        }
+
+        /// <summary>
+        /// Disconnect from the server
+        /// </summary>
+        public void Disconnect()
+        {
+            client.Disconnect(null);
         }
     }
 }

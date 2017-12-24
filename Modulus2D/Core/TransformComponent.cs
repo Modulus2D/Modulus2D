@@ -1,10 +1,5 @@
-﻿using Microsoft.Xna.Framework;
-using Modulus2D.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Modulus2D.Entities;
+using Modulus2D.Math;
 
 namespace Modulus2D.Core
 {

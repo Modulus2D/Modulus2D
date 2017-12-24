@@ -8,7 +8,7 @@ using System.Timers;
 
 namespace Modulus2D.Core
 {
-    public class Server
+    public class Headless
     {        
         // Current state
         private State state;
@@ -16,7 +16,7 @@ namespace Modulus2D.Core
         // Time
         private Stopwatch stopwatch;
 
-        public Server()
+        public Headless()
         {
             stopwatch = new Stopwatch();
             stopwatch.Start();
@@ -28,7 +28,6 @@ namespace Modulus2D.Core
             set
             {
                 state = value;
-                state.Start();
             }
         }
 
@@ -36,6 +35,7 @@ namespace Modulus2D.Core
         {
             // Set state
             State = state;
+            state.Start();
 
             // Game loop
             while (true)
@@ -44,9 +44,6 @@ namespace Modulus2D.Core
                 stopwatch.Restart();
 
                 State.Update(dt);
-
-                // Avoid extreme CPU usage
-                // System.Threading.Thread.Sleep(0);
             }
         }
 

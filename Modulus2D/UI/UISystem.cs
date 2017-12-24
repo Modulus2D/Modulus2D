@@ -1,4 +1,5 @@
-﻿using Modulus2D.Entities;
+﻿using Modulus2D.Core;
+using Modulus2D.Entities;
 using SFML.Graphics;
 using System;
 using System.Collections.Generic;
@@ -10,28 +11,35 @@ namespace Modulus2D.UI
 {
     public class UISystem : EntitySystem
     {
-        // EntityFilter filter = new EntityFilter();
-        View view;
-        RenderTarget target;
+        private EntityFilter filter;
+        private ComponentStorage<MenuComponent> menuComponents;
+
+        private View view;
+        private RenderTarget target;
 
         public UISystem(RenderTarget target)
         {
             this.target = target;
-
             view = new View(new FloatRect(0f, 0f, target.Size.X, target.Size.Y));
+        }
 
-            //filter.Add<TextComponent>();
+        public override void OnAdded()
+        {
+            menuComponents = World.GetStorage<MenuComponent>();
+
+            filter = new EntityFilter(menuComponents);
         }
 
         public override void Update(float deltaTime)
         {
             target.SetView(view);
 
-            /*foreach(Components components in World.Iterate(filter))
+            foreach(int id in World.Iterate(filter))
             {
-                TextComponent component = components.Next<TextComponent>();
-                component.Draw(target);
-            }*/
+                MenuComponent menu = menuComponents.Get(id);
+
+                menu.Draw(target);
+            }
         }
     }
 }

@@ -1,6 +1,4 @@
-﻿using FarseerPhysics.Dynamics;
-using Microsoft.Xna.Framework;
-using Modulus2D.Entities;
+﻿using Modulus2D.Entities;
 using Modulus2D.Core;
 using SFML.Graphics;
 using System;
@@ -21,6 +19,11 @@ namespace Modulus2D.Core
         public InputManager Input { get => input; set => input = value; }
 
         public virtual void Start()
+        {
+
+        }
+
+        public virtual void Close()
         {
 
         }

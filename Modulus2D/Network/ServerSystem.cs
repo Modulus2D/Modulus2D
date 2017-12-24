@@ -2,106 +2,157 @@
 using Modulus2D.Entities;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
 
 namespace Modulus2D.Network
 {
-    public delegate void PlayerConnect(NetPlayer player);
-    public delegate void PlayerDisconnect(NetPlayer player);
+    /// <summary>
+    /// Called when a player connects to the server
+    /// </summary>
+    /// <param name="connection"></param>
+    public delegate void Connected(NetPlayer player);
+
+    /// <summary>
+    /// Called when a player disconnects from the server
+    /// </summary>
+    /// <param name="connection"></param>
+    public delegate void Disconnected(NetPlayer player);
 
     /// <summary>
     /// Server-specific networking system
     /// </summary>
-    public class ServerSystem : EntitySystem
+    public class ServerSystem : NetSystem
     {
-        public event PlayerConnect Connect;
-        public event PlayerDisconnect Disconnect;
+        public event NetUpdate UpdateReceived;
 
+        public event Connected Connected;
+        public event Disconnected Disconnected;
+        
+        // Lidgren
         private NetServer server;
-        private NetSystem networkSystem;
-        private Peer peer;
-
-        private float updateTime = 1 / 30f;
-        private float accumulator = 0f;
-
+        private NetIncomingMessage message;
+        
+        // Networked player
         private Dictionary<NetConnection, NetPlayer> players;
-
+        
+        // Buffered entities
+        private Dictionary<uint, BufferedEntity> bufferedEntities;
+        
         // Current net ID
         private uint currentNetId = 0;
 
-        public ServerSystem(NetSystem networkSystem, int port)
+        public ServerSystem(int port) : base()
         {
-            this.networkSystem = networkSystem;
-
             players = new Dictionary<NetConnection, NetPlayer>();
+            bufferedEntities = new Dictionary<uint, BufferedEntity>();
 
-            // TODO: Not hard-coded?
-            NetPeerConfiguration config = new NetPeerConfiguration("Modulus")
+            NetPeerConfiguration config = new NetPeerConfiguration(Identifier)
             {
                 Port = port
             };
 
             server = new NetServer(config);
             server.Start();
-            
-            peer = new Peer(server);
-
-            peer.Connect += OnConnect;
-            peer.Disconnect += OnDisconnect;
-
-            peer.Update += OnUpdate;
         }
 
-        private void OnConnect(NetConnection connection)
+        public override void OnAdded()
         {
-            NetPlayer player = new NetPlayer()
+            base.OnAdded();
+
+            World.AddRemovedListener<NetComponent>((entity) =>
             {
-                connection = connection
-            };
-            players.Add(connection, player);
-
-            /*// Create initialization buffer
-            AddPacket init = new AddPacket();
-            
-            // Add network ID and builder ID for each entity
-            foreach (Components components in World.Iterate(filter))
-            {
-                NetworkComponent network = components.Next<NetworkComponent>();
-
-                init.builders.Add(network.Id, network.BuilderId);
-            }
-
-            // Send initialization buffer to client
-            server.SendToAll(peer.CreatePacket(init, PacketType.Add), NetDeliveryMethod.ReliableOrdered);
-            */
-
-            // Trigger event
-            Connect(player);
-        }
-
-        private void OnDisconnect(NetConnection connection)
-        {
-            // Disconnect(players[connection]);
-        }
-
-        private void OnUpdate(UpdatePacket packet)
-        {
-            networkSystem.Receive(packet);
+                Remove(netComponents.Get(entity).Id);
+            });
         }
 
         public override void Update(float deltaTime)
         {
-            // Read messages from clients
-            peer.ReadMessages();
+            while ((message = server.ReadMessage()) != null)
+            {
+                switch (message.MessageType)
+                {
+                    case NetIncomingMessageType.Data:
+                        PacketType type = (PacketType)message.ReadByte();
+
+                        switch (type)
+                        {
+                            case PacketType.Update:
+                                uint count = message.ReadUInt32();
+
+                                for(int i = 0; i < count; i++) {
+                                    uint id = message.ReadUInt32();
+
+                                    if (networkedEntities.TryGetValue(id, out Entity entity))
+                                    {
+                                        netComponents.Get(entity).Read(message);
+                                    }
+                                }
+
+                                UpdateReceived?.Invoke((float)stopwatch.Elapsed.TotalSeconds);
+                                stopwatch.Restart();
+
+                                break;
+                        }
+
+                        break;
+
+                    case NetIncomingMessageType.StatusChanged:
+                        switch (message.SenderConnection.Status)
+                        {
+                            case NetConnectionStatus.Connected:
+                                NetPlayer player = new NetPlayer()
+                                {
+                                    connection = message.SenderConnection
+                                };
+                                players.Add(message.SenderConnection, player);
+
+                                SendBuffer(player);
+
+                                Connected?.Invoke(player);
+                                
+                                break;
+                            case NetConnectionStatus.Disconnected:
+                                Disconnected?.Invoke(players[message.SenderConnection]);
+
+                                break;
+                        }
+                        break;
+
+                    default:
+                        break;
+                }
+            }
 
             accumulator += deltaTime;
 
             // Send update
             if (accumulator > updateTime)
             {
-                server.SendToAll(peer.CreatePacket(networkSystem.Transmit(), PacketType.Update), NetDeliveryMethod.UnreliableSequenced);
+                NetOutgoingMessage message = server.CreateMessage();
+                message.Write((byte)PacketType.Update);
+                message.Write(networkedEntities.Count);
+
+                foreach (Entity entity in networkedEntities.Values)
+                {
+                    netComponents.Get(entity).Write(message);
+                }
+
+                server.SendToAll(message, NetDeliveryMethod.UnreliableSequenced);
 
                 accumulator = 0f;
             }
+        }
+
+        /// <summary>
+        /// Register a networked event
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="netEvent"></param>
+        public void RegisterEvent(string name, NetEvent netEvent)
+        {
+            netEvents.Add(name, netEvent);
         }
 
         /// <summary>
@@ -115,42 +166,135 @@ namespace Modulus2D.Network
         }
 
         /// <summary>
-        /// Removes an entity from the world and updates clients
+        /// Register an entity creator
         /// </summary>
-        public void RemoveEntity(uint id)
+        /// <param name="name"></param>
+        /// <param name="creator"></param>
+        public void RegisterEntity(string name, NetCreate creator)
         {
-            RemovePacket packet = new RemovePacket();
-            packet.entities.Add(id);
-
-            server.SendToAll(peer.CreatePacket(packet, PacketType.Remove), NetDeliveryMethod.ReliableOrdered);
+            creators.Add(name, creator);
         }
 
         /// <summary>
-        /// Sends a user-defined event to all clients.
+        /// Send an event to all players
         /// </summary>
+        /// <param name="name"></param>
+        /// <param name="args"></param>
         public void SendEvent(string name, params object[] args)
         {
-            EventPacket packet = new EventPacket()
-            {
-                name = name,
-                args = args,
-            };
-
-            server.SendToAll(peer.CreatePacket(packet, PacketType.Event), NetDeliveryMethod.ReliableOrdered);
+            server.SendToAll(CreateEvent(name, args), NetDeliveryMethod.ReliableOrdered);
         }
 
         /// <summary>
-        /// Sends a user-defined event to one client.
+        /// Send an event to a specific player
         /// </summary>
-        public void SendEventToPlayer(string name, NetPlayer player, params object[] args)
+        /// <param name="name"></param>
+        /// <param name="args"></param>
+        public void SendEvent(NetPlayer player, string name, params object[] args)
         {
-            EventPacket packet = new EventPacket()
+            server.SendMessage(CreateEvent(name, args), player.connection, NetDeliveryMethod.ReliableOrdered);
+        }
+
+        private NetOutgoingMessage CreateEvent(string name, params object[] args)
+        {
+            NetOutgoingMessage message = server.CreateMessage();
+
+            message.Write((byte)PacketType.Event);
+
+            message.Write(name);
+
+            MemoryStream stream = new MemoryStream();
+            formatter.Serialize(stream, args);
+
+            message.Write((int)stream.Length);
+            message.Write(stream.ToArray());
+
+            return message;
+        }
+
+        public Entity Create(string name, params object[] args)
+        {
+            // Create entity
+            Entity entity = World.Create();
+            NetComponent network = new NetComponent(AllocateId());
+            Console.WriteLine(network.Id);
+            entity.AddComponent(network);
+
+            // Add to networked entities
+            networkedEntities.Add(network.Id, entity);
+
+            // Buffer entity
+            bufferedEntities.Add(network.Id, new BufferedEntity
             {
                 name = name,
-                args = args,
-            };
+                args = args
+            });
 
-            server.SendMessage(peer.CreatePacket(packet, PacketType.Event), player.connection, NetDeliveryMethod.ReliableOrdered);
+            // Call creator
+            creators[name](entity, args);
+
+            // Send message to clients
+            NetOutgoingMessage message = server.CreateMessage();
+
+            message.Write((byte)PacketType.Create);
+
+            message.Write(name);
+            message.Write(network.Id);
+
+            MemoryStream stream = new MemoryStream();
+            formatter.Serialize(stream, args);
+
+            message.Write((int)stream.Length);
+            message.Write(stream.ToArray());
+
+            server.SendToAll(message, NetDeliveryMethod.ReliableOrdered);
+
+            return entity;
         }
+
+        public void Remove(uint id)
+        {
+            networkedEntities.Remove(id);
+
+            bufferedEntities.Remove(id);
+
+            // Send message to clients
+            NetOutgoingMessage message = server.CreateMessage();
+
+            message.Write((byte)PacketType.Remove);
+            
+            message.Write(id);
+
+            server.SendToAll(message, NetDeliveryMethod.ReliableOrdered);
+        }
+
+        public void SendBuffer(NetPlayer player)
+        {
+            // Send message to clients
+            NetOutgoingMessage message = server.CreateMessage();
+
+            message.Write((byte)PacketType.Buffer);
+            message.Write(bufferedEntities.Count);
+
+            foreach (KeyValuePair<uint, BufferedEntity> pair in bufferedEntities)
+            {
+                message.Write(pair.Value.name);
+                message.Write(pair.Key);
+                
+                MemoryStream stream = new MemoryStream();
+                formatter.Serialize(stream, pair.Value.args);
+
+                message.Write((int)stream.Length);
+                message.Write(stream.ToArray());
+            }
+
+            server.SendMessage(message, player.connection, NetDeliveryMethod.ReliableOrdered);
+        }
+    }
+
+    class BufferedEntity
+    {
+        public string name;
+        public object[] args;
     }
 }

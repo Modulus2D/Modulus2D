@@ -36,10 +36,10 @@ namespace ExampleServer
             world.AddSystem(maps);
 
             // Load map
-            Entity map = world.Add();
+            Entity map = world.Create();
             map.AddComponent(new TransformComponent());
-            map.AddComponent(new PhysicsComponent());
-            map.GetComponent<PhysicsComponent>().Body.IsStatic = true;
+            map.AddComponent(new Rigidbody());
+            map.GetComponent<Rigidbody>().Body.IsStatic = true;
             map.AddComponent(new MapComponent("Maps/Test.tmx"));
 
             // Add player system
@@ -52,41 +52,48 @@ namespace ExampleServer
             // Add FPS counter
             world.AddSystem(new FPSCounterSystem());
 
-            // Add network system
-            NetSystem networkSystem = new NetSystem();
-            world.AddSystem(networkSystem);
-
             // Create server system
-            ServerSystem serverSystem = new ServerSystem(networkSystem, 14357);
-
-            // serverSystem.RegisterBuilder(builder);
+            ServerSystem serverSystem = new ServerSystem(14357);
 
             world.AddSystem(serverSystem);
 
-            // Create player on connection
-            serverSystem.Connect += (netPlayer) =>
-            {
-                Entity entity = world.Add();
+            Dictionary<NetPlayer, Entity> players = new Dictionary<NetPlayer, Entity>();
 
+            // Create player on connection
+            serverSystem.Connected += (player) =>
+            {
+                Entity entity = serverSystem.Create("player");
+                players[player] = entity;
+
+                // Tell player to send input
+                serverSystem.SendEvent(player, "control", entity.GetComponent<NetComponent>().Id);
+
+                Console.WriteLine("Created player");
+            };
+
+            serverSystem.Disconnected += (player) =>
+            {
+                // Destroy player
+                players[player].Destroy();
+
+                Console.WriteLine("Destroyed player");
+            };
+
+            serverSystem.RegisterEntity("player", (entity, args) =>
+            {
                 entity.AddComponent(new TransformComponent());
 
                 PlayerComponent player = new PlayerComponent();
                 entity.AddComponent(player);
 
-                NetComponent network = new NetComponent(serverSystem.AllocateId());
-                entity.AddComponent(network);
+                NetComponent network = entity.GetComponent<NetComponent>();
 
-                // Transmit physics information
-                network.AddTransmitter(entity.GetComponent<PhysicsComponent>());
-
-                // Receive input information
+                network.AddTransmitter(entity.GetComponent<Rigidbody>());
                 network.AddReceiver(entity.GetComponent<PlayerComponent>());
+            });
 
-                // Notify all clients of creation of player
-                serverSystem.SendEvent("CreatePlayer", network.Id);
-
-                // Notify player's client that they control the player
-                serverSystem.SendEventToPlayer("ControlPlayer", netPlayer, network.Id);
+            serverSystem.Disconnected += (netPlayer) =>
+            {
             };
         }
 

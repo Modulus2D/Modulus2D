@@ -1,4 +1,5 @@
-﻿using Modulus2D.Entities;
+﻿using Lidgren.Network;
+using Modulus2D.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,8 +16,8 @@ namespace Modulus2D.Network
     {
         private uint id;
 
-        private List<INetComponent> transmitters;
-        private List<INetComponent> receivers;
+        private List<INetView> receivers;
+        private List<INetView> transmitters;
 
         /// <summary>
         /// Network ID to uniquely identify entity
@@ -27,39 +28,38 @@ namespace Modulus2D.Network
         {
             this.id = id;
 
-            transmitters = new List<INetComponent>();
-            receivers = new List<INetComponent>();
+            receivers = new List<INetView>();
+            transmitters = new List<INetView>();
         }
-
-        public void AddTransmitter<T>(T transmitter) where T : INetComponent
-        {
-            transmitters.Add(transmitter);
-        }
-
-        public void AddReceiver<T>(T receiver) where T : INetComponent
+        
+        public void AddReceiver(INetView receiver)
         {
             receivers.Add(receiver);
         }
 
-        public List<IUpdate> Transmit()
+        public void AddTransmitter(INetView transmitter)
         {
-            List<IUpdate> updates = new List<IUpdate>();
+            transmitters.Add(transmitter);
+        }
+
+        public void Write(NetBuffer buffer)
+        {
+            buffer.Write(id);
+            buffer.Write(transmitters.Count);
 
             for (int i = 0; i < transmitters.Count; i++)
             {
-                updates.Add(transmitters[i].Transmit());
+                transmitters[i].Transmit(buffer);
             }
-
-            return updates;
         }
 
-        public void ReceiveUpdate(List<IUpdate> updates)
+        public void Read(NetBuffer buffer)
         {
-            int max = Math.Min(receivers.Count, updates.Count);
+            int count = buffer.ReadInt32();
 
-            for (int i = 0; i < max; i++)
+            for (int i = 0; i < count; i++)
             {
-                receivers[i].Receive(updates[i]);
+                receivers[i].Receive(buffer);
             }
         }
     }

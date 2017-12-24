@@ -1,4 +1,4 @@
-﻿using FarseerPhysics.Dynamics;
+﻿/*using FarseerPhysics.Dynamics;
 using Modulus2D.Core;
 using Modulus2D.Entities;
 using Microsoft.Xna.Framework;
@@ -66,16 +66,13 @@ namespace Modulus2D.Physics
                 TransformComponent transform = transformComponents.Get(id);
                 PhysicsComponent physics = physicsComponents.Get(id);
 
-                // TODO: Can this be removed?
-                if (physics.Body != null)
-                {
-                    // Lerp body position
-                    transform.Position += (physics.Body.Position - transform.Position) * accumulator / StepTime;
+                // Lerp body position
+                transform.Position += (physics.Body.Position - transform.Position) * accumulator / StepTime;
 
-                    // TODO: Negative rotation?
-                    transform.Rotation += (-physics.Body.Rotation - transform.Rotation) * accumulator / StepTime;
-                }
+                // TODO: Negative rotation?
+                transform.Rotation += (-physics.Body.Rotation - transform.Rotation) * accumulator / StepTime;
             }
         }
     }
 }
+*/

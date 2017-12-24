@@ -11,7 +11,7 @@ namespace ExampleServer
     {
         static void Main(string[] args)
         {
-            Server server = new Server();
+            Headless server = new Headless();
             server.Start(new ServerState());
         }
     }

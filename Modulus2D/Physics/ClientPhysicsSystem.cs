@@ -1,9 +1,10 @@
-﻿using Microsoft.Xna.Framework;
+﻿/*using Microsoft.Xna.Framework;
 using Modulus2D.Entities;
 using Modulus2D.Network;
 using SFML.System;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -15,24 +16,26 @@ namespace Modulus2D.Physics
         private EntityFilter filter;
         private ComponentStorage<NetComponent> netComponents;
         private ComponentStorage<PhysicsComponent> physicsComponents;
+        
+        private float maxPositionDistance = 0.2f;
+        private float predictLerp = 0.2f;
 
-        private NetSystem networkSystem;
+        private float delta = 0f;
 
-        private float maxPositionDistance = 0f;
-        private float predictLerp = 0.03f;
+        // Stopwatch for interpolation
+        private Stopwatch stopwatch;
 
-        // Clock for interpolation
-        private Clock clock;
-
-        public ClientPhysicsSystem(NetSystem networkSystem)
+        public ClientPhysicsSystem(ClientSystem clientSystem)
         {
-            this.networkSystem = networkSystem;
+            stopwatch = new Stopwatch();
 
-            clock = new Clock();
-
-            this.networkSystem.ReceiveUpdate += () =>
+            clientSystem.UpdateReceived += (delta) =>
             {
-                clock.Restart();
+                Console.WriteLine("UPDATE");
+
+                this.delta = delta;
+
+                stopwatch.Restart();
             };
         }
 
@@ -69,22 +72,22 @@ namespace Modulus2D.Physics
 
                         break;
                     case PhysicsComponent.NetMode.Interpolate:
-                        float delta = networkSystem.LastDelta;
                         if (delta != 0f && physics.lastPosition != null && physics.correctPosition != null)
                         {
-                            physics.Body.Position = Vector2.Lerp(physics.lastPosition, physics.correctPosition, clock.ElapsedTime.AsSeconds() / delta);
-                            physics.Body.Rotation = physics.correctRotation + (physics.correctRotation - physics.lastRotation) * clock.ElapsedTime.AsSeconds() / delta;
+                            physics.Body.Position = Vector2.Lerp(physics.lastPosition, physics.correctPosition, (float)stopwatch.Elapsed.TotalSeconds / delta);
+                            physics.Body.Rotation = physics.correctRotation + (physics.correctRotation - physics.lastRotation) * (float)stopwatch.Elapsed.TotalSeconds / delta;
                         }
 
                         break;
                     case PhysicsComponent.NetMode.Predict:
-                        float distance = Vector2.Distance(physics.Body.Position, physics.correctPosition);
+                        float distance = Vector2.Distance(physics.Body.Position, physics.lastPosition);
                         if (distance > MaxPositionDistance && physics.lastPosition != null && physics.correctPosition != null)
                         {
-                            physics.Body.Position += (physics.correctPosition - physics.Body.Position) * PredictLerp * distance;
-                            // physics.Body.Rotation += (physics.correctRotation - physics.Body.Rotation) * deltaTime * PredictLerp;
+                            physics.Body.Position += (physics.lastPosition - physics.Body.Position) * PredictLerp * deltaTime * distance;
                         }
-                        physics.Body.Rotation = 0f;
+
+                        // physics.Body.Rotation += (physics.correctRotation - physics.Body.Rotation) * PredictLerp * deltaTime;
+                        // physics.Body.LinearVelocity += (physics.correctVelocity - physics.Body.LinearVelocity) * PredictLerp * deltaTime;
 
                         break;
                     case PhysicsComponent.NetMode.Client:
@@ -94,3 +97,4 @@ namespace Modulus2D.Physics
         }
     }
 }
+*/

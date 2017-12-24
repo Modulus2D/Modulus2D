@@ -1,5 +1,5 @@
-﻿using Microsoft.Xna.Framework;
-using Modulus2D.Entities;
+﻿using Modulus2D.Entities;
+using Modulus2D.Math;
 using SFML.Graphics;
 using System.Collections.Generic;
 
@@ -14,7 +14,7 @@ namespace Modulus2D.Graphics
 
         }
 
-        public void AddSprite(Texture texture)
+        public void AddSprite(SFML.Graphics.Texture texture)
         {
             sprites.Add(new Sprite()
             {
@@ -23,7 +23,7 @@ namespace Modulus2D.Graphics
             });
         }
 
-        public void AddSprite(Texture texture, Vector2 offset)
+        public void AddSprite(SFML.Graphics.Texture texture, Vector2 offset)
         {
             sprites.Add(new Sprite()
             {
@@ -36,7 +36,6 @@ namespace Modulus2D.Graphics
     public class Sprite
     {
         public Vector2 offset;
-        public Texture texture;
+        public SFML.Graphics.Texture texture;
     }
 }
-

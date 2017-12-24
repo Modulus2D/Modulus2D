@@ -33,7 +33,7 @@ namespace Modulus2D.Entities
             entityRemovedListeners = new Dictionary<IComponentStorage, List<EntityRemoved>>();
         }
 
-        public Entity Add()
+        public Entity Create()
         {
             return new Entity(allocator.Create(), this);
         }
@@ -41,6 +41,9 @@ namespace Modulus2D.Entities
         public void Remove(int id)
         {
             allocator.Remove(id);
+
+            List<IComponentStorage> toClear = new List<IComponentStorage>();
+
             foreach (IComponentStorage storage in storages.Values)
             {
                 // Notify listeners
@@ -55,9 +58,15 @@ namespace Modulus2D.Entities
                             listener(entity);
                         }
                     }
-                }
 
-                storage.Clear(id);
+                    toClear.Add(storage);
+                }
+            }
+
+            // Entity must be intact until all listeners are called
+            for (int i = 0; i < toClear.Count; i++)
+            {
+                toClear[i].Clear(id);
             }
         }
 

@@ -1,9 +1,5 @@
-﻿using SFML.System;
-using Modulus2D.Entities;
-using Microsoft.Xna.Framework;
-using System;
+﻿/*using Modulus2D.Entities;
 using Modulus2D.Core;
-using SFML.Graphics;
 
 namespace Modulus2D.Graphics
 {
@@ -47,3 +43,4 @@ namespace Modulus2D.Graphics
         }
     }
 }
+*/

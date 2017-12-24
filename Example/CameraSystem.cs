@@ -1,6 +1,7 @@
-﻿using Modulus2D.Core;
+﻿/*using Modulus2D.Core;
 using Modulus2D.Entities;
 using Modulus2D.Graphics;
+using Modulus2D.Network;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,3 +32,4 @@ namespace Example
         }
     }
 }
+*/
