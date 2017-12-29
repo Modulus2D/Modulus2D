@@ -1,3 +1,6 @@
 [submodule "Dependencies"]
 	path = Dependencies
 	url = https://github.com/Modulus2D/Dependencies.git
+[submodule "Physics"]
+	path = Physics
+	url = https://github.com/Modulus2D/Physics.git

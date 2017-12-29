@@ -14,7 +14,7 @@ namespace Modulus2D.Graphics
 
         }
 
-        public void AddSprite(SFML.Graphics.Texture texture)
+        public void AddSprite(Texture texture)
         {
             sprites.Add(new Sprite()
             {
@@ -23,7 +23,7 @@ namespace Modulus2D.Graphics
             });
         }
 
-        public void AddSprite(SFML.Graphics.Texture texture, Vector2 offset)
+        public void AddSprite(Texture texture, Vector2 offset)
         {
             sprites.Add(new Sprite()
             {
@@ -36,6 +36,6 @@ namespace Modulus2D.Graphics
     public class Sprite
     {
         public Vector2 offset;
-        public SFML.Graphics.Texture texture;
+        public Texture texture;
     }
 }

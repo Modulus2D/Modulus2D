@@ -30,9 +30,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="FarseerPhysics, Version=3.5.0.38023, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\FarseerPhysics.3.5.0\lib\NET40\FarseerPhysics.dll</HintPath>
-    </Reference>
     <Reference Include="Lidgren.Network, Version=2012.1.7.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Lidgren.Network.1.0.2\lib\net451\Lidgren.Network.dll</HintPath>
     </Reference>
@@ -75,6 +72,7 @@
     <Compile Include="Core\State.cs" />
     <Compile Include="Graphics\Color.cs" />
     <Compile Include="Graphics\ITarget.cs" />
+    <Compile Include="Graphics\Renderer2D.cs" />
     <Compile Include="Graphics\Shader.cs" />
     <Compile Include="Graphics\Texture.cs" />
     <Compile Include="Graphics\VertexArray.cs" />
@@ -84,19 +82,12 @@
     <Compile Include="Input\ConstantInput.cs" />
     <Compile Include="Input\InputManager.cs" />
     <Compile Include="Input\BasicInput.cs" />
-    <Compile Include="Math\Matrix3.cs" />
-    <Compile Include="Math\Matrix4.cs" />
-    <Compile Include="Math\Vector2.cs" />
-    <Compile Include="Math\Vector4.cs" />
-    <Compile Include="Math\Vector3.cs" />
     <Compile Include="Network\IView.cs" />
     <Compile Include="Network\NetPlayer.cs" />
     <Compile Include="Network\PacketType.cs" />
     <Compile Include="Particles\ParticleComponent.cs" />
     <Compile Include="Particles\ParticleSystem.cs" />
     <Compile Include="Physics\ClientPhysicsSystem.cs" />
-    <Compile Include="Resources\IResource.cs" />
-    <Compile Include="Resources\ResourceManager.cs" />
     <Compile Include="UI\UISystem.cs" />
     <Compile Include="UI\MenuComponent.cs" />
     <Compile Include="Map\MapComponent.cs" />
@@ -110,23 +101,31 @@
     <Compile Include="Entities\EntityWorld.cs" />
     <Compile Include="Entities\IComponent.cs" />
     <Compile Include="Core\FPSCounterSystem.cs" />
-    <Compile Include="Graphics-old\SpriteBatch.cs" />
-    <Compile Include="Graphics-old\Viewport.cs" />
-    <Compile Include="Graphics-old\OrthoCamera.cs" />
+    <Compile Include="Graphics\SpriteBatch.cs" />
+    <Compile Include="Graphics\OrthoCamera.cs" />
     <Compile Include="Map\MapSystem.cs" />
     <Compile Include="Network\ClientSystem.cs" />
     <Compile Include="Network\NetComponent.cs" />
     <Compile Include="Network\NetSystem.cs" />
     <Compile Include="Network\ServerSystem.cs" />
     <Compile Include="Physics\PhysicsSystem.cs" />
-    <Compile Include="Graphics-old\SpriteComponent.cs" />
-    <Compile Include="Graphics-old\SpriteSystem.cs" />
+    <Compile Include="Graphics\SpriteComponent.cs" />
+    <Compile Include="Graphics\SpriteSystem.cs" />
     <Compile Include="Physics\Rigidbody.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Core\TransformComponent.cs" />
     <Compile Include="UI\Widget.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\Math\Math.csproj">
+      <Project>{494b76b4-24af-4d63-90d9-2b16dda9a434}</Project>
+      <Name>Math</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Physics\Physics.csproj">
+      <Project>{f43a0c47-3521-44fb-82f4-a5d2e37f952e}</Project>
+      <Name>Physics</Name>
+    </ProjectReference>
+  </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
     <None Include="WrapperGLFW.dll.config" />

@@ -1,12 +1,8 @@
-﻿using NLog;
+﻿using Modulus2D.Input;
+using NLog;
 using OpenGL;
-using SFML;
 using SFML.Window;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Modulus2D.Graphics
 {
@@ -21,6 +17,9 @@ namespace Modulus2D.Graphics
         private Color clearColor;
 
         private bool open;
+
+        private Texture currentTexture;
+        private Shader currentShader;
 
         public int Width => (int)window.Size.X;
 
@@ -54,6 +53,14 @@ namespace Modulus2D.Graphics
             };
         }
 
+        public void SetInput(InputManager manager)
+        {
+            window.KeyPressed += new EventHandler<KeyEventArgs>(manager.OnKeyPressed);
+            window.KeyReleased += new EventHandler<KeyEventArgs>(manager.OnKeyReleased);
+            window.JoystickButtonPressed += new EventHandler<JoystickButtonEventArgs>(manager.OnJoystickButtonPressed);
+            window.JoystickButtonReleased += new EventHandler<JoystickButtonEventArgs>(manager.OnJoystickButtonReleased);
+        }
+
         public void Dispatch()
         {
             window.DispatchEvents();
@@ -70,15 +77,26 @@ namespace Modulus2D.Graphics
             window.Display();
         }
 
-        public void SetShader(Shader shader)
+        public void SetTexture(Texture texture)
         {
-            shader.Bind();
+            if(texture != currentTexture)
+            {
+                texture.Bind();
+            }
         }
 
-        public void Draw(VertexArray array)
+        public void SetShader(Shader shader)
+        {
+            if(shader != currentShader)
+            {
+                shader.Bind();
+            }
+        }
+
+        public void Draw(VertexArray array, int count)
         {
             array.Bind();
-            Gl.DrawArrays(PrimitiveType.Triangles, array.First, array.Vertices.Length);
+            Gl.DrawArrays(PrimitiveType.Triangles, 0, count);
         }
 
         public void Draw(VertexArray array, uint[] indices, int count)

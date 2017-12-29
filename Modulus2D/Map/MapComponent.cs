@@ -1,5 +1,5 @@
 ﻿using Modulus2D.Entities;
-using SFML.Graphics;
+using Modulus2D.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,8 +11,8 @@ namespace Modulus2D.Map
     public class MapComponent : IComponent
     {
         private string filename;
-        private VertexArray vertices;
-        private RenderStates states;
+        private List<float> vertices;
+        private VertexArray vertexArray;
 
         public MapComponent(string filename)
         {
@@ -20,7 +20,7 @@ namespace Modulus2D.Map
         }
 
         public string Filename { get => filename; set => filename = value; }
-        public VertexArray Vertices { get => vertices; set => vertices = value; }
-        public RenderStates States { get => states; set => states = value; }
+        public List<float> Vertices { get => vertices; set => vertices = value; }
+        public VertexArray VertexArray { get => vertexArray; set => vertexArray = value; }
     }
 }

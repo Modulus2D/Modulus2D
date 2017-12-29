@@ -64,7 +64,7 @@ namespace Modulus2D.Graphics
             GetUniforms();
         }
 
-        public void Bind()
+        internal void Bind()
         {
             Gl.UseProgram(program);
         }

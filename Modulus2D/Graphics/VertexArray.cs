@@ -46,26 +46,8 @@ namespace Modulus2D.Graphics
         // TODO: Make this accessible?
         protected BufferUsage usage = BufferUsage.StaticDraw;
 
-        private int first;
-        public int First { get => first; set => first = value; }
-
-        /// <summary>
-        /// Setting this will update the internal vertex buffer object
-        /// </summary>
-        public float[] Vertices {
-            get => vertices;
-            set
-            {
-                vertices = value;
-
-                Upload();
-            }
-        }
-
         public VertexArray()
         {
-            Vertices = new float[0];
-
             // VAO
             vao = Gl.GenVertexArray();
             Bind();
@@ -74,7 +56,7 @@ namespace Modulus2D.Graphics
             vbo = Gl.GenBuffer();
 
             // TODO: Removing this causes an access violation when specifying vertex attributes for some reason
-            Upload();
+            Upload(new float[0], 0);
         }
 
         public void Bind()
@@ -82,12 +64,17 @@ namespace Modulus2D.Graphics
             Gl.BindVertexArray(vao);
         }
 
-        private void Upload()
+        /// <summary>
+        /// Loads the given vertices onto the GPU
+        /// </summary>
+        /// <param name="vertices">Vertices to upload</param>
+        /// <param name="count">Number of float components to upload</param>
+        public void Upload(float[] vertices, int count)
         {
             Bind();
 
             Gl.BindBuffer(BufferTarget.ArrayBuffer, vbo);
-            Gl.BufferData(BufferTarget.ArrayBuffer, sizeof(float) * (uint)Vertices.Length, Vertices, usage);
+            Gl.BufferData(BufferTarget.ArrayBuffer, sizeof(float) * (uint)count, vertices, usage);
         }
     }
 }

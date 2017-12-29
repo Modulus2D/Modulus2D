@@ -143,17 +143,17 @@ namespace Modulus2D.Math
             return new Vector2(v1.X + v2.X, v1.Y + v2.Y);
         }
 
-        public Vector2 Sub(Vector2 v1, Vector2 v2)
+        public static Vector2 Sub(Vector2 v1, Vector2 v2)
         {
             return new Vector2(v1.X - v2.X, v1.Y - v2.Y);
         }
 
-        public Vector2 Mul(Vector2 v1, Vector2 v2)
+        public static Vector2 Mul(Vector2 v1, Vector2 v2)
         {
             return new Vector2(v1.X * v2.X, v1.Y * v2.Y);
         }
 
-        public Vector2 Div(Vector2 v1, Vector2 v2)
+        public static Vector2 Div(Vector2 v1, Vector2 v2)
         {
             return new Vector2(v1.X / v2.X, v1.Y / v2.Y);
         }
@@ -231,12 +231,22 @@ namespace Modulus2D.Math
         // Vector and vector
         public static Vector2 operator +(Vector2 v1, Vector2 v2)
         {
-            return v1.Add(v2);
+            return Add(v1, v2);
         }
 
         public static Vector2 operator -(Vector2 v1, Vector2 v2)
         {
-            return v1.Sub(v2);
+            return Sub(v1, v2);
+        }
+
+        public static Vector2 operator *(Vector2 v1, Vector2 v2)
+        {
+            return Mul(v1, v2);
+        }
+
+        public static Vector2 operator /(Vector2 v1, Vector2 v2)
+        {
+            return Div(v1, v2);
         }
 
         // Vector and scalar
@@ -285,17 +295,6 @@ namespace Modulus2D.Math
         public static Vector2 operator -(Vector2 v1)
         {
             return v1.Negate();
-        }
-
-        // TODO: Is there a more efficient way to do this?
-        internal static Microsoft.Xna.Framework.Vector2 Convert(Vector2 vec)
-        {
-            return new Microsoft.Xna.Framework.Vector2(vec.X, vec.Y);
-        }
-
-        internal static Vector2 Convert(Microsoft.Xna.Framework.Vector2 vec)
-        {
-            return new Vector2(vec.X, vec.Y);
         }
     }
 }

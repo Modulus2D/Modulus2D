@@ -1,4 +1,4 @@
-﻿/*using Modulus2D.Entities;
+﻿using Modulus2D.Entities;
 using Modulus2D.Core;
 
 namespace Modulus2D.Graphics
@@ -25,9 +25,7 @@ namespace Modulus2D.Graphics
         }
 
         public override void Update(float deltaTime)
-        {
-            batch.Begin();
-            
+        {            
             foreach (int id in World.Iterate(filter))
             {
                 TransformComponent transform = transformComponents.Get(id);
@@ -43,4 +41,3 @@ namespace Modulus2D.Graphics
         }
     }
 }
-*/

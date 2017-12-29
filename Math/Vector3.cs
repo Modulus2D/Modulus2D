@@ -155,17 +155,17 @@ namespace Modulus2D.Math
             return new Vector3(v1.X + v2.X, v1.Y + v2.Y, v1.Z + v2.Z);
         }
 
-        public Vector3 Sub(Vector3 v1, Vector3 v2)
+        public static Vector3 Sub(Vector3 v1, Vector3 v2)
         {
             return new Vector3(v1.X - v2.X, v1.Y - v2.Y, v1.Z - v2.Z);
         }
 
-        public Vector3 Mul(Vector3 v1, Vector3 v2)
+        public static Vector3 Mul(Vector3 v1, Vector3 v2)
         {
             return new Vector3(v1.X * v2.X, v1.Y * v2.Y, v1.Z * v2.Z);
         }
 
-        public Vector3 Div(Vector3 v1, Vector3 v2)
+        public static Vector3 Div(Vector3 v1, Vector3 v2)
         {
             return new Vector3(v1.X / v2.X, v1.Y / v2.Y, v1.Z / v2.Z);
         }
@@ -255,12 +255,22 @@ namespace Modulus2D.Math
         // Vector and vector
         public static Vector3 operator +(Vector3 v1, Vector3 v2)
         {
-            return v1.Add(v2);
+            return Add(v1, v2);
         }
 
         public static Vector3 operator -(Vector3 v1, Vector3 v2)
         {
-            return v1.Sub(v2);
+            return Sub(v1, v2);
+        }
+
+        public static Vector3 operator *(Vector3 v1, Vector3 v2)
+        {
+            return Mul(v1, v2);
+        }
+
+        public static Vector3 operator /(Vector3 v1, Vector3 v2)
+        {
+            return Div(v1, v2);
         }
 
         // Vector and scalar

@@ -32,15 +32,23 @@ namespace Modulus2D.Graphics
         void Clear();
 
         /// <summary>
+        /// Binds the given texture
+        /// </summary>
+        void SetTexture(Texture texture);
+
+        /// <summary>
+        /// Binds the given shader
+        /// </summary>
+        void SetShader(Shader shader);
+
+        /// <summary>
         /// Draws the given vertex array
         /// </summary>
-        /// <param name="array"></param>
-        void Draw(VertexArray array);
+        void Draw(VertexArray array, int count);
 
         /// <summary>
         /// Draws the given vertex array with the given indices
         /// </summary>
-        /// <param name="array"></param>
         void Draw(VertexArray array, uint[] indices, int count);
     }
 }

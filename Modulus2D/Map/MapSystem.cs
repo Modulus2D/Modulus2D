@@ -1,23 +1,18 @@
-﻿/*using FarseerPhysics.Collision.Shapes;
-using FarseerPhysics.Common;
-using Microsoft.Xna.Framework;
-using Modulus2D.Entities;
+﻿using Modulus2D.Entities;
 using Modulus2D.Graphics;
 using Modulus2D.Physics;
-using SFML.Graphics;
-using SFML.System;
 using System.Collections.Generic;
 using TiledSharp;
 
 namespace Modulus2D.Map
 {
-    public class MapSystem : EntitySystem
+    /*public class MapSystem : EntitySystem
     {
         // TODO: Seperate MapSystem and MapRenderSystem classes?
         private bool render = false;
 
         private List<MapComponent> maps = new List<MapComponent>();
-        private List<PhysicsComponent> physicsComponents = new List<PhysicsComponent>();
+        private List<Rigidbody> rigidbodyComponents = new List<Rigidbody>();
 
         private SpriteBatch batch;
 
@@ -40,7 +35,7 @@ namespace Modulus2D.Map
         {
             for (int i = 0; i < maps.Count; i++)
             {
-                Load(maps[i], physicsComponents[i]);
+                Load(maps[i], rigidbodyComponents[i]);
             }
         }
 
@@ -59,7 +54,7 @@ namespace Modulus2D.Map
             Load(map, physics);
 
             maps.Add(map);
-            physicsComponents.Add(physics);
+            rigidbodyComponents.Add(physics);
         }
 
         private void Load(MapComponent map, PhysicsComponent physics)
@@ -119,12 +114,10 @@ namespace Modulus2D.Map
             // Draw into array if rendering enabled
             if (render)
             {
-                // Create vertices
-                map.Vertices = new SFML.Graphics.VertexArray(PrimitiveType.Quads);
+                map.VertexArray = new VertexArray();
 
                 // Load texture
-                SFML.Graphics.Texture texture = new SFML.Graphics.Texture(tiles.Image.Source);
-                map.States = new RenderStates(texture);
+                Texture texture = new Texture(tiles.Image.Source);
 
                 foreach (TmxLayer layer in tmxMap.Layers)
                 {
@@ -144,14 +137,14 @@ namespace Modulus2D.Map
 
                             float halfWidth = 0.5f;
                             float halfHeight = 0.5f;
-
-                            map.Vertices.Append(new Vertex(new Vector2f(tile.X - halfWidth,
+                            
+                            map.Vertices.Add(new Vertex(new Vector2f(tile.X - halfWidth,
                                                                         tile.Y - halfHeight), new Vector2f(uvX, uvY)));
-                            map.Vertices.Append(new Vertex(new Vector2f(tile.X + halfWidth,
+                            map.Vertices.Add(new Vertex(new Vector2f(tile.X + halfWidth,
                                                                         tile.Y - halfHeight), new Vector2f(uvX + tiles.TileWidth, uvY)));
-                            map.Vertices.Append(new Vertex(new Vector2f(tile.X + halfWidth,
+                            map.Vertices.Add(new Vertex(new Vector2f(tile.X + halfWidth,
                                                                         tile.Y + halfHeight), new Vector2f(uvX + tiles.TileWidth, uvY + tiles.TileHeight)));
-                            map.Vertices.Append(new Vertex(new Vector2f(tile.X - halfWidth,
+                            map.Vertices.Add(new Vertex(new Vector2f(tile.X - halfWidth,
                                                                         tile.Y + halfHeight), new Vector2f(uvX, uvY + tiles.TileHeight)));
                         }
                     }
@@ -174,5 +167,5 @@ namespace Modulus2D.Map
                 batch.End();
             }
         }
-    }
-}*/
+    }*/
+}

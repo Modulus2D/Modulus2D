@@ -220,45 +220,53 @@ namespace Modulus2D.Graphics
             shader.Set(viewProj, camera.Update());
 
             // Update vertices
-            vertexArray.Vertices = vertices;
+            // 4 components per vertex, 4 vertices per sprite
+            vertexArray.Upload(vertices, index * 16);
 
             // Bind texture
-            texture.Bind();
+            target.SetTexture(texture);
+
+            // Bind shader
+            target.SetShader(shader);
 
             // Draw vertices
+            // 6 indices per sprite
             target.Draw(vertexArray, indices, index * 6);
 
             // Reset
             index = 0;
         }
+        
+        public void Draw(Texture texture, Vector2 position)
+        {
+            Draw(texture, position, new Vector2(1f, 1f), new Vector2(0f, 0f), new Vector2(1f, 1f), 0f);
+        }
+
+        public void Draw(Texture texture, Vector2 position, float rotation)
+        {
+            Draw(texture, position, new Vector2(1f, 1f), new Vector2(0f, 0f), new Vector2(1f, 1f), rotation);
+        }
+
+        public void Draw(Texture texture, Vector2 position, Vector2 scale)
+        {
+            Draw(texture, position, scale, new Vector2(0f, 0f), new Vector2(1f, 1f), 0f);
+        }
+
+        public void Draw(Texture texture, Vector2 position, Vector2 scale, float rotation)
+        {
+            Draw(texture, position, scale, new Vector2(0f, 0f), new Vector2(1f, 1f), rotation);
+        }
 
         /*
-        public void Draw(SFML.Graphics.Texture texture, Vector2 position)
-        {
-            Draw(texture, position, new Vector2(1f, 1f), new Vector2(0f, 0f), new Vector2(texture.Size.X, texture.Size.Y), 0f);
-        }
-
-        public void Draw(SFML.Graphics.Texture texture, Vector2 position, float rotation)
-        {
-            Draw(texture, position, new Vector2(1f, 1f), new Vector2(0f, 0f), new Vector2(texture.Size.X, texture.Size.Y), rotation);
-        }
-
-        public void Draw(SFML.Graphics.Texture texture, Vector2 position, Vector2 scale)
-        {
-            Draw(texture, position, scale, new Vector2(0f, 0f), new Vector2(texture.Size.X, texture.Size.Y), 0f);
-        }
-
-        public void Draw(SFML.Graphics.Texture texture, Vector2 position, Vector2 scale, float rotation)
-        {
-            Draw(texture, position, scale, new Vector2(0f, 0f), new Vector2(texture.Size.X, texture.Size.Y), rotation);
-        }
-
-        public void Draw(SFML.Graphics.VertexArray vertices, RenderStates states)
-        {
-            target.Draw(vertices, states);
-        }
-
-        public static void DrawRegion(SFML.Graphics.Texture texture, Vector2 position, Vector2 uv1, Vector2 uv2, SFML.Graphics.VertexArray array)
+        /// <summary>
+        /// Draws an array to 
+        /// </summary>
+        /// <param name="texture"></param>
+        /// <param name="position"></param>
+        /// <param name="uv1"></param>
+        /// <param name="uv2"></param>
+        /// <param name="array"></param>
+        public static void DrawArray(Texture texture, Vector2 position, Vector2 uv1, Vector2 uv2, VertexArray array)
         {
             float halfWidth = 32f * PixelsToMeters * 0.5f;
             float halfHeight = 32f * PixelsToMeters * 0.5f;

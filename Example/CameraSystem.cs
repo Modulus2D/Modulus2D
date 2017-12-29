@@ -1,4 +1,4 @@
-﻿/*using Modulus2D.Core;
+﻿using Modulus2D.Core;
 using Modulus2D.Entities;
 using Modulus2D.Graphics;
 using Modulus2D.Network;
@@ -26,10 +26,9 @@ namespace Example
         {
             if (targets.Count > 0)
             {
-                camera.Position += (targets[0].Position - camera.Position) * lerp * deltaTime;
+                camera.Center += (targets[0].Position - camera.Center) * lerp * deltaTime;
                 camera.Update();
             }
         }
     }
 }
-*/

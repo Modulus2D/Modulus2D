@@ -24,7 +24,7 @@ namespace Modulus2D.Graphics
 
         private float angle = 0f;
 
-        private Vector3 center;
+        private Vector2 center;
 
         private bool centerDirty = true;
         private bool angleDirty = true;
@@ -67,7 +67,7 @@ namespace Modulus2D.Graphics
             }
         }
 
-        public Vector3 Center
+        public Vector2 Center
         {
             get => center;
             set
@@ -110,7 +110,7 @@ namespace Modulus2D.Graphics
 
             if (centerDirty)
             {
-                translationView = Matrix4.Translate(-Center);
+                translationView = Matrix4.Translate(new Vector3(-Center.X, -Center.Y, 0f));
 
                 centerDirty = false;
                 recalcView = true;
@@ -124,7 +124,7 @@ namespace Modulus2D.Graphics
 
             if (projDirty)
             {
-                proj = Matrix4.Ortho(aspect * Size, -aspect * Size, Size, -Size, far, near);
+                proj = Matrix4.Ortho(aspect * Size, -aspect * Size, -Size, Size, far, near);
 
                 projDirty = false;
                 recalc = true;

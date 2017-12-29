@@ -1,7 +1,12 @@
-﻿using Modulus2D.Core;
+﻿using Example;
+using Modulus2D.Core;
 using Modulus2D.Entities;
 using Modulus2D.Graphics;
+using Modulus2D.Input;
 using Modulus2D.Network;
+using Modulus2D.Physics;
+using SFML.Window;
+using System;
 
 namespace ExampleGame
 {
@@ -13,7 +18,7 @@ namespace ExampleGame
         public override void Start()
         {
             world = new EntityWorld();
-            /*
+            
             // Add physics system
             PhysicsSystem physicsSystem = new PhysicsSystem()
             {
@@ -30,15 +35,15 @@ namespace ExampleGame
             world.AddSystem(spriteSystem);
 
             // Add map system
-            MapSystem maps = new MapSystem(batch);
-            world.AddSystem(maps);
+            //MapSystem maps = new MapSystem(batch);
+            //world.AddSystem(maps);
             
             // Load map
-            Entity map = world.Create();
+            /*Entity map = world.Create();
             map.AddComponent(new TransformComponent());
-            map.AddComponent(new PhysicsComponent());
-            map.GetComponent<PhysicsComponent>().Body.IsStatic = true;
-            map.AddComponent(new MapComponent("Maps/Test.tmx"));
+            map.AddComponent(new Rigidbody());
+            map.GetComponent<Rigidbody>().IsStatic = true;
+            map.AddComponent(new MapComponent("Maps/Test.tmx"));*/
 
             // Create debug system
             OneShotInput reload = new OneShotInput();
@@ -46,14 +51,10 @@ namespace ExampleGame
 
             reload.AddKey(Keyboard.Key.R, 1f);
 
-            world.AddSystem(new DebugSystem(maps, reload));
+            //world.AddSystem(new DebugSystem(maps, reload));
 
             // Create camera
-            OrthoCamera camera = new OrthoCamera(new Viewport(Graphics.Size.X, Graphics.Size.Y, 10f))
-            {
-                Position = new Vector2(0f, 0f)
-            };
-            batch.Camera = camera;
+            batch.Camera.Size = 10f;
 
             // Add player system
             PlayerSystem playerSystem = new PlayerSystem(physicsSystem);
@@ -78,7 +79,7 @@ namespace ExampleGame
             world.AddSystem(new PlayerInputSystem(moveX, jump));
 
             // Add camera system
-            CameraSystem cameraSystem = new CameraSystem(camera);
+            CameraSystem cameraSystem = new CameraSystem(batch.Camera);
             world.AddSystem(cameraSystem);
 
             // Add client system
@@ -98,12 +99,12 @@ namespace ExampleGame
                 sprites.AddSprite(new Texture("Textures/Face.png"));
                 entity.AddComponent(sprites);
                 
-                PhysicsComponent physics = entity.GetComponent<PhysicsComponent>();
-                physics.Mode = PhysicsComponent.NetMode.Interpolate;
+                PhysicsComponent rigidbody = entity.GetComponent<PhysicsComponent>();
+                rigidbody.Mode = PhysicsComponent.NetMode.Interpolate;
 
                 NetComponent network = entity.GetComponent<NetComponent>();
 
-                network.AddReceiver(physics);
+                network.AddReceiver(rigidbody);
             });
 
             clientSystem.RegisterEvent("control", (args) =>
@@ -120,7 +121,7 @@ namespace ExampleGame
                 entity.GetComponent<NetComponent>().AddTransmitter(entity.GetComponent<PlayerComponent>());
             });
 
-            world.AddSystem(new ClientPhysicsSystem(clientSystem));*/
+            world.AddSystem(new ClientPhysicsSystem(clientSystem));
             
             // Add FPS counter
             world.AddSystem(new FPSCounterSystem());

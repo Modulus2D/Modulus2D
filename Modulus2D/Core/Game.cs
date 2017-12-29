@@ -2,7 +2,6 @@
 using System.Diagnostics;
 using NLog;
 using Modulus2D.Graphics;
-using Modulus2D.Resources;
 using System;
 using Modulus2D.Math;
 
@@ -18,10 +17,8 @@ namespace Modulus2D.Core
         // Input
         private InputManager input;
 
-        private ResourceManager resourceManager;
-
         // Window
-        // private RenderWindow window;
+        private Window window;
 
         // Time
         private Stopwatch stopwatch;
@@ -40,45 +37,31 @@ namespace Modulus2D.Core
             set
             {
                 state = value;
-                // state.Graphics = window;
+                state.Graphics = window;
                 state.Input = input;
             }
         }
 
         public void Start(State state, string name, int width, int height)
         {
-            /*// Add input handlers
-            window.KeyPressed += new EventHandler<KeyEventArgs>(input.OnKeyPressed);
-            window.KeyReleased += new EventHandler<KeyEventArgs>(input.OnKeyReleased);
-            window.JoystickButtonPressed += new EventHandler<JoystickButtonEventArgs>(input.OnJoystickButtonPressed);
-            window.JoystickButtonReleased += new EventHandler<JoystickButtonEventArgs>(input.OnJoystickButtonReleased);*/
-
-            // Set state
-            State = state;
-            state.Start();
-
-            resourceManager = new ResourceManager();
-
-            Window window = new Window(name, width, height)
+            // Create window
+            window = new Window(name, width, height)
             {
                 ClearColor = new Color(0.1f, 0.1f, 0.1f)
             };
 
+            // Set input manager
+            window.SetInput(input);
+
+            // Set state
             State = state;
             state.Start();
-
-            SpriteBatch batch = new SpriteBatch(window);
             
-            Texture texture = new Texture("Textures/Wheel.png");
-
             while (window.Open)
             {
                 window.Dispatch();
                 
                 window.Clear();
-
-                batch.Draw(texture, new Vector2(0f, 0f), new Vector2(1f, 1f), new Vector2(0f, 0f), new Vector2(1f, 1f), 0f);
-                batch.End();
 
                 Update();
 

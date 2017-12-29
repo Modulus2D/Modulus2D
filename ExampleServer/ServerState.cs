@@ -7,7 +7,6 @@ using Modulus2D.Graphics;
 using Modulus2D.Map;
 using Modulus2D.Network;
 using Modulus2D.Physics;
-using Modulus2D.Player.Platformer;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,7 +27,7 @@ namespace ExampleServer
             PhysicsSystem physicsSystem = new PhysicsSystem();
             world.AddSystem(physicsSystem);
 
-            // Add map system
+            /*// Add map system
             MapSystem maps = new MapSystem()
             {
                 Priority = -1 // Render map last
@@ -40,7 +39,7 @@ namespace ExampleServer
             map.AddComponent(new TransformComponent());
             map.AddComponent(new Rigidbody());
             map.GetComponent<Rigidbody>().Body.IsStatic = true;
-            map.AddComponent(new MapComponent("Maps/Test.tmx"));
+            map.AddComponent(new MapComponent("Maps/Test.tmx"));*/
 
             // Add player system
             PlayerSystem playerSystem = new PlayerSystem(physicsSystem);
@@ -88,7 +87,7 @@ namespace ExampleServer
 
                 NetComponent network = entity.GetComponent<NetComponent>();
 
-                network.AddTransmitter(entity.GetComponent<Rigidbody>());
+                network.AddTransmitter(entity.GetComponent<PhysicsComponent>());
                 network.AddReceiver(entity.GetComponent<PlayerComponent>());
             });
 

@@ -1,5 +1,5 @@
-﻿/*using Microsoft.Xna.Framework;
-using Modulus2D.Entities;
+﻿using Modulus2D.Entities;
+using Modulus2D.Math;
 using Modulus2D.Network;
 using SFML.System;
 using System;
@@ -15,7 +15,7 @@ namespace Modulus2D.Physics
     {
         private EntityFilter filter;
         private ComponentStorage<NetComponent> netComponents;
-        private ComponentStorage<PhysicsComponent> physicsComponents;
+        private ComponentStorage<PhysicsComponent> rigidbodyComponents;
         
         private float maxPositionDistance = 0.2f;
         private float predictLerp = 0.2f;
@@ -52,9 +52,9 @@ namespace Modulus2D.Physics
         public override void OnAdded()
         {
             netComponents = World.GetStorage<NetComponent>();
-            physicsComponents = World.GetStorage<PhysicsComponent>();
+            rigidbodyComponents = World.GetStorage<PhysicsComponent>();
 
-            filter = new EntityFilter(netComponents, physicsComponents);
+            filter = new EntityFilter(netComponents, rigidbodyComponents);
         }
 
         public override void Update(float deltaTime)
@@ -63,27 +63,27 @@ namespace Modulus2D.Physics
             foreach (int id in World.Iterate(filter))
             {
                 NetComponent network = netComponents.Get(id);
-                PhysicsComponent physics = physicsComponents.Get(id);
+                PhysicsComponent rigidbody = rigidbodyComponents.Get(id);
 
-                switch(physics.Mode)
+                switch(rigidbody.Mode)
                 {
                     case PhysicsComponent.NetMode.Raw:
-                        physics.Body.Position = physics.correctPosition;
+                        rigidbody.Position = rigidbody.CorrectPosition;
 
                         break;
                     case PhysicsComponent.NetMode.Interpolate:
-                        if (delta != 0f && physics.lastPosition != null && physics.correctPosition != null)
+                        if (delta != 0f && rigidbody.LastPosition != null && rigidbody.CorrectPosition != null)
                         {
-                            physics.Body.Position = Vector2.Lerp(physics.lastPosition, physics.correctPosition, (float)stopwatch.Elapsed.TotalSeconds / delta);
-                            physics.Body.Rotation = physics.correctRotation + (physics.correctRotation - physics.lastRotation) * (float)stopwatch.Elapsed.TotalSeconds / delta;
+                            rigidbody.Position = rigidbody.LastPosition + (rigidbody.CorrectPosition - rigidbody.LastPosition) * ((float)stopwatch.Elapsed.TotalSeconds / delta);
+                            rigidbody.Rotation = rigidbody.CorrectRotation + (rigidbody.CorrectRotation - rigidbody.LastRotation) * (float)stopwatch.Elapsed.TotalSeconds / delta;
                         }
 
                         break;
                     case PhysicsComponent.NetMode.Predict:
-                        float distance = Vector2.Distance(physics.Body.Position, physics.lastPosition);
-                        if (distance > MaxPositionDistance && physics.lastPosition != null && physics.correctPosition != null)
+                        float distance = Vector2.Distance(rigidbody.Position, rigidbody.LastPosition);
+                        if (distance > MaxPositionDistance && rigidbody.LastPosition != null && rigidbody.CorrectPosition != null)
                         {
-                            physics.Body.Position += (physics.lastPosition - physics.Body.Position) * PredictLerp * deltaTime * distance;
+                            rigidbody.Position += (rigidbody.LastPosition - rigidbody.Position) * PredictLerp * deltaTime * distance;
                         }
 
                         // physics.Body.Rotation += (physics.correctRotation - physics.Body.Rotation) * PredictLerp * deltaTime;
@@ -97,4 +97,3 @@ namespace Modulus2D.Physics
         }
     }
 }
-*/

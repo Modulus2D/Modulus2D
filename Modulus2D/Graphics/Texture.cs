@@ -40,7 +40,7 @@ namespace Modulus2D.Graphics
             Gl.GenerateMipmap(TextureTarget.Texture2d);
         }
 
-        public void Bind()
+        internal void Bind()
         {
             Gl.BindTexture(TextureTarget.Texture2d, id);
         }
