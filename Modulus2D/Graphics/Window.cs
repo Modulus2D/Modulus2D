@@ -44,6 +44,7 @@ namespace Modulus2D.Graphics
             // Create window
             window = new SFML.Window.Window(new VideoMode((uint)width, (uint)height), name);
             window.SetActive(true);
+            // window.SetVerticalSyncEnabled(true);
 
             Open = true;
 
@@ -70,6 +71,8 @@ namespace Modulus2D.Graphics
         public void Clear()
         {
             Gl.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
+            Gl.Enable(EnableCap.Blend);
+            Gl.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
         }
 
         public void Swap()
@@ -82,6 +85,7 @@ namespace Modulus2D.Graphics
             if(texture != currentTexture)
             {
                 texture.Bind();
+                currentTexture = texture;
             }
         }
 
@@ -90,6 +94,7 @@ namespace Modulus2D.Graphics
             if(shader != currentShader)
             {
                 shader.Bind();
+                currentShader = shader;
             }
         }
 

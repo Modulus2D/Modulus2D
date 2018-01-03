@@ -1,4 +1,5 @@
-﻿using Modulus2D.Entities;
+﻿using FarseerPhysics.Dynamics;
+using Modulus2D.Entities;
 using Modulus2D.Math;
 using Modulus2D.Network;
 using SFML.System;
@@ -15,7 +16,7 @@ namespace Modulus2D.Physics
     {
         private EntityFilter filter;
         private ComponentStorage<NetComponent> netComponents;
-        private ComponentStorage<PhysicsComponent> rigidbodyComponents;
+        private ComponentStorage<PhysicsComponent> physicsComponents;
         
         private float maxPositionDistance = 0.2f;
         private float predictLerp = 0.2f;
@@ -52,9 +53,9 @@ namespace Modulus2D.Physics
         public override void OnAdded()
         {
             netComponents = World.GetStorage<NetComponent>();
-            rigidbodyComponents = World.GetStorage<PhysicsComponent>();
+            physicsComponents = World.GetStorage<PhysicsComponent>();
 
-            filter = new EntityFilter(netComponents, rigidbodyComponents);
+            filter = new EntityFilter(netComponents, physicsComponents);
         }
 
         public override void Update(float deltaTime)
@@ -63,27 +64,28 @@ namespace Modulus2D.Physics
             foreach (int id in World.Iterate(filter))
             {
                 NetComponent network = netComponents.Get(id);
-                PhysicsComponent rigidbody = rigidbodyComponents.Get(id);
+                PhysicsComponent physics = physicsComponents.Get(id);
+                Body body = physics.Body;
 
-                switch(rigidbody.Mode)
+                switch(physics.Mode)
                 {
                     case PhysicsComponent.NetMode.Raw:
-                        rigidbody.Position = rigidbody.CorrectPosition;
+                        body.Position = physics.CorrectPosition;
 
                         break;
                     case PhysicsComponent.NetMode.Interpolate:
-                        if (delta != 0f && rigidbody.LastPosition != null && rigidbody.CorrectPosition != null)
+                        if (delta != 0f && physics.LastPosition != null && physics.CorrectPosition != null)
                         {
-                            rigidbody.Position = rigidbody.LastPosition + (rigidbody.CorrectPosition - rigidbody.LastPosition) * ((float)stopwatch.Elapsed.TotalSeconds / delta);
-                            rigidbody.Rotation = rigidbody.CorrectRotation + (rigidbody.CorrectRotation - rigidbody.LastRotation) * (float)stopwatch.Elapsed.TotalSeconds / delta;
+                            body.Position = physics.LastPosition + (physics.CorrectPosition - physics.LastPosition) * ((float)stopwatch.Elapsed.TotalSeconds / delta);
+                            body.Rotation = physics.CorrectRotation + (physics.CorrectRotation - physics.LastRotation) * (float)stopwatch.Elapsed.TotalSeconds / delta;
                         }
 
                         break;
                     case PhysicsComponent.NetMode.Predict:
-                        float distance = Vector2.Distance(rigidbody.Position, rigidbody.LastPosition);
-                        if (distance > MaxPositionDistance && rigidbody.LastPosition != null && rigidbody.CorrectPosition != null)
+                        float distance = Vector2.Distance(body.Position, physics.LastPosition);
+                        if (distance > MaxPositionDistance && physics.LastPosition != null && physics.CorrectPosition != null)
                         {
-                            rigidbody.Position += (rigidbody.LastPosition - rigidbody.Position) * PredictLerp * deltaTime * distance;
+                            body.Position += (physics.LastPosition - body.Position) * PredictLerp * deltaTime * distance;
                         }
 
                         // physics.Body.Rotation += (physics.correctRotation - physics.Body.Rotation) * PredictLerp * deltaTime;

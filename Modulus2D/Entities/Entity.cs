@@ -17,9 +17,11 @@ namespace Modulus2D.Entities
             world = entityWorld;
         }
 
-        public void AddComponent<T>(T component) where T : IComponent
+        public T AddComponent<T>(T component) where T : IComponent
         {
             world.AddComponent(id, component);
+
+            return component;
         }
 
         public T GetComponent<T>() where T : IComponent

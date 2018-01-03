@@ -16,53 +16,72 @@ namespace Modulus2D.Math
         /// <summary>
         /// Origin
         /// </summary>
-        public static Vector4 Zero = new Vector4(0f, 0f, 0f, 0f);
+        public static Vector4 Zero { get => new Vector4(0f, 0f, 0f, 0f); }
 
         /// <summary>
         /// One unit in each direction
         /// </summary>
-        public static Vector4 One = new Vector4(1f, 1f, 0f, 0f);
+        public static Vector4 One { get => new Vector4(1f, 1f, 1f, 1f); }
 
         /// <summary>
         /// Unit vector pointing in the positive X direction
         /// </summary>
-        public static Vector4 Right = new Vector4(1f, 0f, 0f, 0f);
+        public static Vector4 Right { get => new Vector4(1f, 0f, 0f, 0f); }
 
         /// <summary>
         /// Unit vector pointing in the negative X direction
         /// </summary>
-        public static Vector4 Left = new Vector4(-1f, 0f, 0f, 0f);
+        public static Vector4 Left { get => new Vector4(-1f, 0f, 0f, 0f); }
 
         /// <summary>
         /// Unit vector pointing in the positive Y direction
         /// </summary>
-        public static Vector4 Up = new Vector4(0f, 1f, 0f, 0f);
+        public static Vector4 Up { get => new Vector4(0f, 1f, 0f, 0f); }
 
         /// <summary>
         /// Unit vector pointing in the negative Y direction
         /// </summary>
-        public static Vector4 Down = new Vector4(0f, -1f, 0f, 0f);
+        public static Vector4 Down { get => new Vector4(0f, -1f, 0f, 0f); }
 
         /// <summary>
         /// Unit vector pointing in the positive Z direction
         /// </summary>
-        public static Vector4 Forward = new Vector4(0f, 0f, 1f, 0f);
+        public static Vector4 Forward { get => new Vector4(0f, 0f, 1f, 0f); }
 
         /// <summary>
         /// Unit vector pointing in the negative Z direction
         /// </summary>
-        public static Vector4 Backward = new Vector4(0f, 0f, -1f, 0f);
+        public static Vector4 Backward { get => new Vector4(0f, 0f, -1f, 0f); }
 
         /// <summary>
         /// Unit vector pointing in the positive W direction
         /// </summary>
-        public static Vector4 Ana = new Vector4(0f, 0f, 0f, 1f);
+        public static Vector4 Ana { get => new Vector4(0f, 0f, 0f, 1f); }
         
         /// <summary>
         /// Unit vector pointing in the negative W direction
         /// </summary>
-        public static Vector4 Kata = new Vector4(0f, 0f, 0f, -1f);
+        public static Vector4 Kata { get => new Vector4(0f, 0f, 0f, -1f); }
 
+        /// <summary>
+        /// Create a 4D vector with each element equal to the given value
+        /// </summary>
+        /// <param name="value"></param>
+        public Vector4(float value)
+        {
+            X = value;
+            Y = value;
+            Z = value;
+            W = value;
+        }
+
+        /// <summary>
+        /// Create a 4D vector with the given elements
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <param name="z"></param>
+        /// <param name="w"></param>
         public Vector4(float x, float y, float z,float w)
         {
             X = x;
@@ -70,32 +89,30 @@ namespace Modulus2D.Math
             Z = z;
             W = w;
         }
-
-        // Normalize
-        public Vector4 Normalize()
-        {
-            float length = Length();
-            return new Vector4(X / length, Y / length, Z / length, W / length);
-        }
-
-        // Normalize (static)
-        public static Vector4 Normalize(Vector4 v)
-        {
-            return v.Normalize();
-        }
-
-        // Negate
-        public Vector4 Negate()
-        {
-            return new Vector4(-X, -Y, -Z, -W);
-        }
-
+        
         // Negate (static)
         public static Vector4 Negate(Vector4 vec)
         {
             return new Vector4(-vec.X, -vec.Y, -vec.Z, -vec.W);
         }
 
+        // Normalize
+        public void Normalize()
+        {
+            float length = Length();
+            X /= length;
+            Y /= length;
+            Z /= length;
+            W /= length;
+        }
+
+        // Normalize (static)
+        public static Vector4 Normalize(Vector4 vec)
+        {
+            vec.Normalize();
+            return vec;
+        }
+        
         // Length
         public float Length()
         {
@@ -122,12 +139,13 @@ namespace Modulus2D.Math
 
         public static float Distance(Vector4 vec1, Vector4 vec2)
         {
-            return (vec1 - vec2).Length();
+            return (float)System.Math.Sqrt(DistanceSquared(vec1, vec2));
         }
 
         public static float DistanceSquared(Vector4 vec1, Vector4 vec2)
         {
-            return (vec1 - vec2).LengthSquared();
+            return (vec1.X - vec2.X) * (vec1.X - vec2.X) + (vec1.Y - vec2.Y) * (vec1.Y - vec2.Y) +
+                (vec1.Z - vec2.Z) * (vec1.Z - vec2.Z) + (vec1.W - vec2.W) * (vec1.W - vec2.W);
         }
 
         public static Vector4 Max(Vector4 vec1, Vector4 vec2)
@@ -139,47 +157,26 @@ namespace Modulus2D.Math
         {
             return new Vector4(System.Math.Min(vec1.X, vec2.X), System.Math.Min(vec1.Y, vec2.Y), System.Math.Min(vec1.Z, vec2.Z), System.Math.Min(vec1.W, vec2.W));
         }
-
-        // Vector and vector
-        public Vector4 Add(Vector4 other)
-        {
-            return new Vector4(X + other.X, Y + other.Y, Z + other.Z, W + other.W);
-        }
-
-        public Vector4 Sub(Vector4 other)
-        {
-            return new Vector4(X - other.X, Y - other.Y, Z - other.Z, W - other.W);
-        }
-
-        public Vector4 Mul(Vector4 other)
-        {
-            return new Vector4(X * other.X, Y * other.Y, Z * other.Z, W * other.W);
-        }
-
-        public Vector4 Div(Vector4 other)
-        {
-            return new Vector4(X / other.X, Y / other.Y, Z / other.Z, W / other.W);
-        }
-
+        
         // Vector and vector (static)
-        public static Vector4 Add(Vector4 v1, Vector4 v2)
+        public static Vector4 Add(Vector4 vec1, Vector4 vec2)
         {
-            return new Vector4(v1.X + v2.X, v1.Y + v2.Y, v1.Z + v2.Z, v1.W + v2.W);
+            return new Vector4(vec1.X + vec2.X, vec1.Y + vec2.Y, vec1.Z + vec2.Z, vec1.W + vec2.W);
         }
 
-        public static Vector4 Sub(Vector4 v1, Vector4 v2)
+        public static Vector4 Sub(Vector4 vec1, Vector4 vec2)
         {
-            return new Vector4(v1.X - v2.X, v1.Y - v2.Y, v1.Z - v2.Z, v1.W - v2.W);
+            return new Vector4(vec1.X - vec2.X, vec1.Y - vec2.Y, vec1.Z - vec2.Z, vec1.W - vec2.W);
         }
 
-        public static Vector4 Mul(Vector4 v1, Vector4 v2)
+        public static Vector4 Mul(Vector4 vec1, Vector4 vec2)
         {
-            return new Vector4(v1.X * v2.X, v1.Y * v2.Y, v1.Z * v2.Z, v1.W * v2.W);
+            return new Vector4(vec1.X * vec2.X, vec1.Y * vec2.Y, vec1.Z * vec2.Z, vec1.W * vec2.W);
         }
 
-        public static Vector4 Div(Vector4 v1, Vector4 v2)
+        public static Vector4 Div(Vector4 vec1, Vector4 vec2)
         {
-            return new Vector4(v1.X / v2.X, v1.Y / v2.Y, v1.Z / v2.Z, v1.W / v2.W);
+            return new Vector4(vec1.X / vec2.X, vec1.Y / vec2.Y, vec1.Z / vec2.Z, vec1.W / vec2.W);
         }
 
         // Vector and scalar
@@ -253,72 +250,72 @@ namespace Modulus2D.Math
         }
 
         // Vector and vector
-        public static Vector4 operator +(Vector4 v1, Vector4 v2)
+        public static Vector4 operator +(Vector4 vec1, Vector4 vec2)
         {
-            return Add(v1, v2);
+            return Add(vec1, vec2);
         }
 
-        public static Vector4 operator -(Vector4 v1, Vector4 v2)
+        public static Vector4 operator -(Vector4 vec1, Vector4 vec2)
         {
-            return Sub(v1, v2);
+            return Sub(vec1, vec2);
         }
 
-        public static Vector4 operator *(Vector4 v1, Vector4 v2)
+        public static Vector4 operator *(Vector4 vec1, Vector4 vec2)
         {
-            return Mul(v1, v2);
+            return Mul(vec1, vec2);
         }
 
-        public static Vector4 operator /(Vector4 v1, Vector4 v2)
+        public static Vector4 operator /(Vector4 vec1, Vector4 vec2)
         {
-            return Div(v1, v2);
+            return Div(vec1, vec2);
         }
 
         // Vector and scalar
-        public static Vector4 operator +(Vector4 v1, float f)
+        public static Vector4 operator +(Vector4 vec1, float f)
         {
-            return Add(v1, f);
+            return Add(vec1, f);
         }
 
-        public static Vector4 operator -(Vector4 v1, float f)
+        public static Vector4 operator -(Vector4 vec1, float f)
         {
-            return Sub(v1, f);
+            return Sub(vec1, f);
         }
 
-        public static Vector4 operator *(Vector4 v1, float f)
+        public static Vector4 operator *(Vector4 vec1, float f)
         {
-            return Mul(v1, f);
+            return Mul(vec1, f);
         }
 
-        public static Vector4 operator /(Vector4 v1, float f)
+        public static Vector4 operator /(Vector4 vec1, float f)
         {
-            return Div(v1, f);
+            return Div(vec1, f);
         }
 
         // Flipped
-        public static Vector4 operator +(float f, Vector4 v1)
+        public static Vector4 operator +(float f, Vector4 vec1)
         {
-            return Add(v1, f);
+            return Add(vec1, f);
         }
 
-        public static Vector4 operator -(float f, Vector4 v1)
+        public static Vector4 operator -(float f, Vector4 vec1)
         {
-            return Sub(v1, f);
+            return Sub(vec1, f);
         }
 
-        public static Vector4 operator *(float f, Vector4 v1)
+        public static Vector4 operator *(float f, Vector4 vec1)
         {
-            return Mul(v1, f);
+            return Mul(vec1, f);
         }
 
-        public static Vector4 operator /(float f, Vector4 v1)
+        public static Vector4 operator /(float f, Vector4 vec1)
         {
-            return Div(v1, f);
+            return Div(vec1, f);
         }
 
         // Negate
-        public static Vector4 operator -(Vector4 v1)
+        public static Vector4 operator -(Vector4 vec)
         {
-            return v1.Negate();
+            return Negate(vec);
         }
     }
 }

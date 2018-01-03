@@ -31,10 +31,18 @@ namespace Modulus2D.Entities
         }
 
         /// <summary>
-        /// Called every update
+        /// Use this to update entitites
         /// </summary>
         /// <param name="deltaTime">The time taken to complete the last frame</param>
         public virtual void Update(float deltaTime)
+        {
+        }
+
+        /// <summary>
+        /// Use this to render entitites
+        /// </summary>
+        /// <param name="deltaTime">The time taken to complete the last frame</param>
+        public virtual void Render(float deltaTime)
         {
         }
     }

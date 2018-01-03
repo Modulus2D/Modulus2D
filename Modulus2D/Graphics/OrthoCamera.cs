@@ -124,7 +124,7 @@ namespace Modulus2D.Graphics
 
             if (projDirty)
             {
-                proj = Matrix4.Ortho(aspect * Size, -aspect * Size, -Size, Size, far, near);
+                proj = Matrix4.Ortho(aspect * Size, -aspect * Size, Size, -Size, far, near);
 
                 projDirty = false;
                 recalc = true;

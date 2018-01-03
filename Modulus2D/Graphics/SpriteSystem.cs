@@ -5,7 +5,7 @@ namespace Modulus2D.Graphics
 {
     public class SpriteSystem : EntitySystem
     {
-        private EntityFilter filter;// = new EntityFilter();
+        private EntityFilter filter;
         private ComponentStorage<TransformComponent> transformComponents;
         private ComponentStorage<SpriteRendererComponent> spriteRendererComponents;
 
@@ -24,7 +24,7 @@ namespace Modulus2D.Graphics
             filter = new EntityFilter(transformComponents, spriteRendererComponents);
         }
 
-        public override void Update(float deltaTime)
+        public override void Render(float deltaTime)
         {            
             foreach (int id in World.Iterate(filter))
             {
@@ -36,8 +36,6 @@ namespace Modulus2D.Graphics
                     batch.Draw(sprites.sprites[i].texture, transform.Position, transform.Rotation);
                 }
             }
-
-            batch.End();
         }
     }
 }

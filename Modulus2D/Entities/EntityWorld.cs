@@ -7,8 +7,8 @@ using Modulus2D.Graphics;
 
 namespace Modulus2D.Entities
 {
-    public delegate void EntityCreated(Entity entity);
-    public delegate void EntityRemoved(Entity entity);
+    public delegate void ComponentAdded(Entity entity);
+    public delegate void ComponentRemoved(Entity entity);
 
     public class EntityWorld
     {
@@ -18,8 +18,8 @@ namespace Modulus2D.Entities
 
         private Dictionary<Type, IComponentStorage> storages;
 
-        private Dictionary<Type, List<EntityCreated>> entityCreatedListeners;
-        private Dictionary<IComponentStorage, List<EntityRemoved>> entityRemovedListeners;
+        private Dictionary<Type, List<ComponentAdded>> componentAddedListeners;
+        private Dictionary<IComponentStorage, List<ComponentRemoved>> componentRemovedListeners;
 
         public EntityWorld()
         {
@@ -29,8 +29,8 @@ namespace Modulus2D.Entities
 
             storages = new Dictionary<Type, IComponentStorage>();
 
-            entityCreatedListeners = new Dictionary<Type, List<EntityCreated>>();
-            entityRemovedListeners = new Dictionary<IComponentStorage, List<EntityRemoved>>();
+            componentAddedListeners = new Dictionary<Type, List<ComponentAdded>>();
+            componentRemovedListeners = new Dictionary<IComponentStorage, List<ComponentRemoved>>();
         }
 
         public Entity Create()
@@ -49,11 +49,11 @@ namespace Modulus2D.Entities
                 // Notify listeners
                 if (storage.Has(id))
                 {
-                    List<EntityRemoved> listeners = GetRemovedListeners(storage);
+                    List<ComponentRemoved> listeners = GetRemovedListeners(storage);
                     if (listeners.Count > 0)
                     {
                         Entity entity = new Entity(id, this);
-                        foreach (EntityRemoved listener in listeners)
+                        foreach (ComponentRemoved listener in listeners)
                         {
                             listener(entity);
                         }
@@ -63,7 +63,7 @@ namespace Modulus2D.Entities
                 }
             }
 
-            // Entity must be intact until all listeners are called
+            // Entity must remain intact until all listeners are called
             for (int i = 0; i < toClear.Count; i++)
             {
                 toClear[i].Clear(id);
@@ -88,7 +88,8 @@ namespace Modulus2D.Entities
         public void AddComponent<T>(int id, T component) where T : IComponent
         {
             ComponentStorage<T> storage = GetStorage<T>();
-
+            
+            // Add intermediate items if necessary
             if (storage.list.Count < id + 1)
             {
                 // Add to end of list
@@ -96,60 +97,69 @@ namespace Modulus2D.Entities
                 {
                     storage.list.Add(default(T));
                 }
-                
-                storage.list[id] = component;
-            }
-            else
-            {
-                // Add in list
-                storage.list[id] = component;
             }
 
-            List<EntityCreated> listeners = GetCreatedListeners<T>();
-            if(listeners.Count > 0)
+            Entity entity = new Entity(id, this);
+
+            if (storage.list[id] != null)
             {
-                Entity entity = new Entity(id, this);
-                foreach (EntityCreated listener in listeners)
+                List<ComponentRemoved> removedListeners = GetRemovedListeners(storage);
+
+                if (removedListeners.Count > 0)
+                {
+                    foreach (ComponentRemoved listener in removedListeners)
+                    {
+                        listener(entity);
+                    }
+                }
+            }
+
+            storage.list[id] = component;
+            
+            List<ComponentAdded> addListeners = GetAddedListeners<T>();
+            if(addListeners.Count > 0)
+            {
+                foreach (ComponentAdded listener in addListeners)
                 {
                     listener(entity);
                 }
             }
         }
 
-        public void AddCreatedListener<T>(EntityCreated listener) where T : IComponent
+        public void AddCreatedListener<T>(ComponentAdded listener) where T : IComponent
         {
-            GetCreatedListeners<T>().Add(listener);
+            GetAddedListeners<T>().Add(listener);
         }
 
-        private List<EntityCreated> GetCreatedListeners<T>() where T : IComponent
+        private List<ComponentAdded> GetAddedListeners<T>() where T : IComponent
         {
-            if (entityCreatedListeners.TryGetValue(typeof(T), out List<EntityCreated> listeners))
+            if (componentAddedListeners.TryGetValue(typeof(T), out List<ComponentAdded> listeners))
             {
                 return listeners;
             }
             else
             {
-                List<EntityCreated> newListeners = new List<EntityCreated>();
-                entityCreatedListeners.Add(typeof(T), newListeners);
+                List<ComponentAdded> newListeners = new List<ComponentAdded>();
+                componentAddedListeners.Add(typeof(T), newListeners);
                 return newListeners;
             }
         }
 
-        public void AddRemovedListener<T>(EntityRemoved listener) where T : IComponent
+        public void AddRemovedListener<T>(ComponentRemoved listener) where T : IComponent
         {
             GetRemovedListeners(GetStorage<T>()).Add(listener);
         }
 
-        private List<EntityRemoved> GetRemovedListeners(IComponentStorage storage)
+        private List<ComponentRemoved> GetRemovedListeners(IComponentStorage storage)
         {
-            if (entityRemovedListeners.TryGetValue(storage, out List<EntityRemoved> listeners))
+            if (componentRemovedListeners.TryGetValue(storage, out List<ComponentRemoved> listeners))
             {
                 return listeners;
             }
             else
             {
-                List<EntityRemoved> newListeners = new List<EntityRemoved>();
-                entityRemovedListeners.Add(storage, newListeners);
+                List<ComponentRemoved> newListeners = new List<ComponentRemoved>();
+                componentRemovedListeners.Add(storage, newListeners);
                 return newListeners;
             }
         }
@@ -189,6 +199,15 @@ namespace Modulus2D.Entities
             for (int i = 0; i < systems.Count; i++)
             {
                 systems[i].Update(deltaTime);
+            }
+        }
+
+        public void Render(float deltaTime)
+        {
+            // Run systems
+            for (int i = 0; i < systems.Count; i++)
+            {
+                systems[i].Render(deltaTime);
             }
         }
 

@@ -31,16 +31,15 @@ namespace Modulus2D.Graphics
 
         private Texture texture;
 
-        public SpriteBatch(ITarget target)
+        public SpriteBatch(ITarget target, OrthoCamera camera)
         {
             this.target = target;
+            this.camera = camera;
 
             vertices = new float[MaxSprites * 16];
             indices = new uint[MaxSprites * 6];
 
             CreateDefaultShader();
-
-            camera = new OrthoCamera(target.Width, target.Height);
 
             vertexArray = new VertexArray()
             {
@@ -87,13 +86,13 @@ namespace Modulus2D.Graphics
 
                 in vec2 UV;
 
-                out vec3 color;
+                out vec4 color;
 
                 uniform sampler2D tex;
 
                 void main()
                 {
-                    color = texture(tex, UV).rgb;
+                    color = texture(tex, UV);
                 }
             ");
 
@@ -116,7 +115,7 @@ namespace Modulus2D.Graphics
             if (index >= MaxSprites)
             {
                 // Render if MaxSprites is exceeded
-                End();
+                Flush();
             }
 
             if (this.texture == null)
@@ -125,75 +124,76 @@ namespace Modulus2D.Graphics
             }
             else if (this.texture != texture)
             {
-                End();
+                Flush();
 
                 this.texture = texture;
             }
-
-            float halfWidth = texture.Width * scale.X * PixelsToMeters * 0.5f;
-            float halfHeight = texture.Height * scale.Y * PixelsToMeters * 0.5f;
+            
+            // UVs determine the size of the sprite relative to the size of the texture
+            float halfWidth = texture.Width * (uv2.X - uv1.X) * scale.X * PixelsToMeters * 0.5f;
+            float halfHeight = texture.Height * (uv2.Y - uv1.Y) * scale.Y * PixelsToMeters * 0.5f;
 
             // 4 values per vertex, 4 * 4 = 16
             int firstValue = index * 16;
 
             // 6 indices per sprite
             int firstIndex = index * 6;
-
+            
             if (rotation == 0f)
             {
                 // Lower left
                 vertices[firstValue + 0] = position.X - halfWidth; // Position X
                 vertices[firstValue + 1] = position.Y - halfHeight; // Position Y
                 vertices[firstValue + 2] = uv1.X; // UV X
-                vertices[firstValue + 3] = uv1.Y; // UV Y
+                vertices[firstValue + 3] = uv2.Y; // UV Y
 
                 // Lower right
                 vertices[firstValue + 4] = position.X + halfWidth; // Position X
                 vertices[firstValue + 5] = position.Y - halfHeight; // Position Y
                 vertices[firstValue + 6] = uv2.X; // UV X
-                vertices[firstValue + 7] = uv1.Y; // UV Y
+                vertices[firstValue + 7] = uv2.Y; // UV Y
 
                 // Upper right
                 vertices[firstValue + 8] = position.X + halfWidth; // Position X
                 vertices[firstValue + 9] = position.Y + halfHeight; // Position Y
                 vertices[firstValue + 10] = uv2.X; // UV X
-                vertices[firstValue + 11] = uv2.Y; // UV Y
+                vertices[firstValue + 11] = uv1.Y; // UV Y
 
                 // Upper left
                 vertices[firstValue + 12] = position.X - halfWidth; // Position X
                 vertices[firstValue + 13] = position.Y + halfHeight; // Position Y
                 vertices[firstValue + 14] = uv1.X; // UV X
-                vertices[firstValue + 15] = uv2.Y; // UV Y
+                vertices[firstValue + 15] = uv1.Y; // UV Y
             }
             else
             {
                 // Rotate if necessary
                 float cos = (float)System.Math.Cos(rotation);
                 float sin = (float)System.Math.Sin(rotation);
-
+                
                 // Lower left
-                vertices[firstValue + 0] = position.X - halfWidth * sin + halfHeight * cos; // Position X
-                vertices[firstValue + 1] = position.Y - halfWidth * cos - halfHeight * sin; // Position Y
+                vertices[firstValue + 0] = position.X - halfWidth * sin - halfHeight * cos; // Position X
+                vertices[firstValue + 1] = position.Y - halfWidth * cos + halfHeight * sin; // Position Y
                 vertices[firstValue + 2] = uv1.X; // UV X
-                vertices[firstValue + 3] = uv1.Y; // UV Y
+                vertices[firstValue + 3] = uv2.Y; // UV Y
 
                 // Lower right
-                vertices[firstValue + 4] = position.X - halfWidth * sin - halfHeight * cos; // Position X
-                vertices[firstValue + 5] = position.Y - halfWidth * cos + halfHeight * sin; // Position Y
+                vertices[firstValue + 4] = position.X - halfWidth * sin + halfHeight * cos; // Position X
+                vertices[firstValue + 5] = position.Y - halfWidth * cos - halfHeight * sin; // Position Y
                 vertices[firstValue + 6] = uv2.X; // UV X
-                vertices[firstValue + 7] = uv1.Y; // UV Y
+                vertices[firstValue + 7] = uv2.Y; // UV Y
 
                 // Upper right
-                vertices[firstValue + 8] = position.X + halfWidth * sin - halfHeight * cos; // Position X
-                vertices[firstValue + 9] = position.Y + halfWidth * cos + halfHeight * sin; // Position Y
+                vertices[firstValue + 8] = position.X + halfWidth * sin + halfHeight * cos; // Position X
+                vertices[firstValue + 9] = position.Y + halfWidth * cos - halfHeight * sin; // Position Y
                 vertices[firstValue + 10] = uv2.X; // UV X
-                vertices[firstValue + 11] = uv2.Y; // UV Y
+                vertices[firstValue + 11] = uv1.Y; // UV Y
 
                 // Upper left
-                vertices[firstValue + 12] = position.X + halfWidth * sin + halfHeight * cos; // Position X
-                vertices[firstValue + 13] = position.Y + halfWidth * cos - halfHeight * sin; // Position Y
+                vertices[firstValue + 12] = position.X + halfWidth * sin - halfHeight * cos; // Position X
+                vertices[firstValue + 13] = position.Y + halfWidth * cos + halfHeight * sin; // Position Y
                 vertices[firstValue + 14] = uv1.X; // UV X
-                vertices[firstValue + 15] = uv2.Y; // UV Y
+                vertices[firstValue + 15] = uv1.Y; // UV Y
             }
 
             // 4 vertices per sprite
@@ -214,7 +214,7 @@ namespace Modulus2D.Graphics
         /// <summary>
         /// Renders the current sprites and resets
         /// </summary>
-        public void End()
+        public void Flush()
         {
             // Update camera
             shader.Set(viewProj, camera.Update());
@@ -239,46 +239,22 @@ namespace Modulus2D.Graphics
         
         public void Draw(Texture texture, Vector2 position)
         {
-            Draw(texture, position, new Vector2(1f, 1f), new Vector2(0f, 0f), new Vector2(1f, 1f), 0f);
+            Draw(texture, position, Vector2.One, Vector2.Zero, Vector2.One, 0f);
         }
 
         public void Draw(Texture texture, Vector2 position, float rotation)
         {
-            Draw(texture, position, new Vector2(1f, 1f), new Vector2(0f, 0f), new Vector2(1f, 1f), rotation);
+            Draw(texture, position, Vector2.One, Vector2.Zero, Vector2.One, rotation);
         }
 
         public void Draw(Texture texture, Vector2 position, Vector2 scale)
         {
-            Draw(texture, position, scale, new Vector2(0f, 0f), new Vector2(1f, 1f), 0f);
+            Draw(texture, position, scale, Vector2.Zero, Vector2.One, 0f);
         }
 
         public void Draw(Texture texture, Vector2 position, Vector2 scale, float rotation)
         {
-            Draw(texture, position, scale, new Vector2(0f, 0f), new Vector2(1f, 1f), rotation);
+            Draw(texture, position, scale, Vector2.Zero, Vector2.One, rotation);
         }
-
-        /*
-        /// <summary>
-        /// Draws an array to 
-        /// </summary>
-        /// <param name="texture"></param>
-        /// <param name="position"></param>
-        /// <param name="uv1"></param>
-        /// <param name="uv2"></param>
-        /// <param name="array"></param>
-        public static void DrawArray(Texture texture, Vector2 position, Vector2 uv1, Vector2 uv2, VertexArray array)
-        {
-            float halfWidth = 32f * PixelsToMeters * 0.5f;
-            float halfHeight = 32f * PixelsToMeters * 0.5f;
-
-            array.Append(new Vertex(new Vector2f(position.X - halfWidth,
-                                                        position.Y - halfHeight), new Vector2f(uv1.X, uv1.Y)));
-            array.Append(new Vertex(new Vector2f(position.X + halfWidth,
-                                                        position.Y - halfHeight), new Vector2f(uv2.X, uv1.Y)));
-            array.Append(new Vertex(new Vector2f(position.X + halfWidth,
-                                                        position.Y + halfHeight), new Vector2f(uv2.X, uv2.Y)));
-            array.Append(new Vertex(new Vector2f(position.X - halfWidth,
-                                                        position.Y + halfHeight), new Vector2f(uv1.X, uv2.Y)));
-        }*/
     }
 }

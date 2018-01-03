@@ -35,10 +35,5 @@ namespace Modulus2D.Input
                 }
             }
         }
-
-        /*public void Reset()
-        {
-            Active = false;
-        }*/
     }
 }

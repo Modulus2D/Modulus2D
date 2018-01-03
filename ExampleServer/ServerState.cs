@@ -27,7 +27,7 @@ namespace ExampleServer
             PhysicsSystem physicsSystem = new PhysicsSystem();
             world.AddSystem(physicsSystem);
 
-            /*// Add map system
+            // Add map system
             MapSystem maps = new MapSystem()
             {
                 Priority = -1 // Render map last
@@ -37,9 +37,8 @@ namespace ExampleServer
             // Load map
             Entity map = world.Create();
             map.AddComponent(new TransformComponent());
-            map.AddComponent(new Rigidbody());
-            map.GetComponent<Rigidbody>().Body.IsStatic = true;
-            map.AddComponent(new MapComponent("Maps/Test.tmx"));*/
+            map.AddComponent(new PhysicsComponent());
+            map.AddComponent(new MapComponent("Maps/Test.tmx"));
 
             // Add player system
             PlayerSystem playerSystem = new PlayerSystem(physicsSystem);

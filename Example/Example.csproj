@@ -55,9 +55,6 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="FarseerPhysics, Version=3.5.0.38023, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\FarseerPhysics.3.5.0\lib\NET40\FarseerPhysics.dll</HintPath>
-    </Reference>
     <Reference Include="Lidgren.Network, Version=2012.1.7.0, Culture=neutral, PublicKeyToken=null" />
     <Reference Include="sfmlnet-audio-2">
       <HintPath>..\Dependencies\SFML\sfmlnet-audio-2.dll</HintPath>
@@ -93,9 +90,17 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Math\Math.csproj">
+      <Project>{494B76B4-24AF-4D63-90D9-2B16DDA9A434}</Project>
+      <Name>Math</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Modulus2D\Modulus2D.csproj">
       <Project>{e72b2608-5855-4e98-bed6-48de097c10f7}</Project>
       <Name>Modulus2D</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Physics\Physics.csproj">
+      <Project>{F43A0C47-3521-44FB-82F4-A5D2E37F952E}</Project>
+      <Name>Physics</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

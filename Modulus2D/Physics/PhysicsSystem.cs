@@ -23,10 +23,11 @@ namespace Modulus2D.Physics
         private float accumulator = 0f;
         
         public float StepTime { get => stepTime; set => stepTime = value; }
+        public World PhysicsWorld { get => physicsWorld; set => physicsWorld = value; }
 
         public PhysicsSystem()
         {
-            physicsWorld = new World(Vector2.Convert(new Vector2(0f, 9.8f)));
+            PhysicsWorld = new World(new Vector2(0f, -9.8f));
         }
 
         public override void OnAdded()
@@ -41,22 +42,13 @@ namespace Modulus2D.Physics
             World.AddCreatedListener<PhysicsComponent>(entity =>
             {
                 PhysicsComponent rigidbody = rigidbodyComponents.Get(entity);
-                rigidbody.Init(physicsWorld);
+                rigidbody.Init(PhysicsWorld);
             });
             World.AddRemovedListener<PhysicsComponent>(entity =>
             {
                 PhysicsComponent rigidbody = rigidbodyComponents.Get(entity);
-                physicsWorld.RemoveBody(rigidbody.Body);
+                PhysicsWorld.RemoveBody(rigidbody.Body);
             });
-        }
-
-        public void Raycast(Vector2 point1, Vector2 point2, RaycastCallback callback)
-        {
-            physicsWorld.RayCast((fixture, point, normal, fraction) =>
-            {
-                callback(fixture != null, Vector2.Convert(point), Vector2.Convert(normal), fraction);
-                return fraction;
-            }, Vector2.Convert(point1), Vector2.Convert(point2));
         }
 
         public override void Update(float deltaTime)
@@ -66,7 +58,7 @@ namespace Modulus2D.Physics
 
             while (accumulator >= StepTime)
             {
-                physicsWorld.Step(StepTime);
+                PhysicsWorld.Step(StepTime);
                 accumulator -= StepTime;
             }
 
@@ -74,13 +66,13 @@ namespace Modulus2D.Physics
             foreach (int id in World.Iterate(filter))
             {
                 TransformComponent transform = transformComponents.Get(id);
-                PhysicsComponent rigidbody = rigidbodyComponents.Get(id);
+                Body body = rigidbodyComponents.Get(id).Body;
 
                 // Lerp body position
-                transform.Position += (rigidbody.Position - transform.Position) * accumulator / StepTime;
+                transform.Position += (new Vector2(body.Position.X, body.Position.Y) - transform.Position) * accumulator / StepTime;
 
                 // TODO: Negative rotation?
-                transform.Rotation += (-rigidbody.Rotation - transform.Rotation) * accumulator / StepTime;
+                transform.Rotation += (-body.Rotation - transform.Rotation) * accumulator / StepTime;
             }
         }
     }

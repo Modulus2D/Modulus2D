@@ -5,6 +5,7 @@ using FarseerPhysics.Factories;
 using Modulus2D.Entities;
 using Modulus2D.Network;
 using Lidgren.Network;
+using Microsoft.Xna.Framework;
 using Modulus2D.Math;
 
 namespace Modulus2D.Physics
@@ -70,6 +71,7 @@ namespace Modulus2D.Physics
         public Fixture CreateBox(float width, float height, Vector2 position, float density, float angle = 0f)
         {
             Shape shape = new PolygonShape(PolygonTools.CreateRectangle(width / 2f, height / 2f, new Vector2(position.X, position.Y), angle), density);
+            
             return CreateFixture(shape);
         }
 

@@ -1,20 +1,24 @@
-﻿using Modulus2D.Entities;
+﻿using FarseerPhysics.Collision.Shapes;
+using FarseerPhysics.Common;
+using Modulus2D.Entities;
 using Modulus2D.Graphics;
+using Modulus2D.Math;
 using Modulus2D.Physics;
+using System;
 using System.Collections.Generic;
 using TiledSharp;
 
 namespace Modulus2D.Map
 {
-    /*public class MapSystem : EntitySystem
+    public class MapSystem : EntitySystem
     {
-        // TODO: Seperate MapSystem and MapRenderSystem classes?
-        private bool render = false;
-
-        private List<MapComponent> maps = new List<MapComponent>();
-        private List<Rigidbody> rigidbodyComponents = new List<Rigidbody>();
+        private EntityFilter filter;
+        private ComponentStorage<MapComponent> mapComponents;
+        private ComponentStorage<PhysicsComponent> physicsComponents;
 
         private SpriteBatch batch;
+
+        // private static Vector2 scale = new Vector2(1 / 16f);
 
         public MapSystem()
         {
@@ -22,50 +26,44 @@ namespace Modulus2D.Map
 
         public MapSystem(SpriteBatch batch)
         {
-            render = true;
             this.batch = batch;
         }
 
         public override void OnAdded()
         {
+            mapComponents = World.GetStorage<MapComponent>();
+            physicsComponents = World.GetStorage<PhysicsComponent>();
+
+            filter = new EntityFilter(mapComponents, physicsComponents);
+            
             World.AddCreatedListener<MapComponent>(AddMap);
         }
 
+        /// <summary>
+        /// Reload all maps
+        /// </summary>
         public void ReloadAll()
         {
-            for (int i = 0; i < maps.Count; i++)
+            foreach (int id in World.Iterate(filter))
             {
-                Load(maps[i], rigidbodyComponents[i]);
+                Load(mapComponents.Get(id), physicsComponents.Get(id));
             }
         }
 
         private void AddMap(Entity entity)
         {
-            PhysicsComponent physics = entity.GetComponent<PhysicsComponent>();
-            if (physics == null)
-            {
-                //logger.Error("Attempted to map collider before adding physics");
-                return;
-            }
-
+            PhysicsComponent physics = entity.AddComponent(new PhysicsComponent());
+            physics.Body.BodyType = FarseerPhysics.Dynamics.BodyType.Static;
             MapComponent map = entity.GetComponent<MapComponent>();
 
             // Load map
             Load(map, physics);
-
-            maps.Add(map);
-            rigidbodyComponents.Add(physics);
         }
 
         private void Load(MapComponent map, PhysicsComponent physics)
         {
-            TmxMap tmxMap = new TmxMap(map.Filename);
-
-            // Load tileset
-            TmxTileset tiles = tmxMap.Tilesets[0];
-            
-            // Reset body
-            if (physics.Body != null)
+            // Reset body if reloading
+            if (map.Map != null)
             {
                 for (int i = 0; i < physics.Body.FixtureList.Count; i++)
                 {
@@ -73,99 +71,89 @@ namespace Modulus2D.Map
                 }
             }
 
+            map.Map = new TmxMap(map.Filename);
+
+            // Load tileset
+            map.Tiles = map.Map.Tilesets[0];
+
+            // Constants
+            map.TileWorldWidth = map.Tiles.TileWidth * SpriteBatch.PixelsToMeters;
+            map.TileWorldHeight = map.Tiles.TileHeight * SpriteBatch.PixelsToMeters;
+
             // Add collision
-            foreach (TmxLayer layer in tmxMap.Layers)
+            foreach (TmxLayer layer in map.Map.Layers)
             {
-                foreach (TmxLayerTile tile in tmxMap.Layers[0].Tiles)
+                foreach (TmxLayerTile tile in map.Map.Layers[0].Tiles)
                 {
                     if (tile.Gid != 0)
                     {
                         int frame = tile.Gid - 1;
-                        int columns = tiles.Columns.Value;
-
-                        int column = frame % columns;
-                        int row = (int)System.Math.Floor(frame / (double)columns);
-
-                        float uvX = tiles.TileWidth * column;
-                        float uvY = tiles.TileWidth * row;
 
                         // Add collision if necessary
-                        foreach(TmxTilesetTile group in tiles.Tiles)
+                        foreach(TmxTilesetTile group in map.Tiles.Tiles)
                         {
                             if (group.Id == frame)
                             {
                                 foreach (TmxObject collider in group.ObjectGroups[0].Objects)
                                 {
-                                    float width = (float)collider.Width * (SpriteBatch.PixelsToMeters / 2f);
-                                    float height = (float)collider.Height * (SpriteBatch.PixelsToMeters / 2f);
+                                    float width = (float)collider.Width * (SpriteBatch.PixelsToMeters);
+                                    float height = (float)collider.Height * (SpriteBatch.PixelsToMeters);
                                     float x = (float)collider.X * SpriteBatch.PixelsToMeters;
                                     float y = (float)collider.Y * SpriteBatch.PixelsToMeters;
-
-                                    var shape = new PolygonShape(PolygonTools.CreateRectangle(width, height, new Vector2(tile.X + x, tile.Y + y), 0f), 1f);
-
-                                    physics.Body.CreateFixture(shape);
+                                    
+                                    physics.CreateBox(width, height, new Vector2(tile.X * map.TileWorldWidth + x, -tile.Y * map.TileWorldHeight - y), 1f, 0f);
                                 }
                             }
                         }
                     }
                 }
             }
-            
-            // Draw into array if rendering enabled
-            if (render)
+
+            if (batch != null)
             {
-                map.VertexArray = new VertexArray();
+                map.Texture = new Texture(map.Tiles.Image.Source);
 
-                // Load texture
-                Texture texture = new Texture(tiles.Image.Source);
-
-                foreach (TmxLayer layer in tmxMap.Layers)
-                {
-                    foreach (TmxLayerTile tile in tmxMap.Layers[0].Tiles)
-                    {
-                        if (tile.Gid != 0)
-                        {
-                            int frame = tile.Gid - 1;
-                            int columns = tiles.Columns.Value;
-
-                            int column = frame % columns;
-                            int row = (int)System.Math.Floor(frame / (double)columns);
-
-                            float uvX = tiles.TileWidth * column;
-                            float uvY = tiles.TileWidth * row;
-
-
-                            float halfWidth = 0.5f;
-                            float halfHeight = 0.5f;
-                            
-                            map.Vertices.Add(new Vertex(new Vector2f(tile.X - halfWidth,
-                                                                        tile.Y - halfHeight), new Vector2f(uvX, uvY)));
-                            map.Vertices.Add(new Vertex(new Vector2f(tile.X + halfWidth,
-                                                                        tile.Y - halfHeight), new Vector2f(uvX + tiles.TileWidth, uvY)));
-                            map.Vertices.Add(new Vertex(new Vector2f(tile.X + halfWidth,
-                                                                        tile.Y + halfHeight), new Vector2f(uvX + tiles.TileWidth, uvY + tiles.TileHeight)));
-                            map.Vertices.Add(new Vertex(new Vector2f(tile.X - halfWidth,
-                                                                        tile.Y + halfHeight), new Vector2f(uvX, uvY + tiles.TileHeight)));
-                        }
-                    }
-                }
+                // Constants
+                map.UvUnitX = (float)map.Tiles.TileWidth / map.Texture.Width;
+                map.UvUnitY = (float)map.Tiles.TileHeight / map.Texture.Height;
             }
         }
 
         public override void Update(float deltaTime)
         {
-            if(render)
+            if(batch == null)
             {
-                batch.Begin();
+                return;
+            }
 
-                for (int i = 0; i < maps.Count; i++)
+            foreach (int id in World.Iterate(filter))
+            {
+                MapComponent mc = mapComponents.Get(id);
+                TmxMap map = mc.Map;
+
+                Texture texture = mc.Texture;
+                
+                foreach (TmxLayer layer in map.Layers)
                 {
-                    MapComponent map = maps[i];
-                    batch.Draw(map.Vertices, map.States);
-                }
+                    foreach (TmxLayerTile tile in map.Layers[0].Tiles)
+                    {
+                        if (tile.Gid != 0)
+                        {
+                            int frame = tile.Gid - 1;
+                            int columns = mc.Tiles.Columns.Value;
 
-                batch.End();
+                            int column = frame % columns;
+                            int row = (int)System.Math.Floor(frame / (double)columns);
+
+                            float uvX = column * mc.UvUnitX;
+                            float uvY = row * mc.UvUnitY;
+
+                            batch.Draw(mc.Texture, new Vector2(tile.X * mc.TileWorldWidth, -tile.Y * mc.TileWorldHeight), Vector2.One, 
+                                new Vector2(uvX, uvY), new Vector2(uvX + mc.UvUnitX, uvY + mc.UvUnitY), 0f);
+                        }
+                    }
+                }
             }
         }
-    }*/
+    }
 }

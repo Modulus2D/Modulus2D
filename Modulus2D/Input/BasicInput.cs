@@ -20,9 +20,9 @@ namespace Modulus2D.Input
             if (Keys.TryGetValue(key, out Button pair))
             {
                 pair.active = true;
-            }
 
-            Recalculate();
+                Recalculate();
+            }
         }
 
         public void OnKeyReleased(Keyboard.Key key)
@@ -30,9 +30,9 @@ namespace Modulus2D.Input
             if (Keys.TryGetValue(key, out Button pair))
             {
                 pair.active = false;
-            }
 
-            Recalculate();
+                Recalculate();
+            }
         }
 
         public void OnJoystickButtonPressed(uint button)
@@ -40,9 +40,9 @@ namespace Modulus2D.Input
             if (JoystickButtons.TryGetValue(button, out Button pair))
             {
                 pair.active = true;
-            }
 
-            Recalculate();
+                Recalculate();
+            }
         }
 
         public void OnJoystickButtonReleased(uint button)
@@ -50,9 +50,9 @@ namespace Modulus2D.Input
             if (JoystickButtons.TryGetValue(button, out Button pair))
             {
                 pair.active = false;
-            }
 
-            Recalculate();
+                Recalculate();
+            }
         }
 
         public void AddKey(Keyboard.Key key, float effect)

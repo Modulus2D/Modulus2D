@@ -14,96 +14,113 @@ namespace Modulus2D.Math
         /// <summary>
         /// Origin
         /// </summary>
-        public static Vector2 Zero = new Vector2(0f, 0f);
+        public static Vector2 Zero { get => new Vector2(0f, 0f); }
 
         /// <summary>
         /// One unit in each direction
         /// </summary>
-        public static Vector2 One = new Vector2(1f, 1f);
+        public static Vector2 One { get => new Vector2(1f, 1f); }
 
         /// <summary>
         /// Unit vector pointing in the positive X direction
         /// </summary>
-        public static Vector2 Right = new Vector2(1f, 0f);
+        public static Vector2 Right { get => new Vector2(1f, 0f); }
 
         /// <summary>
         /// Unit vector pointing in the negative X direction
         /// </summary>
-        public static Vector2 Left = new Vector2(-1f, 0f);
+        public static Vector2 Left { get => new Vector2(-1f, 0f); }
 
         /// <summary>
         /// Unit vector pointing in the positive Y direction
         /// </summary>
-        public static Vector2 Up = new Vector2(0f, 1f);
+        public static Vector2 Up { get => new Vector2(0f, 1f); }
 
         /// <summary>
         /// Unit vector pointing in the negative Y direction
         /// </summary>
-        public static Vector2 Down = new Vector2(0f, -1f);
+        public static Vector2 Down { get => new Vector2(0f, -1f); }
 
+        /// <summary>
+        /// Create a 2D vector with each element equal to the given value
+        /// </summary>
+        /// <param name="value"></param>
+        public Vector2(float value)
+        {
+            X = value;
+            Y = value;
+        }
+
+        /// <summary>
+        /// Create a 2D vector with the given elements
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
         public Vector2(float x, float y)
         {
             X = x;
             Y = y;
         }
-
-        // Normalize
-        public Vector2 Normalize()
-        {
-            float length = Length();
-            return new Vector2(X / length, Y / length);
-        }
-
-        // Normalize (static)
-        public static Vector2 Normalize(Vector2 v)
-        {
-            return v.Normalize();
-        }
-
-        // Negate
-        public Vector2 Negate()
-        {
-            return new Vector2(-X, -Y);
-        }
-
+        
         // Negate (static)
         public static Vector2 Negate(Vector2 vec)
         {
-            return new Vector2(-vec.X, -vec.Y);
+            vec.X = -vec.X;
+            vec.Y = -vec.Y;
+
+            return vec;
+        }
+
+        // Normalize
+        public void Normalize()
+        {
+            float length = Length(this);
+            X /= length;
+            Y /= length;
+        }
+
+        // Normalize (static)
+        public static Vector2 Normalize(Vector2 vec)
+        {
+            float length = Length(vec);
+            vec.X /= length;
+            vec.Y /= length;
+
+            return vec;
         }
 
         // Length
         public float Length()
         {
-            return (float)System.Math.Sqrt(LengthSquared());
+            return Length(this);
+        }
+
+        // Length (static)
+        public static float Length(Vector2 vec)
+        {
+            return (float)System.Math.Sqrt(LengthSquared(vec));
         }
 
         // Length squared
         public float LengthSquared()
         {
-            return X * X + Y * Y;
-        }
-
-        // Length (static)
-        public static float Length(Vector2 v)
-        {
-            return v.Length();
+            return LengthSquared(this);
         }
 
         // Length squared (static)
-        public static float LengthSquared(Vector2 v)
+        public static float LengthSquared(Vector2 vec)
         {
-            return v.LengthSquared();
+            return vec.X * vec.X + vec.Y * vec.Y;
         }
 
         public static float Distance(Vector2 vec1, Vector2 vec2)
         {
-            return (vec1 - vec2).Length();
+            return (float)System.Math.Sqrt(DistanceSquared(vec1, vec2));
         }
 
         public static float DistanceSquared(Vector2 vec1, Vector2 vec2)
         {
-            return (vec1 - vec2).LengthSquared();
+            return (vec1.X - vec2.X) * (vec1.X - vec2.X) + (vec1.Y - vec2.Y) * (vec1.Y - vec2.Y);
         }
 
         public static Vector2 Max(Vector2 vec1, Vector2 vec2)
@@ -115,101 +132,77 @@ namespace Modulus2D.Math
         {
             return new Vector2(System.Math.Min(vec1.X, vec2.X), System.Math.Min(vec1.Y, vec2.Y));
         }
-
-        // Vector and vector
-        public Vector2 Add(Vector2 other)
-        {
-            return new Vector2(X + other.X, Y + other.Y);
-        }
-
-        public Vector2 Sub(Vector2 other)
-        {
-            return new Vector2(X - other.X, Y - other.Y);
-        }
-
-        public Vector2 Mul(Vector2 other)
-        {
-            return new Vector2(X * other.X, Y * other.Y);
-        }
-
-        public Vector2 Div(Vector2 other)
-        {
-            return new Vector2(X / other.X, Y / other.Y);
-        }
-
+        
         // Vector and vector (static)
-        public static Vector2 Add(Vector2 v1, Vector2 v2)
+        public static Vector2 Add(Vector2 vec1, Vector2 vec2)
         {
-            return new Vector2(v1.X + v2.X, v1.Y + v2.Y);
+            vec1.X += vec2.X;
+            vec1.Y += vec2.Y;
+
+            return vec1;
         }
 
-        public static Vector2 Sub(Vector2 v1, Vector2 v2)
+        public static Vector2 Sub(Vector2 vec1, Vector2 vec2)
         {
-            return new Vector2(v1.X - v2.X, v1.Y - v2.Y);
+            vec1.X -= vec2.X;
+            vec1.Y -= vec2.Y;
+
+            return vec1;
         }
 
-        public static Vector2 Mul(Vector2 v1, Vector2 v2)
+        public static Vector2 Mul(Vector2 vec1, Vector2 vec2)
         {
-            return new Vector2(v1.X * v2.X, v1.Y * v2.Y);
+            vec1.X *= vec2.X;
+            vec1.Y *= vec2.Y;
+
+            return vec1;
         }
 
-        public static Vector2 Div(Vector2 v1, Vector2 v2)
+        public static Vector2 Div(Vector2 vec1, Vector2 vec2)
         {
-            return new Vector2(v1.X / v2.X, v1.Y / v2.Y);
+            vec1.X /= vec2.X;
+            vec1.Y /= vec2.Y;
+
+            return vec1;
         }
 
         // Vector and scalar
-        public Vector2 Add(float other)
-        {
-            return new Vector2(X + other, Y + other);
-        }
-
-        public Vector2 Sub(float other)
-        {
-            return new Vector2(X - other, Y - other);
-        }
-
-        public Vector2 Mul(float other)
-        {
-            return new Vector2(X * other, Y * other);
-        }
-
-        public Vector2 Div(float other)
-        {
-            return new Vector2(X / other, Y / other);
-        }
-
-        // Vector and scalar (static)
         public static Vector2 Add(Vector2 vec, float other)
         {
-            return new Vector2(vec.X + other, vec.Y + other);
+            vec.X += other;
+            vec.Y += other;
+
+            return vec;
         }
 
         public static Vector2 Sub(Vector2 vec, float other)
         {
-            return new Vector2(vec.X - other, vec.Y - other);
+            vec.X -= other;
+            vec.Y -= other;
+
+            return vec;
         }
 
         public static Vector2 Mul(Vector2 vec, float other)
         {
-            return new Vector2(vec.X * other, vec.Y * other);
+            vec.X *= other;
+            vec.Y *= other;
+
+            return vec;
         }
 
         public static Vector2 Div(Vector2 vec, float other)
         {
-            return new Vector2(vec.X / other, vec.Y / other);
-        }
+            vec.X /= other;
+            vec.Y /= other;
 
-        // Dot product
-        public float Dot(Vector2 other)
-        {
-            return X * other.X + Y * other.Y;
+            return vec;
         }
-
+        
         // Dot product (static)
         public static float Dot(Vector2 vec1, Vector2 vec2)
         {
-            return vec1.Dot(vec2);
+            return vec1.X * vec2.X + vec1.Y * vec2.Y;
         }
 
         // Equals
@@ -229,72 +222,72 @@ namespace Modulus2D.Math
         }
 
         // Vector and vector
-        public static Vector2 operator +(Vector2 v1, Vector2 v2)
+        public static Vector2 operator +(Vector2 vec1, Vector2 vec2)
         {
-            return Add(v1, v2);
+            return Add(vec1, vec2);
         }
 
-        public static Vector2 operator -(Vector2 v1, Vector2 v2)
+        public static Vector2 operator -(Vector2 vec1, Vector2 vec2)
         {
-            return Sub(v1, v2);
+            return Sub(vec1, vec2);
         }
 
-        public static Vector2 operator *(Vector2 v1, Vector2 v2)
+        public static Vector2 operator *(Vector2 vec1, Vector2 vec2)
         {
-            return Mul(v1, v2);
+            return Mul(vec1, vec2);
         }
 
-        public static Vector2 operator /(Vector2 v1, Vector2 v2)
+        public static Vector2 operator /(Vector2 vec1, Vector2 vec2)
         {
-            return Div(v1, v2);
+            return Div(vec1, vec2);
         }
 
         // Vector and scalar
-        public static Vector2 operator +(Vector2 v1, float f)
+        public static Vector2 operator +(Vector2 vec1, float f)
         {
-            return Add(v1, f);
+            return Add(vec1, f);
         }
 
-        public static Vector2 operator -(Vector2 v1, float f)
+        public static Vector2 operator -(Vector2 vec1, float f)
         {
-            return Sub(v1, f);
+            return Sub(vec1, f);
         }
 
-        public static Vector2 operator *(Vector2 v1, float f)
+        public static Vector2 operator *(Vector2 vec1, float f)
         {
-            return Mul(v1, f);
+            return Mul(vec1, f);
         }
 
-        public static Vector2 operator /(Vector2 v1, float f)
+        public static Vector2 operator /(Vector2 vec1, float f)
         {
-            return Div(v1, f);
+            return Div(vec1, f);
         }
 
         // Flipped
-        public static Vector2 operator +(float f, Vector2 v1)
+        public static Vector2 operator +(float f, Vector2 vec1)
         {
-            return Add(v1, f);
+            return Add(vec1, f);
         }
 
-        public static Vector2 operator -(float f, Vector2 v1)
+        public static Vector2 operator -(float f, Vector2 vec1)
         {
-            return Sub(v1, f);
+            return Sub(vec1, f);
         }
 
-        public static Vector2 operator *(float f, Vector2 v1)
+        public static Vector2 operator *(float f, Vector2 vec1)
         {
-            return Mul(v1, f);
+            return Mul(vec1, f);
         }
 
-        public static Vector2 operator /(float f, Vector2 v1)
+        public static Vector2 operator /(float f, Vector2 vec1)
         {
-            return Div(v1, f);
+            return Div(vec1, f);
         }
 
         // Negate
-        public static Vector2 operator -(Vector2 v1)
+        public static Vector2 operator -(Vector2 vec)
         {
-            return v1.Negate();
+            return Negate(vec);
         }
     }
 }

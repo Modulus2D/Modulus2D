@@ -1,10 +1,14 @@
 ﻿using Example;
+using FarseerPhysics.Dynamics;
 using Modulus2D.Core;
 using Modulus2D.Entities;
 using Modulus2D.Graphics;
 using Modulus2D.Input;
+using Modulus2D.Map;
+using Modulus2D.Math;
 using Modulus2D.Network;
 using Modulus2D.Physics;
+using Modulus2D.Utility;
 using SFML.Window;
 using System;
 
@@ -13,6 +17,7 @@ namespace ExampleGame
     class GameState : State
     {
         private EntityWorld world;
+        private SpriteBatch batch;
         private ClientSystem clientSystem;
 
         public override void Start()
@@ -24,10 +29,15 @@ namespace ExampleGame
             {
                 Priority = -1
             };
-            world.AddSystem(physicsSystem);          
+            world.AddSystem(physicsSystem);
+
+            // Camera
+            OrthoCamera camera = new OrthoCamera(Graphics.Width, Graphics.Height);
+
+            // Sprite bacth
+            batch = new SpriteBatch(Graphics, camera);
 
             // Add sprite system
-            SpriteBatch batch = new SpriteBatch(Graphics);
             SpriteSystem spriteSystem = new SpriteSystem(batch)
             {
                 Priority = -2
@@ -35,26 +45,24 @@ namespace ExampleGame
             world.AddSystem(spriteSystem);
 
             // Add map system
-            //MapSystem maps = new MapSystem(batch);
-            //world.AddSystem(maps);
+            MapSystem mapSystem = new MapSystem(batch);
+            world.AddSystem(mapSystem);
             
             // Load map
-            /*Entity map = world.Create();
+            Entity map = world.Create();
             map.AddComponent(new TransformComponent());
-            map.AddComponent(new Rigidbody());
-            map.GetComponent<Rigidbody>().IsStatic = true;
-            map.AddComponent(new MapComponent("Maps/Test.tmx"));*/
+            map.AddComponent(new PhysicsComponent());
+            map.AddComponent(new MapComponent("Maps/Test.tmx"));
 
             // Create debug system
             OneShotInput reload = new OneShotInput();
             Input.Add(reload);
 
             reload.AddKey(Keyboard.Key.R, 1f);
-
-            //world.AddSystem(new DebugSystem(maps, reload));
+            world.AddSystem(new DebugSystem(mapSystem, reload));
 
             // Create camera
-            batch.Camera.Size = 10f;
+            camera.Size = 8f;
 
             // Add player system
             PlayerSystem playerSystem = new PlayerSystem(physicsSystem);
@@ -79,14 +87,32 @@ namespace ExampleGame
             world.AddSystem(new PlayerInputSystem(moveX, jump));
 
             // Add camera system
-            CameraSystem cameraSystem = new CameraSystem(batch.Camera);
+            CameraSystem cameraSystem = new CameraSystem(camera);
             world.AddSystem(cameraSystem);
 
             // Add client system
             clientSystem = new ClientSystem("127.0.0.1", 14357);
             world.AddSystem(clientSystem);
+            
+            Entity entity = world.Create();
+            entity.AddComponent(new TransformComponent());
 
-            clientSystem.RegisterEntity("player", (entity, args) =>
+            PlayerComponent player = new PlayerComponent();
+            entity.AddComponent(player);
+
+            // Add graphics
+            SpriteRendererComponent sprites = new SpriteRendererComponent();
+            sprites.AddSprite(new Texture("Textures/Wheel.png"));
+            sprites.AddSprite(new Texture("Textures/Face.png"));
+            entity.AddComponent(sprites);
+
+            Body body = entity.GetComponent<PhysicsComponent>().Body;
+            body.Position = new Vector2(0f, 10f);
+
+            cameraSystem.targets.Add(entity.GetComponent<TransformComponent>());
+            entity.AddComponent(new PlayerInputComponent());
+
+            /*clientSystem.RegisterEntity("player", (entity, args) =>
             {
                 entity.AddComponent(new TransformComponent());
 
@@ -99,12 +125,12 @@ namespace ExampleGame
                 sprites.AddSprite(new Texture("Textures/Face.png"));
                 entity.AddComponent(sprites);
                 
-                PhysicsComponent rigidbody = entity.GetComponent<PhysicsComponent>();
-                rigidbody.Mode = PhysicsComponent.NetMode.Interpolate;
+                PhysicsComponent physics = entity.GetComponent<PhysicsComponent>();
+                physics.Mode = PhysicsComponent.NetMode.Interpolate;
 
                 NetComponent network = entity.GetComponent<NetComponent>();
 
-                network.AddReceiver(rigidbody);
+                network.AddReceiver(physics);
             });
 
             clientSystem.RegisterEvent("control", (args) =>
@@ -119,7 +145,7 @@ namespace ExampleGame
 
                 entity.GetComponent<PhysicsComponent>().Mode = PhysicsComponent.NetMode.Predict;
                 entity.GetComponent<NetComponent>().AddTransmitter(entity.GetComponent<PlayerComponent>());
-            });
+            });*/
 
             world.AddSystem(new ClientPhysicsSystem(clientSystem));
             
@@ -128,13 +154,20 @@ namespace ExampleGame
         }
 
         public override void Update(float deltaTime)
-        {            
+        {         
+            // Update world
             world.Update(deltaTime);
+
+            // Render world
+            world.Render(deltaTime);
+
+            // Render last batch
+            batch.Flush();
         }
 
         public override void Close()
         {
-            //clientSystem.Disconnect();  
+            clientSystem.Disconnect();
         }
     }
 }

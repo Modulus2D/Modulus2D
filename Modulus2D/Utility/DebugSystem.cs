@@ -12,11 +12,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Modulus2D.Core
+namespace Modulus2D.Utility
 {
     public class DebugSystem : EntitySystem
     {
-        /*private MapSystem mapSystem;
+        private MapSystem mapSystem;
         // private TextComponent text;
         private OneShotInput reload;
 
@@ -25,21 +25,22 @@ namespace Modulus2D.Core
             this.mapSystem = mapSystem;
             this.reload = reload;
 
-            Entity textEntity = World.Create();
+            // Move this to OnAdded()
+            // Entity textEntity = World.Create();
 
-            Font font = new Font("Resources/Fonts/Inconsolata-Regular.ttf");
-            text = new TextComponent(font);
-            textEntity.AddComponent(text);
+            // Font font = new Font("Resources/Fonts/Inconsolata-Regular.ttf");
+            // text = new TextComponent(font);
+            // textEntity.AddComponent(text);
         }
-
+        
         public override void Update(float deltaTime)
         {
-            // Disabled until console is implemented            
+            // Disabled until console is implemented
             if (reload.Active)
             {
                 Console.WriteLine("Reload");
                 mapSystem.ReloadAll();
             }
-        }*/
+        }
     }
 }

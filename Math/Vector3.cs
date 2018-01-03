@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace Modulus2D.Math
 {
+    // TODO: WRITE UNIT TESTS!
     public struct Vector3 : IEquatable<Vector3>
     {
         public float X;
@@ -15,67 +16,65 @@ namespace Modulus2D.Math
         /// <summary>
         /// Origin
         /// </summary>
-        public static Vector3 Zero = new Vector3(0f, 0f, 0f);
+        public static Vector3 Zero { get => new Vector3(0f, 0f, 0f); }
 
         /// <summary>
         /// One unit in each direction
         /// </summary>
-        public static Vector3 One = new Vector3(1f, 1f, 0f);
+        public static Vector3 One { get => new Vector3(1f, 1f, 1f); }
 
         /// <summary>
         /// Unit vector pointing in the positive X direction
         /// </summary>
-        public static Vector3 Right = new Vector3(1f, 0f, 0f);
+        public static Vector3 Right { get => new Vector3(1f, 0f, 0f); }
 
         /// <summary>
         /// Unit vector pointing in the negative X direction
         /// </summary>
-        public static Vector3 Left = new Vector3(-1f, 0f, 0f);
+        public static Vector3 Left { get => new Vector3(-1f, 0f, 0f); }
 
         /// <summary>
         /// Unit vector pointing in the positive Y direction
         /// </summary>
-        public static Vector3 Up = new Vector3(0f, 1f, 0f);
+        public static Vector3 Up { get => new Vector3(0f, 1f, 0f); }
 
         /// <summary>
         /// Unit vector pointing in the negative Y direction
         /// </summary>
-        public static Vector3 Down = new Vector3(0f, -1f, 0f);
+        public static Vector3 Down { get => new Vector3(0f, -1f, 0f); }
 
         /// <summary>
         /// Unit vector pointing in the positive Z direction
         /// </summary>
-        public static Vector3 Forward = new Vector3(0f, 0f, 1f);
+        public static Vector3 Forward { get => new Vector3(0f, 0f, 1f); }
 
         /// <summary>
         /// Unit vector pointing in the negative Z direction
         /// </summary>
-        public static Vector3 Backward = new Vector3(0f, 0f, -1f);
+        public static Vector3 Backward { get => new Vector3(0f, 0f, -1f); }
 
+        /// <summary>
+        /// Create a 3D vector with each element equal to the given value
+        /// </summary>
+        /// <param name="value"></param>
+        public Vector3(float value)
+        {
+            X = value;
+            Y = value;
+            Z = value;
+        }
+
+        /// <summary>
+        /// Create a 3D vector with the given elements
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <param name="z"></param>
         public Vector3(float x, float y, float z)
         {
             X = x;
             Y = y;
             Z = z;
-        }
-
-        // Normalize
-        public Vector3 Normalize()
-        {
-            float length = Length();
-            return new Vector3(X / length, Y / length, Z / length);
-        }
-
-        // Normalize (static)
-        public static Vector3 Normalize(Vector3 v)
-        {
-            return v.Normalize();
-        }
-
-        // Negate
-        public Vector3 Negate()
-        {
-            return new Vector3(-X, -Y, -Z);
         }
 
         // Negate (static)
@@ -84,10 +83,32 @@ namespace Modulus2D.Math
             return new Vector3(-vec.X, -vec.Y, -vec.Z);
         }
 
+        // Normalize
+        public void Normalize()
+        {
+            float length = Length(this);
+            X /= length;
+            Y /= length;
+            Z /= length;
+        }
+
+        // Normalize (static)
+        public static Vector3 Normalize(Vector3 vec)
+        {
+            vec.Normalize();
+            return vec;
+        }
+
         // Length
         public float Length()
         {
             return (float)System.Math.Sqrt(LengthSquared());
+        }
+
+        // Length (static)
+        public static float Length(Vector3 vec)
+        {
+            return vec.Length();
         }
 
         // Length squared
@@ -96,26 +117,20 @@ namespace Modulus2D.Math
             return X * X + Y * Y + Z * Z;
         }
 
-        // Length (static)
-        public static float Length(Vector3 v)
-        {
-            return v.Length();
-        }
-
         // Length squared (static)
-        public static float LengthSquared(Vector3 v)
+        public static float LengthSquared(Vector3 vec)
         {
-            return v.LengthSquared();
+            return vec.LengthSquared();
         }
 
         public static float Distance(Vector3 vec1, Vector3 vec2)
         {
-            return (vec1 - vec2).Length();
+            return (float)System.Math.Sqrt(DistanceSquared(vec1, vec2));
         }
 
         public static float DistanceSquared(Vector3 vec1, Vector3 vec2)
         {
-            return (vec1 - vec2).LengthSquared();
+            return (vec1.X - vec2.X) * (vec1.X - vec2.X) + (vec1.Y - vec2.Y) * (vec1.Y - vec2.Y) + (vec1.Z - vec2.Z) * (vec1.Z - vec2.Z);
         }
 
         public static Vector3 Max(Vector3 vec1, Vector3 vec2)
@@ -128,46 +143,41 @@ namespace Modulus2D.Math
             return new Vector3(System.Math.Min(vec1.X, vec2.X), System.Math.Min(vec1.Y, vec2.Y), System.Math.Min(vec1.Z, vec2.Z));
         }
 
-        // Vector and vector
-        public Vector3 Add(Vector3 other)
-        {
-            return new Vector3(X + other.X, Y + other.Y, Z + other.Z);
-        }
-
-        public Vector3 Sub(Vector3 other)
-        {
-            return new Vector3(X - other.X, Y - other.Y, Z - other.Z);
-        }
-
-        public Vector3 Mul(Vector3 other)
-        {
-            return new Vector3(X * other.X, Y * other.Y, Z * other.Z);
-        }
-
-        public Vector3 Div(Vector3 other)
-        {
-            return new Vector3(X / other.X, Y / other.Y, Z / other.Z);
-        }
-
         // Vector and vector (static)
-        public static Vector3 Add(Vector3 v1, Vector3 v2)
+        public static Vector3 Add(Vector3 vec1, Vector3 vec2)
         {
-            return new Vector3(v1.X + v2.X, v1.Y + v2.Y, v1.Z + v2.Z);
+            vec1.X += vec2.X;
+            vec1.Y += vec2.Y;
+            vec1.Z += vec2.Z;
+
+            return vec1;
         }
 
-        public static Vector3 Sub(Vector3 v1, Vector3 v2)
+        public static Vector3 Sub(Vector3 vec1, Vector3 vec2)
         {
-            return new Vector3(v1.X - v2.X, v1.Y - v2.Y, v1.Z - v2.Z);
+            vec1.X -= vec2.X;
+            vec1.Y -= vec2.Y;
+            vec1.Z -= vec2.Z;
+
+            return vec1;
         }
 
-        public static Vector3 Mul(Vector3 v1, Vector3 v2)
+        public static Vector3 Mul(Vector3 vec1, Vector3 vec2)
         {
-            return new Vector3(v1.X * v2.X, v1.Y * v2.Y, v1.Z * v2.Z);
+            vec1.X *= vec2.X;
+            vec1.Y *= vec2.Y;
+            vec1.Z *= vec2.Z;
+
+            return vec1;
         }
 
-        public static Vector3 Div(Vector3 v1, Vector3 v2)
+        public static Vector3 Div(Vector3 vec1, Vector3 vec2)
         {
-            return new Vector3(v1.X / v2.X, v1.Y / v2.Y, v1.Z / v2.Z);
+            vec1.X /= vec2.X;
+            vec1.Y /= vec2.Y;
+            vec1.Z /= vec2.Z;
+
+            return vec1;
         }
 
         // Vector and scalar
@@ -253,72 +263,72 @@ namespace Modulus2D.Math
         }
 
         // Vector and vector
-        public static Vector3 operator +(Vector3 v1, Vector3 v2)
+        public static Vector3 operator +(Vector3 vec1, Vector3 vec2)
         {
-            return Add(v1, v2);
+            return Add(vec1, vec2);
         }
 
-        public static Vector3 operator -(Vector3 v1, Vector3 v2)
+        public static Vector3 operator -(Vector3 vec1, Vector3 vec2)
         {
-            return Sub(v1, v2);
+            return Sub(vec1, vec2);
         }
 
-        public static Vector3 operator *(Vector3 v1, Vector3 v2)
+        public static Vector3 operator *(Vector3 vec1, Vector3 vec2)
         {
-            return Mul(v1, v2);
+            return Mul(vec1, vec2);
         }
 
-        public static Vector3 operator /(Vector3 v1, Vector3 v2)
+        public static Vector3 operator /(Vector3 vec1, Vector3 vec2)
         {
-            return Div(v1, v2);
+            return Div(vec1, vec2);
         }
 
         // Vector and scalar
-        public static Vector3 operator +(Vector3 v1, float f)
+        public static Vector3 operator +(Vector3 vec1, float f)
         {
-            return Add(v1, f);
+            return Add(vec1, f);
         }
 
-        public static Vector3 operator -(Vector3 v1, float f)
+        public static Vector3 operator -(Vector3 vec1, float f)
         {
-            return Sub(v1, f);
+            return Sub(vec1, f);
         }
 
-        public static Vector3 operator *(Vector3 v1, float f)
+        public static Vector3 operator *(Vector3 vec1, float f)
         {
-            return Mul(v1, f);
+            return Mul(vec1, f);
         }
 
-        public static Vector3 operator /(Vector3 v1, float f)
+        public static Vector3 operator /(Vector3 vec1, float f)
         {
-            return Div(v1, f);
+            return Div(vec1, f);
         }
 
         // Flipped
-        public static Vector3 operator +(float f, Vector3 v1)
+        public static Vector3 operator +(float f, Vector3 vec1)
         {
-            return Add(v1, f);
+            return Add(vec1, f);
         }
 
-        public static Vector3 operator -(float f, Vector3 v1)
+        public static Vector3 operator -(float f, Vector3 vec1)
         {
-            return Sub(v1, f);
+            return Sub(vec1, f);
         }
 
-        public static Vector3 operator *(float f, Vector3 v1)
+        public static Vector3 operator *(float f, Vector3 vec1)
         {
-            return Mul(v1, f);
+            return Mul(vec1, f);
         }
 
-        public static Vector3 operator /(float f, Vector3 v1)
+        public static Vector3 operator /(float f, Vector3 vec1)
         {
-            return Div(v1, f);
+            return Div(vec1, f);
         }
 
         // Negate
-        public static Vector3 operator -(Vector3 v1)
+        public static Vector3 operator -(Vector3 vec)
         {
-            return v1.Negate();
+            return Negate(vec);
         }
     }
 }
