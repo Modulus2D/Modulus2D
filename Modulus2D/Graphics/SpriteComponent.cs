@@ -5,37 +5,18 @@ using System.Collections.Generic;
 
 namespace Modulus2D.Graphics
 {
-    public class SpriteRendererComponent : IComponent
+    public class SpriteComponent : IComponent
     {
-        public List<Sprite> sprites = new List<Sprite>();
+        private Texture texture;
+        private Vector2 offset;
 
-        public SpriteRendererComponent()
+        public Texture Texture { get => texture; set => texture = value; }
+        public Vector2 Offset { get => offset; set => offset = value; }
+
+        public SpriteComponent(Texture texture)
         {
-
+            Texture = texture;
+            Offset = Vector2.Zero;
         }
-
-        public void AddSprite(Texture texture)
-        {
-            sprites.Add(new Sprite()
-            {
-                offset = new Vector2(0f, 0f),
-                texture = texture
-            });
-        }
-
-        public void AddSprite(Texture texture, Vector2 offset)
-        {
-            sprites.Add(new Sprite()
-            {
-                offset = offset,
-                texture = texture
-            });
-        }
-    }
-
-    public class Sprite
-    {
-        public Vector2 offset;
-        public Texture texture;
     }
 }

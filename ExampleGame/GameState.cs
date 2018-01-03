@@ -100,10 +100,8 @@ namespace ExampleGame
             PlayerComponent player = new PlayerComponent();
             entity.AddComponent(player);
 
-            // Add graphics
-            SpriteRendererComponent sprites = new SpriteRendererComponent();
-            sprites.AddSprite(new Texture("Textures/Wheel.png"));
-            sprites.AddSprite(new Texture("Textures/Face.png"));
+            // Add wheel graphics
+            SpriteComponent sprites = new SpriteComponent(new Texture("Textures/Wheel.png"));
             entity.AddComponent(sprites);
 
             Body body = entity.GetComponent<PhysicsComponent>().Body;

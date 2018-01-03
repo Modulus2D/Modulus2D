@@ -91,7 +91,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Math\Math.csproj">
-      <Project>{494B76B4-24AF-4D63-90D9-2B16DDA9A434}</Project>
+      <Project>{494b76b4-24af-4d63-90d9-2b16dda9a434}</Project>
       <Name>Math</Name>
     </ProjectReference>
     <ProjectReference Include="..\Modulus2D\Modulus2D.csproj">

@@ -77,6 +77,10 @@
       <Project>{ced56192-b356-4ee0-894a-988b13b896a8}</Project>
       <Name>Example</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Math\Math.csproj">
+      <Project>{494b76b4-24af-4d63-90d9-2b16dda9a434}</Project>
+      <Name>Math</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Modulus2D\Modulus2D.csproj">
       <Project>{e72b2608-5855-4e98-bed6-48de097c10f7}</Project>
       <Name>Modulus2D</Name>
